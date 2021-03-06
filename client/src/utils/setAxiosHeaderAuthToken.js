@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const setAuthToken = token => {
+const setAxiosHeaderAuthToken = token => {
   if (token) {
     // Apply authorization token to every request if logged in
     axios.defaults.headers.common["Authorization"] = token;
@@ -10,4 +10,4 @@ const setAuthToken = token => {
   }
 };
 
-export default setAuthToken;
+export default setAxiosHeaderAuthToken;
