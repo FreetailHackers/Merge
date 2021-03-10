@@ -1,4 +1,4 @@
-import { createServer, Response } from "miragejs";
+import { Response } from "miragejs";
 import jwt from "jsonwebtoken";
 import getRandomElement from '../utils/getRandomElement';
 
@@ -47,36 +47,32 @@ function createInvalidRegisterResponse () {
   return new Response(400, {}, { [invalidError[0]]: invalidError[1] });
 }
 
-export function createAuthServer () {
-  createServer({
-    routes() {
-      this.post("/api/users/login", (schema, request) => {
-        const user = JSON.parse(request.requestBody)
+export function addAuthRoutes (server) {
+  server.post("/api/users/login", (schema, request) => {
+    const user = JSON.parse(request.requestBody)
 
-        if (!user.email) {
-          return createIncorrectEmailLoginResponse();
-        }
+    if (!user.email) {
+      return createIncorrectEmailLoginResponse();
+    }
 
-        if (!user.password) {
-          return createIncorrectPasswordLoginResponse();
-        }
+    if (!user.password) {
+      return createIncorrectPasswordLoginResponse();
+    }
 
-        return createSuccessfulLoginResponse();
-      });
+    return createSuccessfulLoginResponse();
+  });
 
-      this.post("/api/users/register", (schema, request) => {
-        const user = JSON.parse(request.requestBody)
+  server.post("/api/users/register", (schema, request) => {
+    const user = JSON.parse(request.requestBody)
 
-        if (!user.name || !user.email || !user.password || !user.password2) {
-          return createInvalidRegisterResponse();
-        }
+    if (!user.name || !user.email || !user.password || !user.password2) {
+      return createInvalidRegisterResponse();
+    }
 
-        if (user.email === "exists") {
-          return createEmailExistsRegisterResponse();
-        }
+    if (user.email === "exists") {
+      return createEmailExistsRegisterResponse();
+    }
 
-        return createSuccessfulRegisterResponse();
-      })
-    },
-  })
+    return createSuccessfulRegisterResponse();
+  });
 }
