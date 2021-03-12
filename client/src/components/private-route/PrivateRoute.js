@@ -3,6 +3,8 @@ import { Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+
+// TODO: more rigorous checks
 const PrivateRoute = ({ component: Component, auth, ...rest }) => (
   <Route
     {...rest}

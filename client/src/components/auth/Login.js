@@ -54,7 +54,6 @@ class Login extends Component {
     return (
       <section>
         <h4>Login below</h4>
-        <p>Don't have an account? <Link to="/register">Register</Link></p>
         <form noValidate onSubmit={this.onSubmit}>
           <div>
             <input
@@ -84,6 +83,7 @@ class Login extends Component {
               {errors.passwordincorrect}
             </span>
           </div>
+          <span>{errors.status}</span>
           <div>
             <button type="submit">Login</button>
           </div>
