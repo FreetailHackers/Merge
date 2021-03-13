@@ -2,14 +2,15 @@ import axios from "axios";
 import setAxiosHeaderAuthToken from "../utils/setAxiosHeaderAuthToken";
 import jwt_decode from "jwt-decode";
 
-import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING } from "./types";
+import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "./types";
 
 // Login - get user token
 export const loginUser = userData => dispatch => {
+  dispatch(setUserLoading())
   axios
     .post("http://localhost:3000/auth/login", userData)
     .then(res => {
-      console.log(res)
+      // console.log(res)
       // Save to localStorage
 
       // Set token to localStorage
@@ -25,32 +26,36 @@ export const loginUser = userData => dispatch => {
       // Set token to Auth header
       setAxiosHeaderAuthToken(token);
       // Decode token to get user data
-      const decoded = jwt_decode(token);
+      const userID = jwt_decode(token);
       // Set current user
-      dispatch(setCurrentUser(decoded));
+      dispatch(setCurrentUser(userID, user));
     })
     .catch(err =>
       {
         // console.log(err.name + ": " + err.message);
         if(err.name === "Error") {
+          dispatch(setUserNotLoading())
           return dispatch({
             type: GET_ERRORS,
             payload: {"status" : err.message}
           })
         }
-        return dispatch({
+        else {
+          dispatch(setUserNotLoading())
+          return dispatch({
             type: GET_ERRORS,
             payload: err.response.data
           })
         }
-      );
+      });
 };
 
 // Set logged in user
-export const setCurrentUser = decoded => {
+export const setCurrentUser = (userID, user) => {
   return {
     type: SET_CURRENT_USER,
-    payload: decoded
+    userID,
+    user
   };
 };
 
@@ -58,6 +63,13 @@ export const setCurrentUser = decoded => {
 export const setUserLoading = () => {
   return {
     type: USER_LOADING
+  };
+};
+
+// User no longer loading
+export const setUserNotLoading = () => {
+  return {
+    type: USER_NOT_LOADING
   };
 };
 

@@ -2,7 +2,8 @@ import jwt_decode from "jwt-decode";
 
 import setAxiosHeaderAuthToken from './setAxiosHeaderAuthToken';
 import store from "../store";
-import { setCurrentUser, logoutUser } from "../actions/authActions";
+import { setCurrentUser, logoutUser, setUserLoading, setUserNotLoading } from "../actions/authActions";
+import axios from "axios";
 
 function isLoginTokenInLocalStorage () {
   return localStorage.jwtToken && localStorage.jwtToken !== "undefined";
@@ -13,8 +14,25 @@ function redirectToLogin () {
 }
 
 function authenticateUserInStore (token) {
-  const decoded = jwt_decode(token);
-  store.dispatch(setCurrentUser(decoded));
+  const userID = jwt_decode(token);
+  // console.log(userID)
+  axios.get("http://localhost:3000/api/users/" + userID).then(
+    (res) => {
+      if(res.data) {
+        const user = res.data;
+        // console.log(user)
+        if(user.status.admitted) {
+          // console.log('user store')
+          store.dispatch(setCurrentUser(userID, user));
+          return;
+        }
+      }
+
+      logoutUserInStore()
+    }).catch(err => logoutUserInStore())
+  // Didn't pass auth test, get me outta here
+
+
 }
 
 function logoutUserInStore () {
@@ -29,6 +47,7 @@ function isTokenExpired (token) {
 }
 
 function initializeAuthIfLoggedIn () {
+  store.dispatch(setUserLoading())
   if (isLoginTokenInLocalStorage()) {
     const token = localStorage.jwtToken;
     setAxiosHeaderAuthToken(token);
@@ -37,6 +56,10 @@ function initializeAuthIfLoggedIn () {
       logoutUserInStore();
     }
   }
+  else {
+    store.dispatch(setUserNotLoading())
+  }
+
 }
 
 export default initializeAuthIfLoggedIn;
