@@ -7,12 +7,13 @@ import store from "./store";
 import { createMockServerIfNotProduction } from './server';
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
-import Navbar from "./components/layout/Navbar";
-import Landing from "./components/layout/Landing";
-import Register from "./components/auth/Register";
-import Login from "./components/auth/Login";
-import PrivateRoute from "./components/private-route/PrivateRoute";
-import Dashboard from "./components/dashboard/Dashboard";
+import Navbar from "./components/Navbar";
+import PrivateRoute from "./components/PrivateRoute";
+
+import Landing from "./pages/Landing";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 import "./App.css";
 
@@ -30,7 +31,7 @@ class App extends Component {
             <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
             <Switch>
-              <PrivateRoute exact path="/dashboard" component={Dashboard} />
+              <PrivateRoute exact path="/dashboard" component={Home} />
             </Switch>
           </div>
         </Router>
