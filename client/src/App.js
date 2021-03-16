@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
 
+import  {createMockServerIfNotProduction}  from "./server/index"
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
 import Navbar from "./components/layout/Navbar";
@@ -24,6 +25,7 @@ class App extends Component {
         <Router>
           <div className="App">
             <Navbar />
+            <div>using {process.env.REACT_APP_API_URL} as API Url</div>
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />

@@ -8,14 +8,15 @@ import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "./
 export const loginUser = userData => dispatch => {
   dispatch(setUserLoading())
   axios
-    .post("http://localhost:3000/auth/login", userData)
+    .post(process.env.REACT_APP_API_URL + "/auth/login", userData)
     .then(res => {
-      // console.log(res)
-      // Save to localStorage
 
       // Set token to localStorage
       const { token, user } = res.data;
+      console.log("token: "+ token);
+      console.log("user: " + JSON.stringify(user));
       const isAdmitted = user.status.admitted;
+      console.log("isAdmitted: " + isAdmitted);
       // Am I admitted?
       if(!isAdmitted) {
         // Get outta here!
@@ -33,20 +34,12 @@ export const loginUser = userData => dispatch => {
     .catch(err =>
       {
         // console.log(err.name + ": " + err.message);
-        if(err.name === "Error") {
-          dispatch(setUserNotLoading())
-          return dispatch({
-            type: GET_ERRORS,
-            payload: {"status" : err.message}
-          })
-        }
-        else {
-          dispatch(setUserNotLoading())
-          return dispatch({
-            type: GET_ERRORS,
-            payload: err.response.data
-          })
-        }
+        dispatch(logoutUser());
+        dispatch(setUserNotLoading());
+        return dispatch({
+          type: GET_ERRORS,
+          payload: {"status" : err.message}
+        });
       });
 };
 

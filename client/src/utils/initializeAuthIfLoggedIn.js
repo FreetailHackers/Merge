@@ -13,17 +13,14 @@ function redirectToLogin () {
   window.location.href = "./login";
 }
 
-function authenticateUserInStore (token) {
-  const userID = jwt_decode(token);
-  // console.log(userID)
-  axios.get("http://localhost:3000/api/users/" + userID).then(
+function authenticateUserInStore(token) {
+  const decoded = jwt_decode(token);
+  axios.get(process.env.REACT_APP_API_URL + "/api/users/" + decoded).then(
     (res) => {
       if(res.data) {
         const user = res.data;
-        // console.log(user)
         if(user.status.admitted) {
-          // console.log('user store')
-          store.dispatch(setCurrentUser(userID, user));
+          store.dispatch(setCurrentUser(decoded, user));
           return;
         }
       }
