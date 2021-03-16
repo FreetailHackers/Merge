@@ -13,10 +13,7 @@ export const loginUser = userData => dispatch => {
 
       // Set token to localStorage
       const { token, user } = res.data;
-      console.log("token: "+ token);
-      console.log("user: " + JSON.stringify(user));
       const isAdmitted = user.status.admitted;
-      console.log("isAdmitted: " + isAdmitted);
       // Am I admitted?
       if(!isAdmitted) {
         // Get outta here!
@@ -33,7 +30,6 @@ export const loginUser = userData => dispatch => {
     })
     .catch(err =>
       {
-        // console.log(err.name + ": " + err.message);
         dispatch(logoutUser());
         dispatch(setUserNotLoading());
         return dispatch({
