@@ -5,7 +5,6 @@ const Landing = () => (
   <section>
     <h2>Landing</h2>
     <p><Link to="/login">login</Link></p>
-    <p><Link to="/register">register</Link></p>
   </section>
 );
 

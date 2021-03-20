@@ -2,51 +2,49 @@ import axios from "axios";
 import setAxiosHeaderAuthToken from "../utils/setAxiosHeaderAuthToken";
 import jwt_decode from "jwt-decode";
 
-import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING } from "./types";
-
-// Register User
-export const registerUser = (userData, history) => dispatch => {
-  axios
-    .post("/api/users/register", userData)
-    .then(res => history.push("/login"))
-    .catch(err =>
-      dispatch({
-        type: GET_ERRORS,
-        payload: err.response.data
-      })
-    );
-};
+import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "./types";
 
 // Login - get user token
 export const loginUser = userData => dispatch => {
+  dispatch(setUserLoading())
   axios
-    .post("/api/users/login", userData)
+    .post(process.env.REACT_APP_API_URL + "/auth/login", userData)
     .then(res => {
-      // Save to localStorage
 
       // Set token to localStorage
-      const { token } = res.data;
+      const { token, user } = res.data;
+      const isAdmitted = user.status.admitted;
+      // Am I admitted?
+      if(!isAdmitted) {
+        // Get outta here!
+        throw new Error("User is not admitted")
+      }
+
       localStorage.setItem("jwtToken", token);
       // Set token to Auth header
       setAxiosHeaderAuthToken(token);
       // Decode token to get user data
-      const decoded = jwt_decode(token);
+      const userID = jwt_decode(token);
       // Set current user
-      dispatch(setCurrentUser(decoded));
+      dispatch(setCurrentUser(userID, user));
     })
     .catch(err =>
-      dispatch({
-        type: GET_ERRORS,
-        payload: err.response.data
-      })
-    );
+      {
+        dispatch(logoutUser());
+        dispatch(setUserNotLoading());
+        return dispatch({
+          type: GET_ERRORS,
+          payload: {"status" : err.message}
+        });
+      });
 };
 
 // Set logged in user
-export const setCurrentUser = decoded => {
+export const setCurrentUser = (userID, user) => {
   return {
     type: SET_CURRENT_USER,
-    payload: decoded
+    userID,
+    user
   };
 };
 
@@ -54,6 +52,13 @@ export const setCurrentUser = decoded => {
 export const setUserLoading = () => {
   return {
     type: USER_LOADING
+  };
+};
+
+// User no longer loading
+export const setUserNotLoading = () => {
+  return {
+    type: USER_NOT_LOADING
   };
 };
 

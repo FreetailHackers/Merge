@@ -1,23 +1,21 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import { Provider } from "react-redux";
 import store from "./store";
 
-import { createMockServerIfNotProduction } from './server';
+import  {createMockServerIfNotProduction}  from "./server/index"
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
-import Navbar from "./components/Navbar";
-import PrivateRoute from "./components/PrivateRoute";
-
-import Landing from "./pages/Landing";
-import Home from "./pages/Home";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
+import Navbar from "./components/layout/Navbar";
+import Landing from "./components/layout/Landing";
+import Login from "./components/auth/Login";
+import PrivateRoute from "./components/private-route/PrivateRoute";
+import Dashboard from "./components/dashboard/Dashboard";
 
 import "./App.css";
 
-createMockServerIfNotProduction();
+// createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -27,12 +25,16 @@ class App extends Component {
         <Router>
           <div className="App">
             <Navbar />
+            <div>using {process.env.REACT_APP_API_URL} as API Url</div>
             <Route exact path="/" component={Landing} />
-            <Route exact path="/register" component={Register} />
             <Route exact path="/login" component={Login} />
+<<<<<<< HEAD
             <Switch>
               <PrivateRoute exact path="/dashboard" component={Home} />
             </Switch>
+=======
+            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+>>>>>>> milestone1-quill-login
           </div>
         </Router>
       </Provider>

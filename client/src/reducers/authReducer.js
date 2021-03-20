@@ -1,11 +1,12 @@
-import { SET_CURRENT_USER, USER_LOADING } from "../actions/types";
+import { SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "../actions/types";
 
 import isEmpty from "is-empty";
 
 const initialState = {
   isAuthenticated: false,
+  userID: null,
   user: {},
-  loading: false
+  loading: true
 };
 
 export default function(state = initialState, action) {
@@ -13,13 +14,20 @@ export default function(state = initialState, action) {
     case SET_CURRENT_USER:
       return {
         ...state,
-        isAuthenticated: !isEmpty(action.payload),
-        user: action.payload
+        isAuthenticated: !isEmpty(action.user),
+        userID: action.userID,
+        user: action.user,
+        loading: false
       };
     case USER_LOADING:
       return {
         ...state,
         loading: true
+      };
+    case USER_NOT_LOADING:
+      return {
+        ...state,
+        loading: false
       };
     default:
       return state;

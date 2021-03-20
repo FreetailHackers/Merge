@@ -1,30 +1,29 @@
 import React, { Component } from "react";
+import { Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { loginUser } from "../actions/authActions";
+import { registerUser } from "../actions/authActions";
 
-class Login extends Component {
+class Register extends Component {
   constructor() {
     super();
     this.state = {
+      name: "",
       email: "",
       password: "",
+      password2: "",
       errors: {}
     };
   }
 
   componentDidMount() {
-    // If logged in and user navigates to Login page, should redirect them to dashboard
+    // If logged in and user navigates to Register page, should redirect them to dashboard
     if (this.props.auth.isAuthenticated) {
       this.props.history.push("/dashboard");
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.auth.isAuthenticated) {
-      this.props.history.push("/dashboard");
-    }
-
     if (nextProps.errors) {
       this.setState({
         errors: nextProps.errors
@@ -39,12 +38,14 @@ class Login extends Component {
   onSubmit = e => {
     e.preventDefault();
 
-    const userData = {
+    const newUser = {
+      name: this.state.name,
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
+      password2: this.state.password2
     };
 
-    this.props.loginUser(userData);
+    this.props.registerUser(newUser, this.props.history);
   };
 
   render() {
@@ -52,8 +53,20 @@ class Login extends Component {
 
     return (
       <section>
-        <h4>Login below</h4>
+        <h4>Register below</h4>
+        <p>Already have an account? <Link to="/login">Log in</Link></p>
         <form noValidate onSubmit={this.onSubmit}>
+          <div>
+            <input
+              onChange={this.onChange}
+              value={this.state.name}
+              error={errors.name}
+              id="name"
+              type="text"
+            />
+            <label htmlFor="name">Name</label>
+            <span>{errors.name}</span>
+          </div>
           <div>
             <input
               onChange={this.onChange}
@@ -63,10 +76,7 @@ class Login extends Component {
               type="email"
             />
             <label htmlFor="email">Email</label>
-            <span>
-              {errors.email}
-              {errors.emailnotfound}
-            </span>
+            <span>{errors.email}</span>
           </div>
           <div>
             <input
@@ -77,14 +87,21 @@ class Login extends Component {
               type="password"
             />
             <label htmlFor="password">Password</label>
-            <span>
-              {errors.password}
-              {errors.passwordincorrect}
-            </span>
+            <span>{errors.password}</span>
           </div>
-          <span>{errors.status}</span>
           <div>
-            <button type="submit">Login</button>
+            <input
+              onChange={this.onChange}
+              value={this.state.password2}
+              error={errors.password2}
+              id="password2"
+              type="password"
+            />
+            <label htmlFor="password2">Confirm Password</label>
+            <span>{errors.password2}</span>
+          </div>
+          <div>
+            <button type="submit">Sign up</button>
           </div>
         </form>
       </section>
@@ -92,19 +109,18 @@ class Login extends Component {
   }
 }
 
-Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth,
-  errors: state.errors,
-  isLoading: state.auth.loading
+  errors: state.errors
 });
 
 export default connect(
   mapStateToProps,
-  { loginUser }
-)(Login);
+  { registerUser }
+)(withRouter(Register));

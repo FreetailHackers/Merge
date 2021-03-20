@@ -1,19 +1,29 @@
 import { Response } from "miragejs";
 import jwt from "jsonwebtoken";
-import getRandomElement from '../utils/getRandomElement';
 
 function createSuccessfulLoginResponse () {
   const payload = {
-    id: 0,
-    name: 'John Doe'
-  };
+    _id : "5f850fa8ce6dafd59eab4f08",
+    profile : { adult : false, skills : [ ], socialMedia : [ ] },
+    confirmation : { dietaryRestrictions : [ ], platforms : [ ] },
+    status : { completedProfile : true, admitted : true, confirmed : true, declined : false, checkedIn : false, reimbursementGiven : false },
+    sponsorFields : { tier : "", workshop : false, estimatedCost : 0 },
+    userAtEvent : { receivedLunch : false, receivedDinner : false, workshopsAttended : [ ], tablesVisited : [ ] },
+    admin : false,
+    sponsor : false,
+    timestamp : 1602555582361,
+    lastUpdated : 1602555582361,
+    verified : true,
+    email : "baz@bar.edu",
+  }
 
-  const token = "Bearer " + jwt.sign(
-    payload,
-    'secret'
+
+  const token = jwt.sign(
+    payload._id,
+    'shhhh super secret code here bro'
   );
 
-  return { token, success: true }
+  return { token, user: payload, success: true }
 }
 
 function createIncorrectEmailLoginResponse () {
@@ -24,31 +34,8 @@ function createIncorrectPasswordLoginResponse () {
   return new Response(400, {}, { passwordincorrect: "Password incorrect" });
 }
 
-function createSuccessfulRegisterResponse () {
-  return { name: 'Jane Doe', email: 'janedoe@example.com', password: 'secure' };
-}
-
-function createEmailExistsRegisterResponse () {
-  return new Response(404, {}, { email: "Email already exists" });
-}
-
-function createInvalidRegisterResponse () {
-  const possibleInvalidErrors = [
-    ["name", "Name field is required"],
-    ["email", "Email field is required"],
-    ["email", "Email is invalid"],
-    ["password", "Password field is required"],
-    ["password2", "Confirm password field is required"],
-    ["password", "Password must be at least 6 characters"],
-    ["password2", "Passwords must match"]
-  ]
-
-  const invalidError = getRandomElement(possibleInvalidErrors);
-  return new Response(400, {}, { [invalidError[0]]: invalidError[1] });
-}
-
-export function addAuthRoutes (server) {
-  server.post("/api/users/login", (schema, request) => {
+export function addAuthRoutes(server) {
+  server.post("auth/login", (schema, request) => {
     const user = JSON.parse(request.requestBody)
 
     if (!user.email) {
@@ -60,19 +47,5 @@ export function addAuthRoutes (server) {
     }
 
     return createSuccessfulLoginResponse();
-  });
-
-  server.post("/api/users/register", (schema, request) => {
-    const user = JSON.parse(request.requestBody)
-
-    if (!user.name || !user.email || !user.password || !user.password2) {
-      return createInvalidRegisterResponse();
-    }
-
-    if (user.email === "exists") {
-      return createEmailExistsRegisterResponse();
-    }
-
-    return createSuccessfulRegisterResponse();
   });
 }
