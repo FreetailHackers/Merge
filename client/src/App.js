@@ -15,7 +15,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 
 import "./App.css";
 
-// createMockServerIfNotProduction();
+createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -28,13 +28,7 @@ class App extends Component {
             <div>using {process.env.REACT_APP_API_URL} as API Url</div>
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
-<<<<<<< HEAD
-            <Switch>
-              <PrivateRoute exact path="/dashboard" component={Home} />
-            </Switch>
-=======
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
->>>>>>> milestone1-quill-login
           </div>
         </Router>
       </Provider>
