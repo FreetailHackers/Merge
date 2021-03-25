@@ -20,7 +20,7 @@ class Dashboard extends Component {
   }
 }
 
-Home.propTypes = {
+Dashboard.propTypes = {
   auth: PropTypes.object.isRequired
 };
 
@@ -33,4 +33,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { logoutUser }
-)(Home);
+)(Dashboard);

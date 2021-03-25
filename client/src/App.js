@@ -7,11 +7,12 @@ import store from "./store";
 import  {createMockServerIfNotProduction}  from "./server/index"
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
-import Navbar from "./components/layout/Navbar";
-import Landing from "./components/layout/Landing";
-import Login from "./components/auth/Login";
-import PrivateRoute from "./components/private-route/PrivateRoute";
-import Dashboard from "./components/dashboard/Dashboard";
+import Navbar from "./components/Navbar";
+import PrivateRoute from "./components/PrivateRoute";
+
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
 import "./App.css";
 
