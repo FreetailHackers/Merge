@@ -1,6 +1,6 @@
 import axios from "axios";
 import setAxiosHeaderAuthToken from "../utils/setAxiosHeaderAuthToken";
-import jwt_decode from "jwt-decode";
+import jwt_decode from "jwt-decode-non-json";
 
 import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "./types";
 
