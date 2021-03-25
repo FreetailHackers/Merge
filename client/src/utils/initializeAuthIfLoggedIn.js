@@ -1,4 +1,4 @@
-import jwt_decode from "jwt-decode";
+import jwt_decode from "jwt-decode-non-json";
 
 import setAxiosHeaderAuthToken from './setAxiosHeaderAuthToken';
 import store from "../store";
