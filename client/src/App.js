@@ -13,6 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Swipe from "./pages/Swipe";
 
 import "./App.css";
 
@@ -30,6 +31,7 @@ class App extends Component {
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <PrivateRoute exact path="/swipe" component={Swipe} />
           </div>
         </Router>
       </Provider>
