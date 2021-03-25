@@ -17,7 +17,7 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "cross-env REACT_APP_API_HOST=$npm_config_api react-scripts start",
+    "start": "cross-env REACT_APP_API_URL=$npm_config_api react-scripts start",
     "owen": "echo $npm_config_api",
     "build": "react-scripts build",
     "test": "react-scripts test",
