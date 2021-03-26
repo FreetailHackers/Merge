@@ -4,26 +4,26 @@ import { connect } from "react-redux";
 import { logoutUser } from "../actions/authActions";
 import { Link } from "react-router-dom";
 
-class Dashboard extends Component {
+class Edit extends Component {
 
   onLogoutClick = e => {
-    e.preventDefault();
-    this.props.logoutUser();
+    this.props.history.push('/dashboard')
   };
 
   render() {
     return (
       <section>
         <p>Welcome home, {JSON.stringify(this.props.user)}</p>
-        <Link to="/swipe">Find team members</Link>
-        <Link to="/edit">Edit profile</Link>
+
+
+
         <button onClick={this.onLogoutClick}>Logout</button>
       </section>
     );
   }
 }
 
-Dashboard.propTypes = {
+Edit.propTypes = {
   auth: PropTypes.object.isRequired
 };
 
@@ -36,4 +36,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { logoutUser }
-)(Dashboard);
+)(Edit);
