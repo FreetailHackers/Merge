@@ -14,7 +14,7 @@ class Database extends Component {
   }
 
   componentDidMount() {
-    axios.get(process.env.REACT_APP_API_URL + "/api/users/", { params: { limit: this.state.limit } }).then(
+    axios.get(process.env.REACT_APP_API_URL + "/users/", { params: { limit: this.state.limit } }).then(
         (res) => {
           if(res.data) {
             this.setState({users: res.data});

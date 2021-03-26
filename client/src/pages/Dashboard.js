@@ -17,6 +17,8 @@ class Dashboard extends Component {
         <p>Welcome home, {JSON.stringify(this.props.user)}</p>
         <Link to="/swipe">Find team members</Link>
         <Link to="/edit">Edit profile</Link>
+        <Link to="/database">View users in database</Link>
+        {this.props.user.admin ? <Link to="/admin">Admin</Link> : null}
         <button onClick={this.onLogoutClick}>Logout</button>
       </section>
     );
