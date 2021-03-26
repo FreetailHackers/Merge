@@ -14,10 +14,43 @@ class Edit extends Component {
     return (
       <section>
         <p>Welcome home, {JSON.stringify(this.props.user)}</p>
+        <form>
+              <label>
+                First Name:
+                <input type="text"/>
+              </label>
+              <label>
+                Last Name:
+                <input type="text"/>
+              </label>
+              <label>
+                School:
+                <input type="text"/>
+              </label>
+              <label>
+                Major:
+                <input type="text"/>
+              </label>
+              <label>
+                Class:
+                <input type="text"/>
+              </label>
+              <label>
+                Skills:
+                <input type="text"/>
+              </label>
+              <label>
+                Experience Level:
+                <input type="text"/>
+              </label>
+              <label>
+                About:
+                <input type="text"/>
+              </label>
+            </form>
 
-
-
-        <button onClick={this.onLogoutClick}>Logout</button>
+        <Link to="/dashboard">Cancel</Link>
+        <button onClick={this.onLogoutClick}>Save</button>
       </section>
     );
   }
