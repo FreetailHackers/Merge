@@ -14,6 +14,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
+import Edit from "./pages/Edit";
 
 import "./App.css";
 
@@ -32,6 +33,7 @@ class App extends Component {
             <Route exact path="/login" component={Login} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
+            <PrivateRoute exact path="/edit" component={Edit} />
           </div>
         </Router>
       </Provider>
