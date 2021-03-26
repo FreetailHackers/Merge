@@ -30,7 +30,7 @@ class App extends Component {
             <div>using {process.env.REACT_APP_API_URL} as API Url</div>
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
-            <Route exact path="/database" component={Database} />
+            <PrivateRoute exact path="/database" component={Database} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
           </div>
         </Router>
