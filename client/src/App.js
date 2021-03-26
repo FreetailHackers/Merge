@@ -13,6 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Database from "./pages/Database";
+import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
@@ -32,6 +33,7 @@ class App extends Component {
             <div>using {process.env.REACT_APP_API_URL} as API Url</div>
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
+            <PrivateRoute exact path="/admin" component={Admin} />
             <PrivateRoute exact path="/database" component={Database} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
