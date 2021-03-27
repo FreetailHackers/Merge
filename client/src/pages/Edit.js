@@ -9,7 +9,6 @@ import userProfileFields from "../content/userProfileFields.json"
 class Edit extends Component {
   
   handleSubmit = (event) => {
-    console.log(this.baseState)
     event.preventDefault()
     this.setState({
       bgColor: "red"
