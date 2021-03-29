@@ -8,4 +8,8 @@ export function addUserRoutes (server) {
   server.get("user/", (schema, request) => {
     return generateUser();
   });
+
+  server.post("user/", (schema, { requestBody: { auth, user} }) => {
+    return "ok";
+  });
 }
