@@ -5,20 +5,19 @@ import { logoutUser, setCurrentUser } from "../actions/authActions";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import userProfileFields from "../content/userProfileFields.json"
-import loadGif from '../assets/loading.gif'
 
 class Edit extends Component {
   
   handleSubmit = (event) => {
     event.preventDefault()
-    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, opacity: 100}, () => {
+    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, bgColor: "red"}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
       axios.post(process.env.REACT_APP_API_URL + "user/", {
         auth: this.props.auth,
         user: this.props.user
       }).then(res => {
         this.setState({
-          opacity: 0
+          bgColor: "green"
         })
       });
     })
@@ -26,7 +25,7 @@ class Edit extends Component {
 
   constructor(props){
     super(props)
-    this.state = {userProfile: {...this.props.user.profile}, opacity: 0}
+    this.state = {userProfile: {...this.props.user.profile}, bgColor: ""}
     this.baseState = {userProfile: {...this.props.user.profile}}
   }
 
@@ -53,12 +52,11 @@ class Edit extends Component {
           userProfileFields.map(v => (
             <label key={v}>
               {this.capitalizeFirstLetter(v)}:
-              <input name={v} value={this.state.userProfile[v] || ""} onChange={this.handleSubmit} ype="text"/>
+              <input name={v} value={this.state.userProfile[v] || ""} onChange={this.handleSubmit} style={{backgroundColor: this.state.bgColor}} type="text"/>
             </label>
           ))
         }
         </form>
-        <img src={loadGif} style={{opacity: this.state.opacity, width: 50}}/>
         <button onClick={this.cancelEdit}>Cancel</button>
         <Link to="/dashboard">Save</Link>
       </section>
