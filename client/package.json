@@ -19,7 +19,7 @@
   "scripts": {
     "start": "REACT_APP_API_URL=$npm_config_api react-scripts start",
     "start-windows": "cross-env REACT_APP_API_URL=$npm_config_api react-scripts start",
-    "debutg_api_string": "echo $npm_config_api",
+    "debug_api_string": "echo $npm_config_api",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
