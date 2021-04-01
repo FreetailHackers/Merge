@@ -20,7 +20,7 @@ import Edit from "./pages/Edit";
 
 import "./App.css";
 
-createMockServerIfNotProduction();
+//createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
