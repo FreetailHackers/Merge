@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser, setCurrentUser } from "../actions/authActions";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import userProfileFields from "../content/userProfileFields.json"
 
@@ -12,9 +11,17 @@ class Edit extends Component {
     event.preventDefault()
     this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, bgColor: "red"}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
-      axios.post(process.env.REACT_APP_API_URL + "user/", {
+    })
+  }
+
+  handleUpdate = (event) => {
+    event.preventDefault()
+    this.setState({ userProfile: { ...this.state.userProfile, [event.target.name]: event.target.value }, bgColor: "red" }, () => {
+      this.props.setCurrentUser(this.props.userID, { ...this.props.user, profile: this.state.userProfile })
+      axios.post(process.env.REACT_APP_API_URL + "/auth/update", {
         auth: this.props.auth,
-        user: this.props.user
+        id: this.props.userID,
+        profile: this.state.userProfile
       }).then(res => {
         this.setState({
           bgColor: "green"
@@ -23,23 +30,23 @@ class Edit extends Component {
     })
   }
 
+  cancelEdit = e => {
+    e.preventDefault();
+    this.setState(this.baseState)
+    this.props.setCurrentUser(this.props.userID, { ...this.props.user, profile: this.baseState.userProfile })
+    axios.post(process.env.REACT_APP_API_URL + "user/", {
+      auth: this.props.auth,
+      user: this.props.user
+    }).then(res => {
+      this.props.history.push('/dashboard')
+    });
+  };
+
   constructor(props){
     super(props)
     this.state = {userProfile: {...this.props.user.profile}, bgColor: ""}
     this.baseState = {userProfile: {...this.props.user.profile}}
   }
-
-  cancelEdit = e => {
-    e.preventDefault();
-    this.setState(this.baseState)
-    this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile})
-      axios.post(process.env.REACT_APP_API_URL + "user/", {
-        auth: this.props.auth,
-        user: this.props.user
-      }).then(res => {
-        this.props.history.push('/dashboard')
-      });
-  };
 
   capitalizeFirstLetter = (str) => str.substring(0, 1).toUpperCase() + str.substring(1)
 
@@ -58,7 +65,7 @@ class Edit extends Component {
         }
         </form>
         <button onClick={this.cancelEdit}>Cancel</button>
-        <Link to="/dashboard">Save</Link>
+        <button onClick={this.handleUpdate}>Update</button>
       </section>
     );
   }
