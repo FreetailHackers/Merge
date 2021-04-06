@@ -55,7 +55,7 @@ class Login extends Component {
     return (
       <section id="login">
         <form noValidate onSubmit={this.onSubmit}>
-          <div class='logo' />
+          <div className='logo' />
           <hr />
           <label htmlFor="email">Email</label>
           <input

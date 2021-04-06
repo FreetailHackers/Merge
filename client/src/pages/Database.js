@@ -3,51 +3,53 @@ import React, { Component } from "react";
 import './Database.css';
 import Collapsible from "../components/Collapsible";
 
+const UserToParagraphFragment = (user, key) => (
+  <span key={key}>
+    <b>{key}</b>: {user[key]}<br />
+  </span>
+)
+
+const UserToParagraph = ({user, keys}) => (
+  <p>
+    { keys.map(key => UserToParagraphFragment(user, key)) }
+  </p>
+)
 class Database extends Component {
   constructor() {
     super();
     this.state = {
-        users:[],
+        users: [],
         limit: 8,
         open: false,
+        keys: []
     };
   }
 
   componentDidMount() {
-    axios.get(process.env.REACT_APP_API_URL + "/users/", { params: { limit: this.state.limit } }).then(
-        (res) => {
-          if(res.data) {
-            this.setState({users: res.data});
-          }
-        })
-  }
-  removeName = (user) => {
-    const userCopy = {...user};
-    delete userCopy.name;
-    return userCopy;
+    axios.get(process.env.REACT_APP_API_URL + "/users/", { params: { limit: this.state.limit } }).then((res) => {
+      if(res.data) {
+        this.setState({
+          users: res.data, 
+          keys: Object.keys(res.data[0]).filter(this.filterOutNameKey)
+        });
+      }
+    });
   }
 
-  userToString = (user) => {
-    let string = "";
-    for (const [key, value] of Object.entries(user)) {
-      string += `${key}: ${value}\n`;
-    }
-    return string
-  }
+  filterOutNameKey = (key) => key !== 'name'
+
+  
 
   render() {
-    return (      
-      <div>
-      <h1 className="headerTitle">Database</h1>
-      {this.state.users.map((user) =>
-        <Collapsible key={user.name} title={user.name}>
-          <div>
-             <p>{this.userToString(this.removeName(user))}</p>
-          </div>
-        </Collapsible>
-      )}
-  </div>
-
+    return (
+      <section>
+        <h1 className="headerTitle">Database</h1>
+        {this.state.users.map((user, index) =>
+          <Collapsible key={index} title={user.name}>
+            <UserToParagraph user={user} keys={this.state.keys} />
+          </Collapsible>
+        )}
+      </section>
     );
   }
 }
