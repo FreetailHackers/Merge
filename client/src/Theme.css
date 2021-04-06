@@ -1,0 +1,27 @@
+:root {
+   --primary: #e76482;
+   --primary-transparent: #e7648230;
+   --primary-less-transparent: #e7648250;
+   --secondary: #473899;
+   --secondary-transparent: #47389930;
+   --secondary-less-transparent: #47389950;
+   --tertiary: #4c82cc;
+
+   --accept: var(--tertiary); /* this should be close to green/blue, for "accept" buttons, etc */
+   --reject: var(--primary); /* this should be close to red, for "cancel" buttons, etc */
+
+   --text-on-primary: #fff;
+   --text-on-secondary: #fff;
+   --text-on-tertiary: #fff;
+
+   --text-on-accept: var(--text-on-tertiary);
+   --text-on-reject: var(--text-on-primary);
+
+   --login-background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Junction_2015.jpg/1200px-Junction_2015.jpg');
+   
+   --logo-color: url('/logo/color.png');
+   --logo-white: url('/logo/white.png');
+
+   --font-body: 'Lato', sans-serif;
+   --font-header: 'Montserrat', sans-serif;
+}

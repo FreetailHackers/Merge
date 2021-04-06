@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { loginUser } from "../actions/authActions";
 
+import './Login.css';
+
 class Login extends Component {
   constructor() {
     super();
@@ -51,41 +53,38 @@ class Login extends Component {
     const { errors } = this.state;
 
     return (
-      <section>
-        <h4>Login below</h4>
+      <section id="login">
         <form noValidate onSubmit={this.onSubmit}>
-          <div>
-            <input
-              onChange={this.onChange}
-              value={this.state.email}
-              error={errors.email}
-              id="email"
-              type="email"
-            />
-            <label htmlFor="email">Email</label>
-            <span>
-              {errors.email}
-              {errors.emailnotfound}
-            </span>
-          </div>
-          <div>
-            <input
-              onChange={this.onChange}
-              value={this.state.password}
-              error={errors.password}
-              id="password"
-              type="password"
-            />
-            <label htmlFor="password">Password</label>
-            <span>
-              {errors.password}
-              {errors.passwordincorrect}
-            </span>
-          </div>
-          <span>{errors.status}</span>
-          <div>
-            <button type="submit">Login</button>
-          </div>
+          <div className='logo' />
+          <hr />
+          <label htmlFor="email">Email</label>
+          <input
+            onChange={this.onChange}
+            value={this.state.email}
+            error={errors.email}
+            id="email"
+            type="email"
+            placeholder="foo@bar.edu"
+          />
+          <span className='error'>
+            {errors.email}
+            {errors.emailnotfound}
+          </span>
+          <label htmlFor="password">Password</label>
+          <input
+            onChange={this.onChange}
+            value={this.state.password}
+            error={errors.password}
+            id="password"
+            type="password"
+            placeholder="Password (at least 6 characters)"
+          />
+          <span className='error'>
+            {errors.password}
+            {errors.passwordincorrect}
+          </span>
+          <button type="submit">Login</button>
+          <span className='error'>{errors.status}</span>
         </form>
       </section>
     );
