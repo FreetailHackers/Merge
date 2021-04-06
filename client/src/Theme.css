@@ -1,0 +1,17 @@
+:root {
+   --primary: #e76482;
+   --secondary: #473899;
+   --tertiary: #4c82cc;
+
+   --text-on-primary: #fff;
+   --text-on-secondary: #fff;
+   --text-on-tertiary: #fff;
+
+   --login-background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Junction_2015.jpg/1200px-Junction_2015.jpg');
+   
+   --logo-color: url('https://freetailhackers.com/img/assets/freetailLogo.png');
+   --logo-white: url('https://freetailhackers.com/img/assets/freetailLogo.png');
+
+   --font-body: 'Lato', sans-serif;
+   --font-header: 'Montserrat', sans-serif;
+}
