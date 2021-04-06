@@ -26,6 +26,12 @@ nav#navbar a:nth-of-type(2) {
    margin-top: 40px;
 }
 
+nav#navbar a:hover {
+   border-left: #ffffff19 10px solid;
+
+   background-color: #ffffff09;
+}
+
 nav#navbar a.active {
    border-left: #fff3 10px solid;
 
