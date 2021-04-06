@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../actions/authActions";
-import { Link } from "react-router-dom";
 
 class Dashboard extends Component {
 
@@ -15,11 +14,6 @@ class Dashboard extends Component {
     return (
       <section>
         <p>Welcome home, {JSON.stringify(this.props.user)}</p>
-        <Link to="/swipe">Find team members</Link>
-        <Link to="/edit">Edit profile</Link>
-        <Link to="/database">View users in database</Link>
-        {this.props.user.admin ? <Link to="/admin">Admin</Link> : null}
-        <button onClick={this.onLogoutClick}>Logout</button>
       </section>
     );
   }

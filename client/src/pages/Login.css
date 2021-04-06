@@ -21,17 +21,6 @@ section#login form {
    background-color: #fff;
 }
 
-section#login form .logo {
-   height: 100px;
-
-   background-image: var(--logo-color);
-   background-size: contain;
-   background-repeat: no-repeat;
-   background-position: center;
-
-   filter: invert();
-}
-
 section#login form label {
    display: inline-block;
    width: 100%;

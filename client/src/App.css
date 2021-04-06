@@ -1,6 +1,23 @@
+.App {
+   display: flex;
+}
+
 hr {
    border: none;
    background-color: #ddd;
    height: 1px;
    margin: 20px 0;
+}
+
+.logo {
+   height: 100px;
+
+   background-image: var(--logo-color);
+   background-size: contain;
+   background-repeat: no-repeat;
+   background-position: center;
+}
+
+section {
+   flex-grow: 1;
 }

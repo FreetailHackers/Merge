@@ -1,0 +1,32 @@
+nav#navbar {
+   height: 100vh;
+   padding: 20px 0;
+
+   background-color: var(--primary);
+}
+
+nav#navbar a {
+   display: block;
+   width: 200px;
+   padding: 20px;
+   border-left: #fff0 10px solid;
+   border-bottom: #fff3 1px solid;
+
+   color: var(--text-on-primary);
+   text-decoration: none;
+   font-size: 1.2em;
+}
+
+nav#navbar a:first-of-type {
+   border-bottom: none;
+}
+
+nav#navbar a:nth-of-type(2) {
+   margin-top: 40px;
+}
+
+nav#navbar a.active {
+   border-left: #fff3 10px solid;
+
+   background-color: #fff2;
+}
