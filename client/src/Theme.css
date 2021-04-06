@@ -7,9 +7,15 @@
    --secondary-less-transparent: #47389950;
    --tertiary: #4c82cc;
 
+   --accept: var(--tertiary); /* this should be close to green/blue, for "accept" buttons, etc */
+   --reject: var(--primary); /* this should be close to red, for "cancel" buttons, etc */
+
    --text-on-primary: #fff;
    --text-on-secondary: #fff;
    --text-on-tertiary: #fff;
+
+   --text-on-accept: var(--text-on-tertiary);
+   --text-on-reject: var(--text-on-primary);
 
    --login-background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Junction_2015.jpg/1200px-Junction_2015.jpg');
    
