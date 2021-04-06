@@ -1,6 +1,10 @@
 :root {
    --primary: #e76482;
+   --primary-transparent: #e7648230;
+   --primary-less-transparent: #e7648250;
    --secondary: #473899;
+   --secondary-transparent: #47389930;
+   --secondary-less-transparent: #47389950;
    --tertiary: #4c82cc;
 
    --text-on-primary: #fff;
