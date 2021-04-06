@@ -15,16 +15,19 @@ const Navbar = (props) => {
   }
   
   return (
-    <nav id="navbar">
-      <Link to="/dashboard">
-        <div className='logo' />
-      </Link>
-      <NavLink to="/swipe">Find Team Members</NavLink>
-      <NavLink to="/edit">Edit Profile</NavLink>
-      <NavLink to="/database">User List</NavLink>
-      {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
-      <Link onClick={onLogoutClick} to="/">Logout</Link>
-    </nav>
+    <div>
+      <div id="navbar-spacing" />
+      <nav id="navbar">
+        <Link to="/dashboard">
+          <div className='logo white' />
+        </Link>
+        <NavLink to="/swipe">Find Team Members</NavLink>
+        <NavLink to="/edit">Edit Profile</NavLink>
+        <NavLink to="/database">User List</NavLink>
+        {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
+        <Link onClick={onLogoutClick} to="/">Logout</Link>
+      </nav>
+    </div>
   );
 }
 

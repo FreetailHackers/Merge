@@ -1,9 +1,16 @@
 nav#navbar {
-   height: 100vh;
+   position: fixed;
+   overflow-y:auto;
+
+   height: calc(100vh - 40px);
    padding: 20px 0;
    z-index: 1;
 
    background-color: var(--primary);
+}
+
+#navbar-spacing {
+   width: 250px;
 }
 
 nav#navbar a {

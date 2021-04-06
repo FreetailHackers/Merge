@@ -18,6 +18,10 @@ hr {
    background-position: center;
 }
 
+.logo.white {
+   background-image: var(--logo-white);
+}
+
 section {
    flex-grow: 1;
 }

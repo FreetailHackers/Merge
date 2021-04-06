@@ -19,8 +19,8 @@
 
    --login-background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Junction_2015.jpg/1200px-Junction_2015.jpg');
    
-   --logo-color: url('https://freetailhackers.com/img/assets/freetailLogo.png');
-   --logo-white: url('https://freetailhackers.com/img/assets/freetailLogo.png');
+   --logo-color: url('/logo/color.png');
+   --logo-white: url('/logo/white.png');
 
    --font-body: 'Lato', sans-serif;
    --font-header: 'Montserrat', sans-serif;
