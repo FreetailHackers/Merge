@@ -17,7 +17,7 @@
    --text-on-accept: var(--text-on-tertiary);
    --text-on-reject: var(--text-on-primary);
 
-   --login-background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Junction_2015.jpg/1200px-Junction_2015.jpg');
+   --login-background: url('/background.png');
    
    --logo-color: url('/logo/color.png');
    --logo-white: url('/logo/white.png');
