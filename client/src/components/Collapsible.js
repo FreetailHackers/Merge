@@ -19,12 +19,15 @@ class Collapsible extends Component {
     render() {
       return (
         <div>
-          <div onClick={this.togglePanel} className='headerDatabase'>
+          <button 
+            onClick={this.togglePanel} 
+            className='headerDatabase'
+          >
             <span style={{ width: 40, display: 'inline-block', verticalAlign: 'middle' }}>
               { this.state.open ? <BsArrowsCollapse /> : <BsArrowsExpand /> }
             </span>
             { this.props.title }
-          </div>
+          </button>
           { 
             this.state.open
             ? 

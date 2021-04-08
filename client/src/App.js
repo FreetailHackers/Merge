@@ -12,7 +12,6 @@ import PrivateRoute from "./components/PrivateRoute";
 
 import Login from "./pages/Login";
 import Database from "./pages/Database";
-import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
@@ -34,7 +33,7 @@ class App extends Component {
               <Route exact path="/login" component={Login} />
               <Route path="/:anything" component={Navbar} /> 
             </Switch>
-            <PrivateRoute exact path="/admin" component={Admin} />
+            <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
             <PrivateRoute exact path="/database" component={Database} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
