@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
+import GithubCard from './GithubCard';
 import './SwipeProfile.css';
 
 const SwipeProfile = (props) => {
@@ -20,8 +21,14 @@ const SwipeProfile = (props) => {
          }}
       >
          <h3 draggable={false}>{ props.name }</h3>
+         <img src={ props.profilePictureUrl } alt='' />
          <h4 draggable={false}>{ props.school }</h4>
-         <p draggable={false}>{ props.intro }</p>
+         <p draggable={false} style={{ marginBottom: 60 }}>{ props.intro }</p>
+         {
+            props.github 
+            ? <GithubCard username={ props.github } />
+            : null
+         }
       </div>
    )
 };

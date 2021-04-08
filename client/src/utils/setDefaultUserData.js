@@ -6,7 +6,9 @@ export function setDefaultUserData (currentData) {
       classStanding: '[missing class standing]',
       skills: [],
       experienceLevel: '[missing experience level]',
-      intro: '[missing introduction]'
+      intro: '[missing introduction]',
+      profilePictureUrl: '/default-profile.png',
+      github: null
    }
 
    for (const key in defaultUserData) {
