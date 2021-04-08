@@ -1,8 +1,13 @@
 .headerDatabase{
+  display: block;
   border: solid 1px #f2f2f2;
   padding: 15px;
   margin-left:10px;
   margin-right:10px;
+  width: calc(100% - 30px);
+
+  text-align: left;
+  font-size: 1em;
 
   background-color: var(--primary);
 
@@ -29,4 +34,24 @@
   margin-left:5px;
   margin-right:5px;
   text-align: center;
+}
+
+.pagination {
+  text-align: center;
+}
+
+.pagination a, .pagination span {
+  display: inline-block;
+  margin: 0 5px;
+  min-width: 20px;
+}
+
+.pagination a {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pagination div {
+  display: inline;
 }
