@@ -19,7 +19,8 @@ class Swipe extends Component {
             classStanding: res.data.classStanding,
             skills: res.data.skills,
             experienceLevel: res.data.experienceLevel,
-            intro: res.data.intro
+            intro: res.data.intro,
+            profilePictureUrl: res.data.profilePictureUrl
           }),
           loadingUserToShow: false
         }, () => {
@@ -152,6 +153,7 @@ class Swipe extends Component {
               name={this.state.userToShow.name} 
               school={this.state.userToShow.school}
               intro={this.state.userToShow.intro}
+              profilePictureUrl={this.state.userToShow.profilePictureUrl}
               onMouseDown={this.mouseDownOnProfile}
               relativePosition={this.state.profilePosition}
               relativeAngle={this.state.profileAngle}

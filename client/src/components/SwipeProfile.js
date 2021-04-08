@@ -20,6 +20,7 @@ const SwipeProfile = (props) => {
          }}
       >
          <h3 draggable={false}>{ props.name }</h3>
+         <img src={ props.profilePictureUrl } alt='' />
          <h4 draggable={false}>{ props.school }</h4>
          <p draggable={false}>{ props.intro }</p>
       </div>
