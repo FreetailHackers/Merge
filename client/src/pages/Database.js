@@ -6,8 +6,8 @@ import { UserToParagraph } from "../components/UserToParagraph";
 import { Pagination } from '../components/Pagination';
 
 class Database extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
         users: [],
         limit: 8,
@@ -92,7 +92,7 @@ class Database extends Component {
   render() {
     return (
       <section>
-        <h1 className="headerTitle">Database</h1>
+        <h1 className="headerTitle">{this.props.title || "User Database"}</h1>
         {Object.keys(this.state.filter).map((key, i) => <div key={i} className='filterInput'>
           <label>Filter by {key}</label>
           <input 
