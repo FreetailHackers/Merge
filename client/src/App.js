@@ -21,7 +21,7 @@ import "./Theme.css";
 import "./App.css";
 
 createMockServerIfNotProduction();
-initializeAuthIfLoggedIn();
+// initializeAuthIfLoggedIn();
 
 class App extends Component {
   render() {

@@ -26,6 +26,16 @@ section {
    flex-grow: 1;
 }
 
+input {
+   padding: 10px;
+   width: 300px;
+
+   border: 1px #ddd solid;
+   border-radius: 0;
+
+   font-size: 1em;
+}
+
 .spin-animation {
    animation: spin 0.5s infinite;
 }

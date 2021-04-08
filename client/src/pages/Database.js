@@ -3,37 +3,7 @@ import React, { Component } from "react";
 import './Database.css';
 import Collapsible from "../components/Collapsible";
 import { UserToParagraph } from "../components/UserToParagraph";
-
-const PaginationButton = ({ n, setPage }) => (
-  n > 0
-  // eslint-disable-next-line
-  ? <a href="#" onClick={(e) => setPage(n, e)}>{n}</a>
-  // eslint-disable-next-line
-  : <a href="#" onClick={(e) => e.preventDefault()}> </a>
-)
-
-const Pagination = ({ page, setPage }) => (
-  <p className='pagination'>
-    {
-      page >= 5
-      ? 
-      <div>
-        <PaginationButton n={Math.max(page - 10, 1)} setPage={setPage} />
-        <span>...</span>
-      </div>
-      : null
-    }
-    <PaginationButton n={page - 3} setPage={setPage} />
-    <PaginationButton n={page - 2} setPage={setPage} />
-    <PaginationButton n={page - 1} setPage={setPage} />
-    <span>{page}</span>
-    <PaginationButton n={page + 1} setPage={setPage} />
-    <PaginationButton n={page + 2} setPage={setPage} />
-    <PaginationButton n={page + 3} setPage={setPage} />
-    <span>...</span>
-    <PaginationButton n={page + 10} setPage={setPage} />
-  </p>
-)
+import { Pagination } from '../components/Pagination';
 
 class Database extends Component {
   constructor() {
@@ -42,7 +12,13 @@ class Database extends Component {
         users: [],
         limit: 8,
         keys: [],
-        page: this.parsePageNumberHash(window.location.hash)
+        page: this.parsePageNumberHash(window.location.hash),
+        filter: {
+          name: '',
+          university: '',
+          skills: ''
+        },
+        lastDateSent: 0
     };
   }
 
@@ -56,14 +32,34 @@ class Database extends Component {
   }
 
   getUsersFromAPI = () => {
-    axios.get(process.env.REACT_APP_API_URL + "/users/", { params: { limit: this.state.limit, page: this.state.page } }).then((res) => {
-      console.log(res.data)
-      if(res.data && res.data.page === this.state.page.toString()) {
-        this.setState({
-          users: res.data.users, 
-          keys: Object.keys(res.data.users[0]).filter(this.filterOutNameKey)
-        });
-      }
+    const filterParameters = {};
+    for (const key in this.state.filter) {
+      filterParameters[key + 'Filter'] = this.state.filter[key];
+    }
+
+    const dateSent = new Date();
+
+    if (dateSent < this.state.lastDateSent) return;
+
+    this.setState({
+      lastDateSent: dateSent
+    }, () => {
+      axios.get(process.env.REACT_APP_API_URL + "/users/", 
+      { 
+        params: {
+          limit: this.state.limit,
+          page: this.state.page,
+          ...filterParameters,
+          dateSent: dateSent.toString()
+        } 
+      }).then((res) => {
+        if(res.data && res.data.dateSent.toString() === this.state.lastDateSent.toString()) {
+          this.setState({
+            users: res.data.users, 
+            keys: Object.keys(res.data.users[0]).filter(this.filterOutNameKey)
+          });
+        }
+      });
     });
   }
 
@@ -82,10 +78,32 @@ class Database extends Component {
     });
   }
 
+  updateFilter = (e) => {
+    this.setState({
+      filter: {
+        ...this.state.filter,
+        [e.target.name]: e.target.value
+      }
+    }, () => {
+      this.getUsersFromAPI();
+    });
+  }
+
   render() {
     return (
       <section>
         <h1 className="headerTitle">Database</h1>
+        {Object.keys(this.state.filter).map((key, i) => <div key={i} className='filterInput'>
+          <label>Filter by {key}</label>
+          <input 
+            name={key}
+            value={this.state.filter[key]} 
+            placeholder={`${key}`}
+            type='text'
+            onChange={this.updateFilter}
+          />  
+        </div>)}
+        <br /><br />
         {this.state.users.map((user, index) =>
           <Collapsible key={index} title={user.name}>
             <UserToParagraph user={user} keys={this.state.keys} />
