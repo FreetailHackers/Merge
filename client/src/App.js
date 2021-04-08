@@ -21,7 +21,7 @@ import "./Theme.css";
 import "./App.css";
 
 createMockServerIfNotProduction();
-// initializeAuthIfLoggedIn();
+initializeAuthIfLoggedIn();
 
 class App extends Component {
   render() {
@@ -34,11 +34,11 @@ class App extends Component {
               <Route exact path="/login" component={Login} />
               <Route path="/:anything" component={Navbar} /> 
             </Switch>
-            <Route exact path="/admin" component={Admin} />
-            <Route exact path="/database" component={Database} /> {/* REMIND ME TO CHANGE THIS BACK TO PRIVATE */}
-            <Route exact path="/dashboard" component={Dashboard} />
-            <Route exact path="/swipe" component={Swipe} />
-            <Route exact path="/edit" component={Edit} />
+            <PrivateRoute exact path="/admin" component={Admin} />
+            <PrivateRoute exact path="/database" component={Database} />
+            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <PrivateRoute exact path="/swipe" component={Swipe} />
+            <PrivateRoute exact path="/edit" component={Edit} />
           </div>
         </Router>
       </Provider>
