@@ -36,7 +36,7 @@ class App extends Component {
             </Switch>
             <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
             <PrivateRoute exact path="/database" component={Database} />
-            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <Route exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
             <PrivateRoute exact path="/edit" component={Edit} />
             <Route exact path="/chat" component={Chat} />

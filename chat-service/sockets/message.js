@@ -8,6 +8,7 @@ addMessageRoutes (socket) {
       const fromUserId = socket._connectedUserId;
       const toUserId = parsed.toUserId;
 
+      // TODO change from original Message chat db to Chat based db
       const message = new Message({
          fromUserId,
          toUserId,
@@ -22,6 +23,7 @@ addMessageRoutes (socket) {
       const userId = socket._connectedUserId;
       const otherUserId = parsed.otherUsedId;
 
+      // TODO change from original Message chat db to Chat based db
       Message.find({
          $or: [
             {

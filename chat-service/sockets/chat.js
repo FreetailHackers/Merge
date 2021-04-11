@@ -3,25 +3,23 @@ const Message = require('../models/message');
 module.exports = {
 
 addChatRoutes (socket) {
-   // currently this will send the last message sent to each other user by the requesting user
-   // along with the last message sent to the requesting user by each other user
    socket.on('request chats', _ => {
       console.log('Got request chats socket message');
       const userId = socket._connectedUserId;
 
-      // todo: would be great if we could make these 2
-      // requests into 1 request or do them async
+      // TODO change from original Message chat db to Chat based db
       const pairs = [["toUserId", "fromUserId"], ["fromUserId", "toUserId"]];
       const mongoRequests = pairs.map(pair => [
-         { "$match": { [`${pair[0]}`]: userId } },
+         { "$match": { "userIds": { $has: userId } } },
          { "$sort": { "date": -1 } },
          { "$group": { 
             "_id": {[`${pair[1]}`]: `$${pair[1]}`},
-            [`otherUserId`]: { "$first": `$${pair[1]}` },
+            "otherUserId": { "$first": `$${pair[1]}` },
             "message": { "$first": "$message" },
             "date": { "$first": "$date" },
             "original_id": { "$first": "$_id" }
-         }}
+         }},
+
       ]);
       
       Message.aggregate(mongoRequests[0])
