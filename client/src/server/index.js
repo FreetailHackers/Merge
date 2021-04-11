@@ -10,6 +10,7 @@ export function createMockServer () {
       addAuthRoutes(this);
       addUserRoutes(this);
       addSwipeRoutes(this);
+      this.passthrough();
     }
   });
 }

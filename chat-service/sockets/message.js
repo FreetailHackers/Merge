@@ -35,10 +35,12 @@ addMessageRoutes (socket) {
          ]
       }).then(messages => {
          socket.emit('messages', {
-            messages
+            messages: JSON.stringify(messages)
          });
       });
    });
+
+   console.log('Added message routes');
 }
 
 }
