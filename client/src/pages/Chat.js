@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import socket from 'socket.io-client';
 import ChatSidebar from '../components/ChatSidebar';
-
-import './Chat.css';
+import ChatWindow from '../components/ChatWindow';
 
 const filterOutSelfFromChat = (chat) => {
    const selfId = "0"; // todo: get this from redux
@@ -18,9 +17,11 @@ class Chat extends Component {
       super(props);
 
       this.state = {
+         activeChatIndex: 0,
          chats: [
             // temp data while socketio team works
             {
+               _id: "0",
                userIds: ["1", "0"],
                userNames: ["Raffer", "Ben"],
                userImages: ["https://www.animalspot.net/wp-content/uploads/2017/03/Chinstrap-Penguin.jpg", "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw"],
@@ -38,6 +39,7 @@ class Chat extends Component {
                }]
             },
             {
+               _id: "1",
                userIds: ["2", "0"],
                userNames: ["Jason", "Ben"],
                userImages: ["https://th.bing.com/th/id/Rd9accff7c37684e159f050d299998c7b?rik=KPh19WNdTrp3yw&riu=http%3a%2f%2fweknowyourdreams.com%2fimages%2fpenguin%2fpenguin-12.jpg&ehk=GOxVirbOiTqX4u20wBBKB8fW9Kjt3N1ht1vKGt9O58A%3d&risl=&pid=ImgRaw", "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw"],
@@ -55,6 +57,7 @@ class Chat extends Component {
                }]
             },
             {
+               _id: "2",
                userIds: ["0", "4"],
                userNames: ["Ben", "Ryan"],
                userImages: ["https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw", "https://artprojectsforkids.org/wp-content/uploads/2019/08/Penguin-Easy-1.jpg"],
@@ -91,9 +94,18 @@ class Chat extends Component {
       this.socket.disconnect();
    }
 
+   sendMessage = (message) => {
+      const activeChat = this.state.chats[this.state.activeChatIndex];
+      this.socket.emit('send message', JSON.stringify({
+         chatId: activeChat._id,
+         message
+      }));
+   }
+
    render = () => (
-      <div>
-         <ChatSidebar chats={this.state.chats} />
+      <div style={{ display: 'flex', width: '100%' }}>
+         <ChatSidebar chats={this.state.chats} setActiveChatIndex={(i) => this.setState({ activeChatIndex: i })} activeChatIndex={this.state.activeChatIndex} />
+         <ChatWindow chat={this.state.chats[this.state.activeChatIndex]} sendMessage={this.sendMessage} />
       </div>
    )
 }

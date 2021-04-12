@@ -6,21 +6,21 @@ const howLongAgo = (date) => {
 
    const secondDifference = millisecondDifference / 1000;
    if (secondDifference < 60) {
-      return Math.floor(secondDifference) + 's'
+      return Math.floor(secondDifference) + 's';
    }
 
    const minuteDifference = secondDifference / 60;
    if (minuteDifference < 60) {
-      return Math.floor(minuteDifference) + 'min'
+      return Math.floor(minuteDifference) + 'min';
    }
 
    const hourDifference = minuteDifference / 60;
    if (hourDifference < 24) {
-      return Math.floor(hourDifference) + 'hr'
+      return Math.floor(hourDifference) + 'hr';
    }
 
    const dayDifference = hourDifference / 24;
-   return Math.floor(dayDifference) + ' days'
+   return Math.floor(dayDifference) + ' days';
 }
 
 export default howLongAgo;

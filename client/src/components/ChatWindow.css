@@ -1,0 +1,54 @@
+.chatWindow {
+   /* child flex properties */
+   flex-grow: 1;
+
+   /* parent flex properties */
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-end;
+
+   height: 100vh;
+}
+
+.newMessageBox {
+   height: 40px;
+   width: calc(100% - 20px);
+   padding: 10px;
+
+   display: flex;
+   justify-content: center;
+   vertical-align: middle;
+}
+
+.newMessageBox input {
+   border: none;
+   background: #eee;
+   border-radius: 999px;
+   flex-grow: 1;
+   vertical-align: middle;
+}
+
+.newMessageBox input:focus {
+   outline: none;
+}
+
+.newMessageBox p {
+   display: inline-block;
+   width: 30px;
+   height: 30px;
+   margin: 0 10px;
+   padding: 5px;
+
+   vertical-align: middle;
+   text-align: center;
+   
+   font-size: 25px;
+   border-radius: 50%;
+   
+   transition: background 0.1s;
+   cursor: pointer;
+}
+
+.newMessageBox p:hover {
+   background: #eee;
+}
