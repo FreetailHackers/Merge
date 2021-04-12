@@ -60,7 +60,7 @@ class Chat extends Component {
                userImages: ["https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw", "https://artprojectsforkids.org/wp-content/uploads/2019/08/Penguin-Easy-1.jpg"],
                messages: [{
                   fromUserId: "0",
-                  message: "Penguins are cool",
+                  message: "Penguins are pretty cool, do you like penguins?",
                   date: (new Date() - 1000 * 60 * 60 * 4.7),
                   seen: false
                },

@@ -10,6 +10,7 @@ const ChatSidebar = ({ chats }) => (
                lastMessage={chat.messages[0].message} 
                lastMessageDate={chat.messages[0].date} 
                profilePicture={chat.userImages[0]}
+               seen={chat.messages[0].seen}
             />
          )
       }
