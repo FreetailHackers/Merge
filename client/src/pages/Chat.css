@@ -1,0 +1,60 @@
+.chatSidebar {
+   height: calc(100vh - 20px);
+   width: 300px;
+   padding: 10px;
+
+   border-right: 1px #ddd solid;
+
+   overflow-y: auto;
+}
+
+.chatPreview {
+   margin: 10px 0;
+   padding: 15px 5px;
+   border-radius: 8px;
+
+   display: flex;
+   flex-wrap: wrap;
+
+   cursor: pointer;
+
+   transition: background 0.1s;
+}
+
+.chatPreview:hover {
+   background: #eee;
+}
+
+.chatPreview h4, .chatPreview p {
+   margin: 0;
+   font-weight: normal;
+}
+
+.chatPreview p {
+   color: #888;
+   margin-top: 5px;
+}
+
+.chatPreview .smallDivider {
+   display: inline-block;
+
+   width: 3px;
+   height: 3px;
+   margin: 0 4px;
+
+   vertical-align: middle;
+
+   background: #888;
+   border-radius: 50%;
+}
+
+.chatPicture {
+   width:45px;
+   height:45px;
+   margin-right: 10px;
+
+   background-size: cover;
+   background-position: center;
+
+   border-radius: 50%;
+}
