@@ -10,7 +10,7 @@ const ChatPreview = ({ users, lastMessage, lastMessageDate, profilePicture, seen
       </div>
       {
          !seen
-         ? <span className='unread' />
+         ? <span className='unreadBubble' />
          : null
       }
    </div>
