@@ -11,16 +11,16 @@ const howLongAgo = (date) => {
 
    const minuteDifference = secondDifference / 60;
    if (minuteDifference < 60) {
-      return Math.floor(minuteDifference) + 'min';
+      return Math.floor(minuteDifference) + 'm';
    }
 
    const hourDifference = minuteDifference / 60;
    if (hourDifference < 24) {
-      return Math.floor(hourDifference) + 'hr';
+      return Math.floor(hourDifference) + 'h';
    }
 
    const dayDifference = hourDifference / 24;
-   return Math.floor(dayDifference) + ' days';
+   return Math.floor(dayDifference) + 'd';
 }
 
 export default howLongAgo;

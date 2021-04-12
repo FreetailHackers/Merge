@@ -4,12 +4,26 @@ import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
 
 const filterOutSelfFromChat = (chat) => {
+   const chatCopy = JSON.parse(JSON.stringify(chat));
    const selfId = "0"; // todo: get this from redux
    const selfIndexInChat = chat.userIds.indexOf(selfId);
-   chat.userIds.splice(selfIndexInChat, 1);
-   chat.userNames.splice(selfIndexInChat, 1);
-   chat.userImages.splice(selfIndexInChat, 1);
-   return chat;
+   chatCopy.userIds.splice(selfIndexInChat, 1);
+   chatCopy.userNames.splice(selfIndexInChat, 1);
+   chatCopy.userImages.splice(selfIndexInChat, 1);
+   return chatCopy;
+}
+
+const getIdToProfileMap = (chats) => {
+   const profiles = {};
+   for (const chat of chats) {
+      for (const key in chat.userIds) {
+         profiles[chat.userIds[key]] = {
+            image: chat.userImages[key],
+            name: chat.userNames[key]
+         }
+      }
+   }
+   return profiles;
 }
 
 class Chat extends Component {
@@ -54,6 +68,30 @@ class Chat extends Component {
                   message: "Hi!",
                   date: (new Date() - 1000 * 60 * 60 * 4.8),
                   seen: true
+               },
+               {
+                  fromUserId: "0",
+                  message: "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.",
+                  date: (new Date() - 1000 * 60 * 60 * 5.1),
+                  seen: true
+               },
+               {
+                  fromUserId: "0",
+                  message: "Hi 3!",
+                  date: (new Date() - 1000 * 60 * 60 * 5.2),
+                  seen: true
+               },
+               {
+                  fromUserId: "2",
+                  message: "Hi 4!",
+                  date: (new Date() - 1000 * 60 * 60 * 5.4),
+                  seen: true
+               },
+               {
+                  fromUserId: "2",
+                  message: "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.",
+                  date: (new Date() - 1000 * 60 * 60 * 5.5),
+                  seen: true
                }]
             },
             {
@@ -74,7 +112,7 @@ class Chat extends Component {
                   seen: false
                }]
             }
-         ].map(chat => filterOutSelfFromChat(chat))
+         ]
       };
    }
 
@@ -84,9 +122,14 @@ class Chat extends Component {
       this.socket.on('chats', data => {
          console.log('chats', data);
          this.setState({
-            chats: JSON.parse(data).map(chat => filterOutSelfFromChat(chat))
+            chats: JSON.parse(data),
+            profiles: getIdToProfileMap(JSON.parse(data))
          });
       });
+
+      this.setState({
+         profiles: getIdToProfileMap(this.state.chats)
+      })
    }
 
    componentWillUnmount () {
@@ -104,8 +147,8 @@ class Chat extends Component {
 
    render = () => (
       <div style={{ display: 'flex', width: '100%' }}>
-         <ChatSidebar chats={this.state.chats} setActiveChatIndex={(i) => this.setState({ activeChatIndex: i })} activeChatIndex={this.state.activeChatIndex} />
-         <ChatWindow chat={this.state.chats[this.state.activeChatIndex]} sendMessage={this.sendMessage} />
+         <ChatSidebar chats={this.state.chats.map(chat => filterOutSelfFromChat(chat))} setActiveChatIndex={(i) => this.setState({ activeChatIndex: i })} activeChatIndex={this.state.activeChatIndex} />
+         <ChatWindow profiles={this.state.profiles || []} chat={this.state.chats[this.state.activeChatIndex]} sendMessage={this.sendMessage} />
       </div>
    )
 }

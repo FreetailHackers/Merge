@@ -1,6 +1,7 @@
 .chatSidebar {
    height: calc(100vh - 20px);
    width: 300px;
+   min-width: 300px;
    padding: 10px;
 
    border-right: 1px #ddd solid;
@@ -51,7 +52,7 @@
    overflow: hidden;
    text-overflow: ellipsis;
    max-width: 150px;
-   vertical-align: middle;
+   vertical-align: top;
 }
 
 .chatPreview.unread p, .chatPreview.unread h4 {

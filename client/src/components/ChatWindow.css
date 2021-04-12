@@ -10,6 +10,10 @@
    height: 100vh;
 }
 
+/*
+New message box
+*/
+
 .newMessageBox {
    height: 40px;
    width: calc(100% - 20px);
@@ -51,4 +55,73 @@
 
 .newMessageBox p:hover {
    background: #eee;
+}
+
+/*
+Messages
+*/
+
+.message {
+   max-width: 60%;
+   margin-bottom: 14px;
+
+   display: flex;
+   align-items: flex-end;
+}
+
+.message.rightSide {
+   align-self: flex-end;
+   flex-direction: row-reverse;
+   text-align: right;
+}
+
+.message.mergeBottom {
+   margin: 0 60px 2px 60px;
+}
+
+.messageImage {
+   width: 39px;
+   min-width: 39px;
+   height: 39px;
+   border-radius: 50%;
+   margin: 0 10px;
+
+   background-size: cover;
+   background-position: center;
+}
+
+.messageName {
+   margin: 0 10px;
+   color: #888;
+   font-size: 0.8em;
+}
+
+.messageContent {
+   flex-grow: 1;
+   padding: 10px;
+   border-radius: 20px;
+
+   background: #eee;
+}
+
+.message.rightSide .messageContent {
+   background: var(--primary);
+   color: var(--text-on-primary);
+   text-align: left;
+}
+
+.message.mergeBottom:not(.rightSide) .messageContent {
+   border-bottom-left-radius: 4px;
+}
+
+.message.mergeTop:not(.rightSide) .messageContent {
+   border-top-left-radius: 4px;
+}
+
+.message.mergeBottom.rightSide .messageContent {
+   border-bottom-right-radius: 4px;
+}
+
+.message.mergeTop.rightSide .messageContent {
+   border-top-right-radius: 4px;
 }
