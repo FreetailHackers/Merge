@@ -15,11 +15,12 @@ import Database from "./pages/Database";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
+import Chat from "./pages/Chat";
 
 import "./Theme.css";
 import "./App.css";
 
-createMockServerIfNotProduction();
+// createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -35,9 +36,10 @@ class App extends Component {
             </Switch>
             <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
             <PrivateRoute exact path="/database" component={Database} />
-            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <Route exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
             <PrivateRoute exact path="/edit" component={Edit} />
+            <Route exact path="/chat" component={Chat} />
           </div>
         </Router>
       </Provider>

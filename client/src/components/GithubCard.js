@@ -28,7 +28,7 @@ class GithubCard extends Component {
         this.state.loading
         ? "loading"
         : 
-        <a href={`https://github.com/${this.state.profileData.login}`} target="_blank">
+        <a href={`https://github.com/${this.state.profileData.login}`} target="_blank" rel="noopener noreferrer">
           <img src={this.state.profileData.avatar_url} className='githubImage' alt='' />
           <div style={{ flexGrow: 2 }}>
             <h5>{this.state.profileData.login}</h5>
