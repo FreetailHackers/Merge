@@ -56,3 +56,13 @@
    transform: scale(1.1);
    opacity: 0.8;
 }
+
+.profile-container {
+   width: 100%;
+   padding: 20px;
+}
+
+.profile-child {
+   width: 50%;
+   float: left;
+} 

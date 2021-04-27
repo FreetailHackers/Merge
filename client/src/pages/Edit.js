@@ -5,6 +5,7 @@ import { logoutUser, setCurrentUser } from "../actions/authActions";
 import axios from "axios";
 import userProfileFields from "../content/userProfileFields.json"
 import { RiLoader3Line } from "react-icons/ri";
+import SwipeProfile from "../components/SwipeProfile";
 
 import './Edit.css';
 
@@ -12,7 +13,7 @@ class Edit extends Component {
   
   handleSubmit = (event) => {
     event.preventDefault()
-    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, saved: false}, () => {
+    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, saved: false, savedChanges: false}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
       axios.post(process.env.REACT_APP_API_URL + "user/", {
         auth: this.props.auth,
@@ -46,64 +47,80 @@ class Edit extends Component {
 
   constructor(props){
     super(props)
-    this.state = {userProfile: {...this.props.user.profile}, saved: true, profilePictureUrl: this.props.user.profilePictureUrl}
+    this.state = {userProfile: {...this.props.user.profile}, saved: true, savedChanges:true, profilePictureUrl: this.props.user.profilePictureUrl}
     this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
   }
 
   cancelEdit = e => {
     e.preventDefault();
     this.setState(this.baseState)
-    this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile, profilePictureUrl: this.state.baseState.profilePictureUrl})
+    this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile, profilePictureUrl: this.baseState.profilePictureUrl})
     axios.post(process.env.REACT_APP_API_URL + "user/", {
       auth: this.props.auth,
       user: this.props.user
-    }).then(res => {
-      this.props.history.push('/dashboard')
-    });
+    }).then(() => {
+      this.setState({ savedChanges: true})
+    })
   };
 
   doneEdit = e => {
-    this.props.history.push('/dashboard');
+    this.setState({ savedChanges: true})
   }
 
   capitalizeFirstLetter = (str) => str.substring(0, 1).toUpperCase() + str.substring(1)
 
   render() {
     return (
-      <section id="settings">
-        <form>
-          <div>
-            <label>Current Picture:</label>
-            <img src={this.state.profilePictureUrl} alt='your profile' width="200" height="200" />
-          </div>
-          <div>
-            <label>Upload Picture:</label>
-            <input type="file" name="filename" onChange={this.handleNewProfilePicture} />
-          </div>
-          {
-            userProfileFields.map((v, i) => (
-              <div key={i}>
-                <label>
-                  {this.capitalizeFirstLetter(v)}:
-                </label>
-                <input 
-                  name={v} 
-                  placeholder={this.capitalizeFirstLetter(v)}
-                  value={this.state.userProfile[v] || ""} 
-                  onChange={this.handleSubmit}
-                  type="text"
-                />
+      <div class="profile-container">
+        <div class="profile-child">
+          <section id="settings">
+            <form>
+              <div>
+                <label>Current Picture:</label>
+                <img src={this.state.profilePictureUrl} alt='your profile' width="200" height="200" />
               </div>
-            ))
-          }
-        </form>
-        {
-          this.state.saved
-          ? <button onClick={this.doneEdit} className='done'>Done</button>
-          : <button className='loading'><RiLoader3Line className='spin-animation' /> saving...</button>
-        }
-        <button onClick={this.cancelEdit} className='cancel'>Cancel</button>
-      </section>
+              <div>
+                <label>Upload Picture:</label>
+                <input type="file" name="filename" onChange={this.handleNewProfilePicture} />
+              </div>
+              {
+                userProfileFields.map((v, i) => (
+                  <div key={i}>
+                    <label>
+                      {this.capitalizeFirstLetter(v)}:
+                    </label>
+                    <input 
+                      name={v} 
+                      placeholder={this.capitalizeFirstLetter(v)}
+                      value={this.state.userProfile[v] || ""} 
+                      onChange={this.handleSubmit}
+                      type="text"
+                    />
+                  </div>
+                ))
+              }
+            </form>
+              {
+                this.state.saved
+                ? <button onClick={this.doneEdit} className='done'>Done</button>
+                : <button className='loading'><RiLoader3Line className='spin-animation' /> saving...</button>
+              }
+              <button onClick={this.cancelEdit} className='cancel'>Cancel</button>
+          </section>
+        </div>
+        <div class="profile-child">
+          {
+            this.state.savedChanges
+            ? <SwipeProfile 
+                  name={this.state.userProfile.name} 
+                  school={this.state.userProfile.school}
+                  intro={this.state.userProfile.intro}
+                  profilePictureUrl={this.state.profilePictureUrl}
+                />
+            : null
+            }
+        </div>
+      </div>
     );
   }
 }

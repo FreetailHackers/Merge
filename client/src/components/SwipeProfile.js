@@ -6,7 +6,7 @@ import './SwipeProfile.css';
 const SwipeProfile = (props) => {
    const relativePosition = props.relativePosition || [0, 0];
    const angle = props.relativeAngle || 0;
-   const isBeingDragged = props.relativePosition.some(v => v !== 0); 
+   const isBeingDragged = relativePosition.some(v => v !== 0); 
 
    return (
       <div 
