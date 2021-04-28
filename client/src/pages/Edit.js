@@ -13,7 +13,7 @@ class Edit extends Component {
   
   handleSubmit = (event) => {
     event.preventDefault()
-    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, saved: false, savedChanges: false}, () => {
+    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, saved: false, savedChanges: true}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
       axios.post(process.env.REACT_APP_API_URL + "user/", {
         auth: this.props.auth,
@@ -22,6 +22,7 @@ class Edit extends Component {
         this.setState({
           saved: true
         })
+        this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
       });
     });
   }
@@ -47,7 +48,7 @@ class Edit extends Component {
 
   constructor(props){
     super(props)
-    this.state = {userProfile: {...this.props.user.profile}, saved: true, savedChanges:true, profilePictureUrl: this.props.user.profilePictureUrl}
+    this.state = {userProfile: {...this.props.user.profile}, saved: true, savedChanges: true, profilePictureUrl: this.props.user.profilePictureUrl}
     this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
   }
 
@@ -63,16 +64,16 @@ class Edit extends Component {
     })
   };
 
-  doneEdit = e => {
-    this.setState({ savedChanges: true})
+  handleEdit = e => {
+    this.setState({userProfile: {...this.state.userProfile, [e.target.name]: e.target.value}, savedChanges: false})
   }
 
   capitalizeFirstLetter = (str) => str.substring(0, 1).toUpperCase() + str.substring(1)
 
   render() {
     return (
-      <div class="profile-container">
-        <div class="profile-child">
+      <div className="profile-container">
+        <div className="profile-child">
           <section id="settings">
             <form>
               <div>
@@ -93,7 +94,7 @@ class Edit extends Component {
                       name={v} 
                       placeholder={this.capitalizeFirstLetter(v)}
                       value={this.state.userProfile[v] || ""} 
-                      onChange={this.handleSubmit}
+                      onChange={this.handleEdit}
                       type="text"
                     />
                   </div>
@@ -102,7 +103,7 @@ class Edit extends Component {
             </form>
               {
                 this.state.saved
-                ? <button onClick={this.doneEdit} className='done'>Done</button>
+                ? <button onClick={this.handleSubmit} className='save'>Save</button>
                 : <button className='loading'><RiLoader3Line className='spin-animation' /> saving...</button>
               }
               <button onClick={this.cancelEdit} className='cancel'>Cancel</button>

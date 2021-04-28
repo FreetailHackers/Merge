@@ -33,7 +33,7 @@
    margin-left: 140px;
 }
 
-#settings button.done {
+#settings button.save {
    background-color: var(--accept);
    color: var(--text-on-accept);
 }
