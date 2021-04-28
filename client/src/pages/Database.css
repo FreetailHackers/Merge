@@ -65,3 +65,15 @@
   margin-left: 12px;
   display: inline-block;
 }
+
+.chat-button {
+  background-color: #1ec19b;
+  color: white;
+  float: right;
+  padding: 10px;
+  font-family: var(--font-body);
+  font-size: 1.2em;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}

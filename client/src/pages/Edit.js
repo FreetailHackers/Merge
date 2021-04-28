@@ -117,6 +117,7 @@ class Edit extends Component {
                   school={this.state.userProfile.school}
                   intro={this.state.userProfile.intro}
                   profilePictureUrl={this.state.profilePictureUrl}
+                  github={this.state.userProfile['github username']}
                 />
             : null
             }
