@@ -1,44 +1,65 @@
 .swipe-profile {
-   background: #ddd;
-
    min-width: 300px;
    width: 50%;
    padding: 20px;
    margin: 50px auto;
-   border: 2px solid rgb(255, 255, 255);
+
+   background: #fff;
+   box-shadow: -10px -20px 50px var(--primary-transparent), 
+                10px  20px 50px var(--secondary-transparent);
+
+   border-radius: 20px;
 
    position: relative;
+   filter: grayscale(0);
 
    cursor: pointer;
-   transition: left 0.5s, top 0.5s, transform 0.5s, border 0.4s;
+   transition: left 0.5s, top 0.5s, transform 0.5s, border 0.4s, box-shadow 0.3s, opacity 0.8s, filter 0.8s;
+}
+
+.swipe-profile h3 {
+   margin: 0;
+   font-size: 3.5em;
+   font-weight: normal;
+   word-wrap: break-word;
+}
+
+.swipe-profile h4 {
+   margin: 10px 0;
+   font-size: 2em;
+   font-weight: normal;
+   word-wrap: break-word;
 }
 
 .swipe-profile.dragged {
-   transition: none;
-}
-
-.swipe-profile.neutral-side {
-   border: 4px solid rgb(0, 0, 0);
-}
-
-.swipe-profile.reject-side {
-   border: 4px solid rgb(177, 39, 39);
+   transition: box-shadow 0.3s, opacity 0.8s, filter 0.8s;
 }
 
 .swipe-profile.accept-side {
-   border: 4px solid rgb(25, 171, 25);
+   box-shadow: -10px -20px 80px var(--primary-less-transparent), 
+                10px  20px 80px var(--secondary-less-transparent);
+}
+
+.swipe-profile.reject-side {
+   box-shadow: 0px 0px 50px var(--primary-transparent);
+   filter: grayscale(1);
+   opacity: 0.5;
 }
 
 .swipe-profile.reject-committed-side {
-   border: 4px solid rgb(177, 39, 39);
    left: -100vw !important;
 }
 
 .swipe-profile.accept-committed-side {
-   border: 4px solid rgb(25, 171, 25);
    left: 100vw !important;
 }
 
 .swipe-profile p {
    white-space: pre-line;
+}
+
+.swipe-profile img {
+   position: relative;
+   width: calc(100% + 40px);
+   left: -20px;
 }

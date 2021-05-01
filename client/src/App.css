@@ -1,0 +1,51 @@
+.App {
+   display: flex;
+}
+
+hr {
+   border: none;
+   background-color: #ddd;
+   height: 1px;
+   margin: 20px 0;
+}
+
+.logo {
+   height: 100px;
+
+   background-image: var(--logo-color);
+   background-size: contain;
+   background-repeat: no-repeat;
+   background-position: center;
+}
+
+.logo.white {
+   background-image: var(--logo-white);
+}
+
+section {
+   flex-grow: 1;
+}
+
+input {
+   padding: 10px;
+   width: 300px;
+
+   border: 1px #ddd solid;
+   border-radius: 0;
+
+   font-size: 1em;
+}
+
+.spin-animation {
+   animation: spin 0.5s infinite;
+}
+
+@keyframes spin {
+   from {
+      transform: rotate(0deg);
+   }
+
+   to {
+      transform: rotate(360deg);
+   }
+}

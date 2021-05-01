@@ -1,35 +1,67 @@
 .headerDatabase{
-    cursor: pointer;
-    border: solid 1px #f2f2f2;
-    padding: 15px;
-    background-color: #0089CC;
-    color: #FFF;
-    font-family: verdana;
-    margin-left:10px;
-    margin-right:10px;
-  }
+  display: block;
+  border: solid 1px #f2f2f2;
+  padding: 15px;
+  margin-left:10px;
+  margin-right:10px;
+  width: calc(100% - 30px);
 
+  text-align: left;
+  font-size: 1em;
+
+  background-color: var(--primary);
+
+  color: var(--text-on-primary);
+
+  cursor: pointer;
+}
 
 .contentDatabase{
-    cursor: pointer;
-    border-left: solid 1px #f2f2f2;
-    border-right: solid 1px #f2f2f2;
-    border-bottom: solid 1px #f2f2f2;
-    border-radius: 0 0 5px 5px;
-    margin-left:15px;
-    margin-right:15px;
-    padding: 5px;
-    font-family: verdana;
-    font-size: 14px;
-  }
-  
-  .headerTitle {
-    margin-left:5px;
-    margin-right:5px;
-    text-align: center;
-  }
+  margin-left:15px;
+  margin-right:15px;
+  margin-bottom: 20px;
 
-  div {
-    white-space: pre-wrap;
-    flex: 1;
-  }
+  border: solid 1px #f2f2f2;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+
+  padding: 5px;
+    
+  white-space: pre-line;
+}
+
+.headerTitle {
+  margin-left:5px;
+  margin-right:5px;
+  text-align: center;
+}
+
+.pagination {
+  text-align: center;
+}
+
+.pagination a, .pagination span {
+  display: inline-block;
+  margin: 0 5px;
+  min-width: 20px;
+}
+
+.pagination a {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pagination div {
+  display: inline;
+}
+
+.filterInput input {
+  margin: 4px 12px;
+  width: 150px;
+}
+
+.filterInput {
+  margin-left: 12px;
+  display: inline-block;
+}
