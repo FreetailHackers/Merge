@@ -18,7 +18,17 @@ const UserSchema = new Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  profile: [{
+    adult: Boolean,
+    socialMedia: {String, required=false},
+    school: String,
+    major: String,
+    class: String,
+    skills: String,
+    experience: String,
+    intro: String
+  }]
 });
 
 module.exports = User = mongoose.model("users", UserSchema);
