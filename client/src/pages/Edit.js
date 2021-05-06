@@ -4,8 +4,9 @@ import { connect } from "react-redux";
 import { logoutUser, setCurrentUser } from "../actions/authActions";
 import axios from "axios";
 import userProfileFields from "../content/userProfileFields.json"
-import { RiLoader3Line } from "react-icons/ri";
 import SwipeProfile from "../components/SwipeProfile";
+import { startCase } from "lodash";
+import { Link } from 'react-router-dom';
 
 import './Edit.css';
 
@@ -13,16 +14,11 @@ class Edit extends Component {
   
   handleSubmit = (event) => {
     event.preventDefault()
-    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}, saved: false, savedChanges: true}, () => {
+    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
       axios.post(process.env.REACT_APP_API_URL + "user/", {
         auth: this.props.auth,
         user: this.props.user
-      }).then(res => {
-        this.setState({
-          saved: true
-        })
-        this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
       });
     });
   }
@@ -34,21 +30,19 @@ class Edit extends Component {
     const data = new FormData();
 		data.append('file', file);
 
-    this.setState({saved: false}, () => {
-      axios.post(process.env.REACT_APP_API_URL + "user/profile-picture", {
-        auth: this.props.auth,
-        user: this.props.user,
-        data
-      }).then(res => {
-        this.setState({ saved: true, profilePictureUrl: res.data.url })
-        this.props.setCurrentUser(this.props.userID, {...this.props.user, profilePictureUrl: res.data.url})
-      });
+    axios.post(process.env.REACT_APP_API_URL + "user/profile-picture", {
+      auth: this.props.auth,
+      user: this.props.user,
+      data
+    }).then(res => {
+      this.setState({profilePictureUrl: res.data.url })
+      this.props.setCurrentUser(this.props.userID, {...this.props.user, profilePictureUrl: res.data.url})
     });
   }
 
   constructor(props){
     super(props)
-    this.state = {userProfile: {...this.props.user.profile}, saved: true, savedChanges: true, profilePictureUrl: this.props.user.profilePictureUrl}
+    this.state = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
     this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
   }
 
@@ -60,15 +54,14 @@ class Edit extends Component {
       auth: this.props.auth,
       user: this.props.user
     }).then(() => {
-      this.setState({ savedChanges: true})
     })
   };
 
   handleEdit = e => {
-    this.setState({userProfile: {...this.state.userProfile, [e.target.name]: e.target.value}, savedChanges: false})
+    this.setState({userProfile: {...this.state.userProfile, [e.target.name]: e.target.value}})
   }
 
-  capitalizeFirstLetter = (str) => str.substring(0, 1).toUpperCase() + str.substring(1)
+  getOrEmptyString = (str) => str ? str : ""
 
   render() {
     return (
@@ -88,11 +81,11 @@ class Edit extends Component {
                 userProfileFields.map((v, i) => (
                   <div key={i}>
                     <label>
-                      {this.capitalizeFirstLetter(v)}:
+                      {startCase(v)}:
                     </label>
                     <input 
                       name={v} 
-                      placeholder={this.capitalizeFirstLetter(v)}
+                      placeholder={startCase(v)}
                       value={this.state.userProfile[v] || ""} 
                       onChange={this.handleEdit}
                       type="text"
@@ -101,26 +94,19 @@ class Edit extends Component {
                 ))
               }
             </form>
-              {
-                this.state.saved
-                ? <button onClick={this.handleSubmit} className='save'>Save</button>
-                : <button className='loading'><RiLoader3Line className='spin-animation' /> saving...</button>
-              }
-              <button onClick={this.cancelEdit} className='cancel'>Cancel</button>
+              <button onClick={this.handleSubmit} className='save'>Save</button>
+              <button onClick={this.cancelEdit} className='cancel'>
+                  <Link to="/dashboard">Cancel</Link>
+              </button>
           </section>
         </div>
-        <div class="profile-child">
-          {
-            this.state.savedChanges
-            ? <SwipeProfile 
-                  name={this.state.userProfile.name} 
-                  school={this.state.userProfile.school}
-                  intro={this.state.userProfile.intro}
-                  profilePictureUrl={this.state.profilePictureUrl}
-                  github={this.state.userProfile['github username']}
-                />
-            : null
-            }
+        <div className="profile-child">
+            <SwipeProfile 
+                name={this.getOrEmptyString(this.state.userProfile.name)} 
+                school={this.getOrEmptyString(this.state.userProfile.school)}
+                intro={this.getOrEmptyString(this.state.userProfile.intro)}
+                profilePictureUrl={this.getOrEmptyString(this.state.profilePictureUrl)}
+            />    
         </div>
       </div>
     );

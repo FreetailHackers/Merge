@@ -67,8 +67,8 @@
 }
 
 .chat-button {
-  background-color: #1ec19b;
-  color: white;
+  background-color: var(--tertiary);
+  color: var(--text-on-tertiary);
   float: right;
   padding: 10px;
   font-family: var(--font-body);
