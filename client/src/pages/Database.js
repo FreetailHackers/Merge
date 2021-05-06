@@ -106,6 +106,7 @@ class Database extends Component {
         <br /><br />
         {this.state.users.map((user, index) =>
           <Collapsible key={index} title={user.name}>
+            <button className="chat-button">Message</button>
             <UserToParagraph user={user} keys={this.state.keys} />
           </Collapsible>
         )}

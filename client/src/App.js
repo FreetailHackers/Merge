@@ -20,7 +20,7 @@ import Chat from "./pages/Chat";
 import "./Theme.css";
 import "./App.css";
 
-// createMockServerIfNotProduction();
+createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {

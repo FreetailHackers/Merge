@@ -33,7 +33,7 @@
    margin-left: 140px;
 }
 
-#settings button.done {
+#settings button.save {
    background-color: var(--accept);
    color: var(--text-on-accept);
 }
@@ -41,18 +41,25 @@
 #settings button.cancel {
    border: var(--reject) 2px solid;
    background-color: #fff;
+}
+
+#settings a {
+   text-decoration: none;
    color: var(--reject);
+   display: block;
 }
 
-#settings button.loading {
-   filter: grayscale();
-}
-
-#settings button.loading svg {
-   vertical-align: middle;
-}
-
-#settings button:not(.loading):hover, #settings button:not(.loading):focus {
+#settings button:hover, #settings button:focus {
    transform: scale(1.1);
    opacity: 0.8;
 }
+
+.profile-container {
+   width: 100%;
+   padding: 20px;
+}
+
+.profile-child {
+   width: 50%;
+   float: left;
+} 
