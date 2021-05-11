@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ChatSchema = new Schema({
+   _id:  Number,
    userIds: [String],
    messages: [{
       fromUserId: {
@@ -16,13 +17,13 @@ const ChatSchema = new Schema({
          type: Date,
          default: Date.now
       },
-      seen: {
-         type: Boolean,
-         default: false
-      }
+      // seen: {
+      //    type: {Boolean},
+      //    default: false
+      // }
    }]
 });
 
-MessageSchema.index({ userIds: 1 });
+// ChatSchema.index({ userIds: 1 });
 
-module.exports = Message = mongoose.model("messages", MessageSchema);
+module.exports = ChatSchema;

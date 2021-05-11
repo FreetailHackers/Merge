@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import socket from 'socket.io-client';
+import io from 'socket.io-client';
 import ChatSidebar from '../components/ChatSidebar';
 import ChatWindow from '../components/ChatWindow';
 
@@ -25,11 +25,10 @@ const getIdToProfileMap = (chats) => {
    }
    return profiles;
 }
-
+var socket = io("http://localhost:5001", { transports: ["websocket"] });
 class Chat extends Component {
    constructor (props) {
       super(props);
-
       this.state = {
          activeChatIndex: 0,
          chats: [
@@ -115,11 +114,22 @@ class Chat extends Component {
          ]
       };
    }
-
+   
    componentDidMount () {
+      // load previous chats into left bar
       console.log('connecting to socket');
-      this.socket = socket('http://localhost:5001');
-      this.socket.on('chats', data => {
+      socket.on("connect", () => {
+         console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+       });
+      socket.on('connect_error', function(err) {
+         console.log("client connect_error: ", err);
+      });
+      
+      socket.on('connect_timeout', function(err) {
+         console.log("client connect_timeout: ", err);
+      });
+      console.log("check 1 ", socket.connected)
+      socket.on('chats', data => {
          console.log('chats', data);
          this.setState({
             chats: JSON.parse(data),
@@ -134,16 +144,33 @@ class Chat extends Component {
 
    componentWillUnmount () {
       console.log('disconnecting from socket');
-      this.socket.disconnect();
+      socket.on("disconnect", () => {
+         console.log(socket.id); // undefined
+       });
+      socket.disconnect();
+   }
+
+   getMessages() {
+      const activeChat = this.state.chats[this.state.activeChatIndex];
+      socket.emit('request messages', JSON.stringify({
+         chatId: activeChat._id,
+         page: 1
+      }))
    }
 
    sendMessage = (message) => {
+      // push one more message onto chat document
+      console.log(message)
       const activeChat = this.state.chats[this.state.activeChatIndex];
-      this.socket.emit('send message', JSON.stringify({
+      socket.emit('send message', JSON.stringify({
          chatId: activeChat._id,
-         message
+         message: "Test"
       }));
+      
+      this.getMessages()
    }
+
+  
 
    render = () => (
       <div style={{ display: 'flex', width: '100%' }}>

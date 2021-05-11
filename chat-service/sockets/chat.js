@@ -1,15 +1,16 @@
-const Message = require('../models/message');
+const Message = require('../models/Chat');
 
 module.exports = {
 
+//TODO: get previous chats from database
 addChatRoutes (socket) {
-   socket.on('request chats', _ => {
+   socket.on('request chats', (data) => {
       console.log('Got request chats socket message');
+      const parsed = JSON.parse(data)
       const userId = socket._connectedUserId;
-
+      const chats = parsed.chatIds
       // TODO change from original Message chat db to Chat based db
-      const pairs = [["toUserId", "fromUserId"], ["fromUserId", "toUserId"]];
-      const mongoRequests = pairs.map(pair => [
+      const mongoRequests = chats.map(chat => [
          { "$match": { "userIds": { $has: userId } } },
          { "$sort": { "date": -1 } },
          { "$group": { 
