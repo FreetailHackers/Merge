@@ -15,17 +15,17 @@ module.exports = {
       socket.on('send message', async (data) => {
          console.log("Recieved Message")
          const parsed = JSON.parse(data);
-         // const chatId = parsed.chatId;
-         // const fromUser = parsed.fromUser;
-         // const incomingMessage = parsed.message;
-         chatId = 1
-         fromUser = "11"
-         const incomingMessage = "We just finished this shit"
+         const chatId = parsed.chatId;
+         const fromUser = parsed.fromUser;
+         const incomingMessage = parsed.message;
+         // // chatId = 1
+         // // fromUser = "11"
+         // const incomingMessage = "Hello Raffer"
          var Chat = mongoose.model("chat", ChatSchema, "chats");
          Chat.findByIdAndUpdate(
             chatId,
             {$push: {"messages": {fromUserID: fromUser, message: incomingMessage, data: Date.now()}}},
-            {safe: true, upsert: false},
+            {safe: true, upsert: true},
             function(err, model) {
                if(err) console.log(err);
            }
@@ -34,7 +34,7 @@ module.exports = {
    
 
    socket.on('request messages', async (data) => {
-      console.log("Requestion Messages")
+      console.log("Requesting Messages")
       const parsed = JSON.parse(data);
       const userId = socket._connectedUserId;
       const msgPerPage = 25;  //Change as needed
@@ -50,15 +50,13 @@ module.exports = {
          console.log("%s", chat.messages[0].message)
          messages = chat.messages
          userIds = chat.userIds
+         console.log(messages[0])
       })
-      const messagesOut = [];
-      for(let i = messages.size - ((page + 1) * msgPerPage); i < messages.size - (page * msgPerPage); i++){
-         messagesOut.add(messages[i]);
-      }
-      console.log(messagesOut)
-      socket.emit('messages', {
-         messages: JSON.stringify(messagesOut)
-      });
+   });
+
+   socket.emit('messages', () => {
+      JSON.stringify({chatMessage: chat.messages})
+      
    });
 
    console.log('Added message routes');

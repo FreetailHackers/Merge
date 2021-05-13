@@ -156,18 +156,35 @@ class Chat extends Component {
          chatId: activeChat._id,
          page: 1
       }))
+      socket.on('messages', (data) => {
+            console.log(data)
+            console.log("in messages")
+            const parsed = JSON.parse(data)
+            const messages = parsed.chatMessages
+            console.log(messages)
+            return messages
+      })
    }
 
    sendMessage = (message) => {
       // push one more message onto chat document
       console.log(message)
       const activeChat = this.state.chats[this.state.activeChatIndex];
+      console.log(activeChat._id)
+
+      var messages = {
+         fromUserId: "0",
+         message: message,
+         date: (new Date() - 1000 * 60 * 60 * 4.3),
+         seen: false
+      }
+      this.state.chats[0].messages.push(messages)
+
       socket.emit('send message', JSON.stringify({
          chatId: activeChat._id,
-         message: "Test"
+         userId: "10",
+         message: message
       }));
-      
-      this.getMessages()
    }
 
   
