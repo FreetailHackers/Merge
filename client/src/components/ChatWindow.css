@@ -1,0 +1,127 @@
+.chatWindow {
+   /* child flex properties */
+   flex-grow: 1;
+
+   /* parent flex properties */
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-end;
+
+   height: 100vh;
+}
+
+/*
+New message box
+*/
+
+.newMessageBox {
+   height: 40px;
+   width: calc(100% - 20px);
+   padding: 10px;
+
+   display: flex;
+   justify-content: center;
+   vertical-align: middle;
+}
+
+.newMessageBox input {
+   border: none;
+   background: #eee;
+   border-radius: 999px;
+   flex-grow: 1;
+   vertical-align: middle;
+}
+
+.newMessageBox input:focus {
+   outline: none;
+}
+
+.newMessageBox p {
+   display: inline-block;
+   width: 30px;
+   height: 30px;
+   margin: 0 10px;
+   padding: 5px;
+
+   vertical-align: middle;
+   text-align: center;
+   
+   font-size: 25px;
+   border-radius: 50%;
+   
+   transition: background 0.1s;
+   cursor: pointer;
+}
+
+.newMessageBox p:hover {
+   background: #eee;
+}
+
+/*
+Messages
+*/
+
+.message {
+   max-width: 60%;
+   margin-bottom: 14px;
+
+   display: flex;
+   align-items: flex-end;
+}
+
+.message.rightSide {
+   align-self: flex-end;
+   flex-direction: row-reverse;
+   text-align: right;
+}
+
+.message.mergeBottom {
+   margin: 0 60px 2px 60px;
+}
+
+.messageImage {
+   width: 39px;
+   min-width: 39px;
+   height: 39px;
+   border-radius: 50%;
+   margin: 0 10px;
+
+   background-size: cover;
+   background-position: center;
+}
+
+.messageName {
+   margin: 0 10px;
+   color: #888;
+   font-size: 0.8em;
+}
+
+.messageContent {
+   flex-grow: 1;
+   padding: 10px;
+   border-radius: 20px;
+
+   background: #eee;
+}
+
+.message.rightSide .messageContent {
+   background: var(--primary);
+   color: var(--text-on-primary);
+   text-align: left;
+}
+
+.message.mergeBottom:not(.rightSide) .messageContent {
+   border-bottom-left-radius: 4px;
+}
+
+.message.mergeTop:not(.rightSide) .messageContent {
+   border-top-left-radius: 4px;
+}
+
+.message.mergeBottom.rightSide .messageContent {
+   border-bottom-right-radius: 4px;
+}
+
+.message.mergeTop.rightSide .messageContent {
+   border-top-right-radius: 4px;
+}

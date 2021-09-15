@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import { Provider } from "react-redux";
 import store from "./store";
@@ -7,15 +7,20 @@ import store from "./store";
 import  {createMockServerIfNotProduction}  from "./server/index"
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
-import Navbar from "./components/layout/Navbar";
-import Landing from "./components/layout/Landing";
-import Login from "./components/auth/Login";
-import PrivateRoute from "./components/private-route/PrivateRoute";
-import Dashboard from "./components/dashboard/Dashboard";
+import Navbar from "./components/Navbar";
+import PrivateRoute from "./components/PrivateRoute";
 
+import Login from "./pages/Login";
+import Database from "./pages/Database";
+import Dashboard from "./pages/Dashboard";
+import Swipe from "./pages/Swipe";
+import Edit from "./pages/Edit";
+import Chat from "./pages/Chat";
+
+import "./Theme.css";
 import "./App.css";
 
-// createMockServerIfNotProduction();
+createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -24,11 +29,17 @@ class App extends Component {
       <Provider store={store}>
         <Router>
           <div className="App">
-            <Navbar />
-            <div>using {process.env.REACT_APP_API_URL} as API Url</div>
-            <Route exact path="/" component={Landing} />
-            <Route exact path="/login" component={Login} />
-            <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            <Switch> {/* this will render the login page WITHOUT the navbar on routes / and /login */}
+              <Route exact path="/" component={Login} />
+              <Route exact path="/login" component={Login} />
+              <Route path="/:anything" component={Navbar} /> 
+            </Switch>
+            <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
+            <PrivateRoute exact path="/database" component={Database} />
+            <Route exact path="/dashboard" component={Dashboard} />
+            <PrivateRoute exact path="/swipe" component={Swipe} />
+            <PrivateRoute exact path="/edit" component={Edit} />
+            <Route exact path="/chat" component={Chat} />
           </div>
         </Router>
       </Provider>

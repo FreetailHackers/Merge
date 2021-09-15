@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { logoutUser } from "../../actions/authActions";
+import { logoutUser } from "../actions/authActions";
+
+import './Dashboard.css';
 
 class Dashboard extends Component {
 
@@ -11,10 +13,18 @@ class Dashboard extends Component {
   };
 
   render() {
+    const name = this.props.user.name;
+
     return (
-      <section>
-        <p>Welcome home, {JSON.stringify(this.props.user)}</p>
-        <button onClick={this.onLogoutClick}>Logout</button>
+      <section id='dashboard'>
+        <h1>Welcome home{ name ? `, ${name}` : `!` }</h1>
+        <p>Start finding your hackathon team members!</p>
+        <div className='team-image'>
+          <div className='background' />
+          <div className='main' />
+          <div className='primary' />
+          <div className='secondary' />
+        </div>
       </section>
     );
   }

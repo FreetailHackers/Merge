@@ -9,7 +9,7 @@ function createSuccessfulLoginResponse () {
     status : { completedProfile : true, admitted : true, confirmed : true, declined : false, checkedIn : false, reimbursementGiven : false },
     sponsorFields : { tier : "", workshop : false, estimatedCost : 0 },
     userAtEvent : { receivedLunch : false, receivedDinner : false, workshopsAttended : [ ], tablesVisited : [ ] },
-    admin : false,
+    admin : true,
     sponsor : false,
     timestamp : 1602555582361,
     lastUpdated : 1602555582361,
