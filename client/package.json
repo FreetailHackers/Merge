@@ -19,8 +19,9 @@
     "socket.io-client": "^4.0.1"
   },
   "scripts": {
-    "start": "set PORT=5000 && cross-env REACT_APP_API_URL=$npm_config_api REACT_APP_CHAT_URL=$npm_config_chat_api react-scripts start",
-    "owen": "echo $npm_config_api",
+    "start": "REACT_APP_API_URL=$npm_config_api react-scripts start",
+    "start-windows": "set PORT=5000 && cross-env REACT_APP_API_URL=$npm_config_api REACT_APP_CHAT_URL=$npm_config_chat_api react-scripts start",
+    "debug_api_string": "echo $npm_config_api",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
