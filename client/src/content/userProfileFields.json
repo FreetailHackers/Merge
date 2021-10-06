@@ -6,5 +6,7 @@
     "skills",
     "experience",
     "intro",
-    "githubUsername"
+    "githubUsername",
+    "linkedinLink",
+    "portfolioLink"
 ]

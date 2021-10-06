@@ -37,13 +37,15 @@
 
 .swipe-profile.accept-side {
    box-shadow: -10px -20px 80px var(--primary-less-transparent), 
-                10px  20px 80px var(--secondary-less-transparent);
+                10px  20px 80px var(--secondary-less-transparent);   
+   background: rgb(50,205,50);
+   transition: background 0.3s;   
 }
 
 .swipe-profile.reject-side {
    box-shadow: 0px 0px 50px var(--primary-transparent);
-   filter: grayscale(1);
-   opacity: 0.5;
+   background: rgb(255,0,0);
+   transition: background 0.3s;   
 }
 
 .swipe-profile.reject-committed-side {
@@ -60,6 +62,6 @@
 
 .swipe-profile img {
    position: relative;
-   width: calc(100% + 40px);
-   left: -20px;
+   width: 80%;
+   left: 30px;
 }

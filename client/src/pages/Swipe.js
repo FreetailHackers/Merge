@@ -21,7 +21,9 @@ class Swipe extends Component {
             experienceLevel: res.data.experienceLevel,
             intro: res.data.intro,
             profilePictureUrl: res.data.profilePictureUrl,
-            github: res.data.github
+            github: res.data.github,
+            linkedin: res.data.linkedin,
+            portfolio: res.data.portfolio
           }),
           loadingUserToShow: false
         }, () => {
@@ -49,12 +51,34 @@ class Swipe extends Component {
     document.body.addEventListener('mouseup', this.mouseUpOnProfile);
     document.body.addEventListener('mouseleave', this.mouseUpOnProfile);
     document.body.addEventListener('mousemove', this.mouseMoveOnProfile);
+    document.body.addEventListener('onkeydown', this.checkKey);
   }
 
   componentWillUnmount () {
     document.body.removeEventListener('mouseup', this.mouseUpOnProfile);
     document.body.removeEventListener('mouseleave', this.mouseUpOnProfile.bind(this));
     document.body.removeEventListener('mousemove', this.mouseMoveOnProfile);
+    document.body.removeEventListener('onkeydown', this.checkKey);
+  }
+
+  checkKey = (e) => {
+    e = e || window.event;
+    // left key press
+    if (e.keyCode === '37') {
+      this.setState({
+        profilePosition: [0, 0],
+        profileAngle: 0,
+        profileSide: 'reject'
+      });
+    } 
+    // right key press
+    else if (e.keyCode === '39') {
+      this.setState({
+        profilePosition: [0, 0],
+        profileAngle: 0,
+        profileSide: 'accept'
+      });
+    }
   }
 
   mouseDownOnProfile = (e) => {
