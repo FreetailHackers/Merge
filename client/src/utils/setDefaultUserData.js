@@ -7,7 +7,7 @@ export function setDefaultUserData (currentData) {
       skills: [],
       experienceLevel: '[missing experience level]',
       intro: '[missing introduction]',
-      profilePictureUrl: 'https://github.com/FreetailHackers/Merge/blob/3daacf11aae960ec34949e39ff6f4e24be861f8a/client/public/default-profile.png',
+      profilePictureUrl: '/default-profile.png',
       github: null,
       linkedin: null,
       portfolio: null

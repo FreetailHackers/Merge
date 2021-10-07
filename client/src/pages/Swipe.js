@@ -180,6 +180,8 @@ class Swipe extends Component {
               intro={this.state.userToShow.intro}
               profilePictureUrl={this.state.userToShow.profilePictureUrl}
               github={this.state.userToShow.github}
+              linkedin={this.state.userToShow.linkedin}
+              portfolio={this.state.userToShow.portfolio}
               onMouseDown={this.mouseDownOnProfile}
               relativePosition={this.state.profilePosition}
               relativeAngle={this.state.profileAngle}

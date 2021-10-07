@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import GithubCard from './GithubCard';
 import './SwipeProfile.css';
 import LinkedInCard from './LinkedInCard';
+import PortfolioCard from './PortfolioCard';
 
 const SwipeProfile = (props) => {
    const relativePosition = props.relativePosition || [0, 0];
@@ -33,7 +34,12 @@ const SwipeProfile = (props) => {
          }
          {
             props.linkedin
-            ? <LinkedInCard id={ props.github } />
+            ? <LinkedInCard link={ props.linkedin } />
+            : null
+         }
+         {
+            props.portfolio
+            ? <PortfolioCard link={ props.portfolio } />
             : null
          }
       </div>

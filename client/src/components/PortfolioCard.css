@@ -1,4 +1,4 @@
-.linkedin-card {
+.portfolio-card {
     padding: 10px;
  
     border-radius: 8px;
@@ -9,38 +9,37 @@
     margin-top: 10px;
  }
  
- .linkedin-card:hover {
+ .portfolio-card:hover {
     box-shadow: 0 3px 10px #0002;
  }
  
- .linkedin-card > a {
+ .portfolio-card > a {
     display: flex;
     flex-direction: row;
     align-items: top;
     text-decoration: none;
  }
 
- .linkedin-card h5 {
+ .portfolio-card h5 {
    font-size: 2em;
    margin: 0 10px;
    color: #000;
 }
 
-.linkedin-card p {
+.portfolio-card p {
    font-size: 1em;
    margin: 0 10px;
    color: #000;
 }
- 
- .linkedin-card .linkedinLogo {
-    width: 50px;
-    height: 50px;
-    margin-top: 10px;
- 
-    color: #0000;
- 
-    background-image: url('/Linkedin-logo.png');
-    background-size: contain;
-    background-repeat: no-repeat;
- }
- 
+
+.portfolio-card .portfolioLogo {
+   width: 50px;
+   height: 50px;
+   margin-top: 3px;
+
+   color: #0000;
+
+   background-image: url('/Portfolio-Logo.svg');
+   background-size: contain;
+   background-repeat: no-repeat;
+}
