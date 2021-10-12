@@ -61,26 +61,6 @@ class Swipe extends Component {
     document.body.removeEventListener('keydown', this.keyDown);
   }
 
-  checkKey = (e) => {
-    e = e || window.event;
-    // left key press
-    if (e.keyCode === '37') {
-      this.setState({
-        profilePosition: [0, 0],
-        profileAngle: 0,
-        profileSide: 'reject'
-      });
-    } 
-    // right key press
-    else if (e.keyCode === '39') {
-      this.setState({
-        profilePosition: [0, 0],
-        profileAngle: 0,
-        profileSide: 'accept'
-      });
-    }
-  }
-
   keyDown = (e) => {
     e.preventDefault();
     if (this.state.profileSide.indexOf('committed') !== -1) return;
@@ -133,7 +113,6 @@ class Swipe extends Component {
           break;
     }
   }
-
 
   mouseDownOnProfile = (e) => {
     e.preventDefault();
