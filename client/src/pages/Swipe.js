@@ -51,14 +51,14 @@ class Swipe extends Component {
     document.body.addEventListener('mouseup', this.mouseUpOnProfile);
     document.body.addEventListener('mouseleave', this.mouseUpOnProfile);
     document.body.addEventListener('mousemove', this.mouseMoveOnProfile);
-    document.body.addEventListener('onkeydown', this.checkKey);
+    document.body.addEventListener('keydown', this.keyDown);
   }
 
   componentWillUnmount () {
     document.body.removeEventListener('mouseup', this.mouseUpOnProfile);
     document.body.removeEventListener('mouseleave', this.mouseUpOnProfile.bind(this));
     document.body.removeEventListener('mousemove', this.mouseMoveOnProfile);
-    document.body.removeEventListener('onkeydown', this.checkKey);
+    document.body.removeEventListener('keydown', this.keyDown);
   }
 
   checkKey = (e) => {
@@ -80,6 +80,60 @@ class Swipe extends Component {
       });
     }
   }
+
+  keyDown = (e) => {
+    e.preventDefault();
+    if (this.state.profileSide.indexOf('committed') !== -1) return;
+    switch (e.code) {
+      case "ArrowLeft":
+          this.setState({
+            profileSide: 'reject-committed',
+            cursorDown: false,
+            profilePosition: [0, 0],
+            profileAngle: -20,
+          }, () => {
+            axios.post(process.env.REACT_APP_API_URL + "swipe/", {
+              auth: this.props.auth,
+              otherUser: this.state.userToShow,
+              decision: this.state.profileSide
+            }).then(res => {});
+            setTimeout(() => {
+              this.getUserToShow(() => {
+                this.setState({
+                  cursorDown: false,
+                  profileAngle: 0,
+                  profileSide: 'neutral'
+                })
+              });
+            }, 350)
+          });
+          break;
+      case "ArrowRight":
+        this.setState({
+          profileSide: 'accept-committed',
+          cursorDown: false,
+          profilePosition: [0, 0],
+          profileAngle: 20,
+        }, () => {
+          axios.post(process.env.REACT_APP_API_URL + "swipe/", {
+            auth: this.props.auth,
+            otherUser: this.state.userToShow,
+            decision: this.state.profileSide
+          }).then(res => {});
+          setTimeout(() => {
+            this.getUserToShow(() => {
+              this.setState({
+                cursorDown: false,
+                profileAngle: 0,
+                profileSide: 'neutral'
+              })
+            });
+          }, 350)
+        });
+          break;
+    }
+  }
+
 
   mouseDownOnProfile = (e) => {
     e.preventDefault();
