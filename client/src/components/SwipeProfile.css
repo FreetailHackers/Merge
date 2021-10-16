@@ -75,3 +75,38 @@
    width: 80%;
    left: 30px;
 }
+
+.arrows {
+   width: 100%;
+   display: flex;
+   margin: 0 auto;
+   justify-content: space-between;
+}
+
+.arrow {
+   width: 75px;
+   height: 75px;
+   padding-bottom: 15px;
+}
+
+.left {
+   float: left;
+   margin: 0 10vw;
+   border: 0;
+}
+
+/* .left:hover {
+   background: rgb(50,205,50);
+   transition: background 0.3s;
+} */
+
+.right {
+   float: right;
+   margin: 0 10vw;
+   border: 0;
+}
+
+/* .right:hover {
+   background: rgb(255,0,0);
+   transition: background 0.3s; 
+} */

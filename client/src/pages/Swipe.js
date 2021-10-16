@@ -52,6 +52,7 @@ class Swipe extends Component {
     document.body.addEventListener('mouseleave', this.mouseUpOnProfile);
     document.body.addEventListener('mousemove', this.mouseMoveOnProfile);
     document.body.addEventListener('keydown', this.keyDown);
+    document.body.addEventListener('click', this.mouseDown);
   }
 
   componentWillUnmount () {
@@ -59,11 +60,64 @@ class Swipe extends Component {
     document.body.removeEventListener('mouseleave', this.mouseUpOnProfile.bind(this));
     document.body.removeEventListener('mousemove', this.mouseMoveOnProfile);
     document.body.removeEventListener('keydown', this.keyDown);
+    document.body.removeEventListener('click', this.mouseDown);
+  }
+
+  mouseDown = (e) => {
+    e.preventDefault();
+    if (this.state.profileSide.indexOf('committed') !== -1) return;
+    switch (e.target.id) {
+      case "left":
+          this.setState({
+            profileSide: 'reject-committed',
+            profilePosition: [0, 0],
+            profileAngle: -20,
+          }, () => {
+            axios.post(process.env.REACT_APP_API_URL + "swipe/", {
+              auth: this.props.auth,
+              otherUser: this.state.userToShow,
+              decision: this.state.profileSide
+            }).then(res => {});
+            setTimeout(() => {
+              this.getUserToShow(() => {
+                this.setState({
+                  profileAngle: 0,
+                  profileSide: 'neutral'
+                })
+              });
+            }, 350)
+          });
+          break;
+      case "right":
+        this.setState({
+          profileSide: 'accept-committed',
+          profilePosition: [0, 0],
+          profileAngle: 20,
+        }, () => {
+          axios.post(process.env.REACT_APP_API_URL + "swipe/", {
+            auth: this.props.auth,
+            otherUser: this.state.userToShow,
+            decision: this.state.profileSide
+          }).then(res => {});
+          setTimeout(() => {
+            this.getUserToShow(() => {
+              this.setState({
+                profileAngle: 0,
+                profileSide: 'neutral'
+              })
+            });
+          }, 350)
+        });
+          break;
+      default:
+        break;
+    }
   }
 
   keyDown = (e) => {
     e.preventDefault();
     if (this.state.profileSide.indexOf('committed') !== -1) return;
+
     switch (e.code) {
       case "ArrowLeft":
           this.setState({
@@ -111,7 +165,15 @@ class Swipe extends Component {
           }, 350)
         });
           break;
+      default:
+        break;
     }
+  }
+
+  buttonClick = (e) => {
+    e.preventDefault();
+    if (this.state.profileSide.indexOf('committed') !== -1) return;
+    
   }
 
   mouseDownOnProfile = (e) => {
