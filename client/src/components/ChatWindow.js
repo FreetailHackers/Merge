@@ -26,6 +26,15 @@ class ChatWindow extends Component {
       }
    }
 
+   sendMessageButton = () => {
+      let message = document.getElementById('newMessageInput').value;
+      if (message === '') return;
+      this.props.sendMessage(message);
+      this.setState({
+         ['update']: ''
+      })
+   }
+
    render = () => (
       <div className='chatWindow'>
          {
@@ -45,8 +54,9 @@ class ChatWindow extends Component {
             })
          }
          <div className='newMessageBox'>
-            <input name='newMessage' type='text' value={this.state.newMessage} placeholder='Aa' onChange={this.onType} onKeyDown={this.onKeyDown} />
-            <p onClick={() => this.props.sendMessage('❤️')}>❤️</p>
+            <input id='newMessageInput' name='newMessage' type='text' value={this.state.newMessage} placeholder='Aa' onChange={this.onType} onKeyDown={this.onKeyDown} />
+            <p onClick={() => {this.props.sendMessage('❤️'); this.setState({['update']: ''})}}>❤️</p>
+            <p onClick={this.sendMessageButton}>➡️</p>
          </div>
       </div>
    );

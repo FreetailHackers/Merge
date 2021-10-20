@@ -120,7 +120,7 @@ class Chat extends Component {
       const tempMessages1 = []
       this.state = {
          activeChatIndex: 0,
-         chats: tempMessages1
+         chats: tempMessages
       };
    }
    
