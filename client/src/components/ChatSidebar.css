@@ -80,6 +80,10 @@
    background: #000;
 }
 
+.chatPreview.chatrequest {
+   background: rgb(198, 211, 253);
+}
+
 .chatPicture {
    width:45px;
    height:45px;

@@ -37,6 +37,7 @@ class Chat extends Component {
             {
                _id: "0",
                userIds: ["1", "0"],
+               chatRequest: false, 
                userNames: ["Raffer", "Ben"],
                userImages: ["https://www.animalspot.net/wp-content/uploads/2017/03/Chinstrap-Penguin.jpg", "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw"],
                messages: [{
@@ -55,6 +56,7 @@ class Chat extends Component {
             {
                _id: "1",
                userIds: ["2", "0"],
+               chatRequest: false, 
                userNames: ["Jason", "Ben"],
                userImages: ["https://th.bing.com/th/id/Rd9accff7c37684e159f050d299998c7b?rik=KPh19WNdTrp3yw&riu=http%3a%2f%2fweknowyourdreams.com%2fimages%2fpenguin%2fpenguin-12.jpg&ehk=GOxVirbOiTqX4u20wBBKB8fW9Kjt3N1ht1vKGt9O58A%3d&risl=&pid=ImgRaw", "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw"],
                messages: [{
@@ -97,6 +99,7 @@ class Chat extends Component {
             {
                _id: "2",
                userIds: ["0", "4"],
+               chatRequest: false, 
                userNames: ["Ben", "Ryan"],
                userImages: ["https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw", "https://artprojectsforkids.org/wp-content/uploads/2019/08/Penguin-Easy-1.jpg"],
                messages: [{
@@ -111,9 +114,32 @@ class Chat extends Component {
                   date: (new Date() - 1000 * 60 * 60 * 4.9),
                   seen: false
                }]
+            },
+            {
+               _id: "3",
+               userIds: ["0", "5"],
+               chatRequest: false, 
+               userNames: ["Ben", "Nikhil"],
+               userImages: ["https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw", "https://media.istockphoto.com/vectors/cute-penguin-icon-in-flat-style-vector-id868646936?s=612x612"],
+               messages: [{
+                  fromUserId: "5",
+                  message: "Hey, wanna form a team?",
+                  date: (new Date() - 1000 * 60 * 60 * 4.7),
+                  seen: false
+               }]
             }
          ]
       };
+      
+      // sort all messages once here based on time after retrieving + check which ones are chat requests
+      this.state.chats.forEach(function sortMessages(chat){
+         chat.messages = chat.messages.sort((a,b) => a.date - b.date);
+         let chatMessages = chat.messages.map(obj => obj.fromUserId);
+         // is the current user present in the chat?
+         if (!chatMessages.includes("0")) {
+            chat.chatRequest = true
+         }
+       });
    }
 
    componentDidMount () {
@@ -139,6 +165,7 @@ class Chat extends Component {
 
    sendMessage = (message) => {
       const activeChat = this.state.chats[this.state.activeChatIndex];
+      activeChat.chatRequest = false;
       this.socket.emit('send message', JSON.stringify({
          chatId: activeChat._id,
          message

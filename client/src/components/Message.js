@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Message = ({fromSelf, content, image, name, mergeBottom, mergeTop}) => (
+const Message = ({fromSelf, content, image, name, timestamp, mergeBottom, mergeTop}) => (
    <div className={
       'message' 
       + (fromSelf ? ' rightSide' : '') 
@@ -19,6 +19,9 @@ const Message = ({fromSelf, content, image, name, mergeBottom, mergeTop}) => (
             : <p className='messageName'>{name}</p>
          }
          <div className='messageContent'>{content}</div>
+      </div>
+      <div>
+         <p className='messageTimestamp'>{timestamp}</p>
       </div>
    </div>
 );

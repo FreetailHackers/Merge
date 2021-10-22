@@ -10,6 +10,7 @@ const ChatSidebar = ({ chats, setActiveChatIndex, activeChatIndex }) => (
                key={i}
                active={i === activeChatIndex}
                users={chat.userNames} 
+               chatRequest={chat.chatRequest}
                lastMessage={chat.messages[0].message} 
                lastMessageDate={chat.messages[0].date} 
                profilePicture={chat.userImages[0]}
