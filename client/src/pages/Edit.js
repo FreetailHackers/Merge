@@ -16,9 +16,21 @@ class Edit extends Component {
     event.preventDefault()
     this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}}, () => {
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
-      axios.post(process.env.REACT_APP_API_URL + "user/", {
+    })
+  }
+
+  handleUpdate = (event) => {
+    event.preventDefault()
+    this.setState({ userProfile: { ...this.state.userProfile, [event.target.name]: event.target.value }, bgColor: "red" }, () => {
+      this.props.setCurrentUser(this.props.userID, { ...this.props.user, profile: this.state.userProfile })
+      axios.post(process.env.REACT_APP_API_URL + "/auth/update", {
         auth: this.props.auth,
-        user: this.props.user
+        id: this.props.userID,
+        profile: this.state.userProfile
+      }).then(res => {
+        this.setState({
+          saved: true
+        })
       });
     });
   }
@@ -30,7 +42,7 @@ class Edit extends Component {
     const data = new FormData();
 		data.append('file', file);
 
-    axios.post(process.env.REACT_APP_API_URL + "user/profile-picture", {
+    axios.post(process.env.REACT_APP_API_URL + "/profile-picture", {
       auth: this.props.auth,
       user: this.props.user,
       data
@@ -40,9 +52,10 @@ class Edit extends Component {
     });
   }
 
+
   constructor(props){
     super(props)
-    this.state = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
+    this.state = {userProfile: {...this.props.user.profile}, saved: true, profilePictureUrl: this.props.user.profilePictureUrl}
     this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
   }
 
@@ -50,6 +63,7 @@ class Edit extends Component {
     e.preventDefault();
     this.setState(this.baseState)
     this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile, profilePictureUrl: this.baseState.profilePictureUrl})
+    
     axios.post(process.env.REACT_APP_API_URL + "user/", {
       auth: this.props.auth,
       user: this.props.user
