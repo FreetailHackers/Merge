@@ -9,6 +9,9 @@ class ChatWindow extends Component {
       this.state = {
          newMessage: ''
       }
+
+      // sort messages before printing them out based on timestamp
+      this.props.chat.messages = this.props.chat.messages.slice().sort((a,b) => a.date - b.date);
    }
 
    onType = (e) => {
@@ -43,11 +46,13 @@ class ChatWindow extends Component {
                const profile = this.props.profiles[message.fromUserId];
                const image = profile ? profile.image : '';
                const name = profile ? profile.name : 'Profile missing';
+               const timestamp = message ? new Date(message.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                return (<Message
                   fromSelf={message.fromUserId === "0" /*TODO: use redux user id*/}
                   content={message.message}
                   image={image}
                   name={name}
+                  timestamp={timestamp}
                   mergeTop={index > 0 && message.fromUserId === this.props.chat.messages[index - 1].fromUserId}
                   mergeBottom={index < this.props.chat.messages.length - 1 && message.fromUserId === this.props.chat.messages[index + 1].fromUserId}
                />)

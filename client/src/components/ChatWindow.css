@@ -103,6 +103,11 @@ Messages
 
    background: #eee;
 }
+.messageTimestamp {
+   margin: 6px 4px 2px 4px;
+   color: #888;
+   font-size: 0.8em;
+}
 
 .message.rightSide .messageContent {
    background: var(--primary);

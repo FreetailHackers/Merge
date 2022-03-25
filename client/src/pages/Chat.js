@@ -115,6 +115,19 @@ class Chat extends Component {
                date: (new Date() - 1000 * 60 * 60 * 4.9),
                seen: false
             }]
+         },
+         {
+            _id: "3",
+            userIds: ["0", "5"],
+            chatRequest: false, 
+            userNames: ["Ben", "Nikhil"],
+            userImages: ["https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw", "https://media.istockphoto.com/vectors/cute-penguin-icon-in-flat-style-vector-id868646936?s=612x612"],
+            messages: [{
+               fromUserId: "5",
+               message: "Hey, wanna form a team?",
+               date: (new Date() - 1000 * 60 * 60 * 4.7),
+               seen: false
+            }]
          }
       ]
       const tempMessages1 = []
@@ -122,6 +135,16 @@ class Chat extends Component {
          activeChatIndex: 0,
          chats: tempMessages
       };
+      
+      // sort all messages once here based on time after retrieving + check which ones are chat requests
+      this.state.chats.forEach(function sortMessages(chat){
+         chat.messages = chat.messages.sort((a,b) => a.date - b.date);
+         let chatMessages = chat.messages.map(obj => obj.fromUserId);
+         // is the current user present in the chat?
+         if (!chatMessages.includes("0")) {
+            chat.chatRequest = true
+         }
+       });
    }
    
    componentDidMount () {
