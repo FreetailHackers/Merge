@@ -8,7 +8,9 @@ export function setDefaultUserData (currentData) {
       experienceLevel: '[missing experience level]',
       intro: '[missing introduction]',
       profilePictureUrl: '/default-profile.png',
-      github: null
+      github: null,
+      linkedin: null,
+      portfolio: null
    }
 
    for (const key in defaultUserData) {

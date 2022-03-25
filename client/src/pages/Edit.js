@@ -42,8 +42,7 @@ class Edit extends Component {
     const data = new FormData();
 		data.append('file', file);
 
-    axios.post(process.env.REACT_APP_API_URL + "
-               /profile-picture", {
+    axios.post(process.env.REACT_APP_API_URL + "/profile-picture", {
       auth: this.props.auth,
       user: this.props.user,
       data
