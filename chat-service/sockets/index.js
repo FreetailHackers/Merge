@@ -1,17 +1,20 @@
+
+
 module.exports = {
 
 configureSockets (server) {
+
    const io = require('socket.io')(server, {
       cors: {
-         origin: "*",
+         origin: "http://localhost:3000",
          methods: ["GET", "POST"]
       }
-   });
+   })
    const auth = require('./auth');
    const message = require('./message');
    const chat = require('./chat');
 
-   io.sockets.on('connect', socket => {
+   io.on('connection', socket => {
       console.log('Client connected to socket');
       if (auth.authenticate(socket, socket.handshake.query.token)) {
          message.addMessageRoutes(socket);
@@ -19,15 +22,15 @@ configureSockets (server) {
       }
    });
 
-   io.sockets.on('disconnect', socket => {
+   io.on('disconnect', socket => {
       console.log('Client disconnected from socket');
    });
 
-   io.sockets.on('connect_error', function(err) {
+   io.on('connect_error', function(err) {
       console.log("client connect_error: ", err);
    });
    
-   io.sockets.on('connect_timeout', function(err) {
+   io.on('connect_timeout', function(err) {
       console.log("client connect_timeout: ", err);
    });
 
