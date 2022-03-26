@@ -4,19 +4,24 @@
   "private": true,
   "dependencies": {
     "axios": "^0.22.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode-non-json": "^3.1.2",
     "miragejs": "^0.1.41",
+    "process": "^0.11.10",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-icons": "^4.2.0",
     "react-redux": "^5.1.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.1",
+    "react-scripts": "^5.0.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "socket.io-client": "^4.0.1"
+    "socket.io-client": "^4.0.1",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.4"
   },
   "scripts": {
     "start": "REACT_APP_API_URL=$npm_config_api react-scripts start",

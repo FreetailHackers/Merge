@@ -21,14 +21,14 @@
    opacity: 0.2;
    width: 500px;
    height: 500px;
-   -webkit-mask-image: url('/dashboard-image/background.svg');
-   mask-image: url('/dashboard-image/background.svg');
+   -webkit-mask-image: url('../assets/images/dashboard-image/background.svg');
+   mask-image: url('../assets/images/dashboard-image/background.svg');
 }
 
 .team-image .main {
    width: 500px;
    height: 500px;
-   background-image: url('/dashboard-image/team.svg');
+   background-image: url('../assets/images/dashboard-image/team.svg');
 }
 
 .team-image .primary {
@@ -36,8 +36,8 @@
    opacity: 1;
    width: 500px;
    height: 500px;
-   -webkit-mask-image: url('/dashboard-image/primary.svg');
-   mask-image: url('/dashboard-image/primary.svg');
+   -webkit-mask-image: url('../assets/images/dashboard-image/primary.svg');
+   mask-image: url('../assets/images/dashboard-image/primary.svg');
 }
 
 .team-image .secondary {
@@ -45,6 +45,6 @@
    opacity: 1;
    width: 500px;
    height: 500px;
-   -webkit-mask-image: url('/dashboard-image/secondary.svg');
-   mask-image: url('/dashboard-image/secondary.svg');
+   -webkit-mask-image: url('../assets/images/dashboard-image/secondary.svg');
+   mask-image: url('../assets/images/dashboard-image/secondary.svg');
 }

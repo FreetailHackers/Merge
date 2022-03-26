@@ -39,7 +39,7 @@
 
    color: #0000;
 
-   background-image: url('/Portfolio-Logo.svg');
+   background-image: url('../assets/images/Portfolio-logo.svg');
    background-size: contain;
    background-repeat: no-repeat;
 }

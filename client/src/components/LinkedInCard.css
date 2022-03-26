@@ -39,7 +39,7 @@
  
     color: #0000;
  
-    background-image: url('/Linkedin-logo.png');
+    background-image: url('../assets/images/Linkedin-logo.png');
     background-size: contain;
     background-repeat: no-repeat;
  }

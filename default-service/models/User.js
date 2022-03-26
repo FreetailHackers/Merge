@@ -21,7 +21,7 @@ const UserSchema = new Schema({
   },
   profile: [{
     adult: Boolean,
-    socialMedia: {String, required=false},
+    socialMedia: {String, required: false},
     school: String,
     major: String,
     class: String,
