@@ -3,14 +3,25 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Changes to webpack.config.js in React-Scripts
 Insert the following code right at the end of the resolve code block:
 ``` 
-      fallback: {
-        buffer : require.resolve('buffer'),
-        process: require.resolve('process/browser'),
-        stream : require.resolve('stream-browserify'),
-        util   : require.resolve('util'),
-        crypto : require.resolve('crypto-browserify')
-      },
+  fallback: {
+    buffer : require.resolve('buffer'),
+    process: require.resolve('process/browser'),
+    stream : require.resolve('stream-browserify'),
+    util   : require.resolve('util'),
+    crypto : require.resolve('crypto-browserify')
+  },
 ```
+And you to you need insert the following code in the plugins code block:
+```
+  new webpack.ProvidePlugin({
+    process: 'process/browser',
+  }),
+  new webpack.EnvironmentPlugin(['NODE_ENV', 'REACT_APP_API_URL']),
+  new webpack.DefinePlugin({
+    'process.env.PORT': JSON.stringify(process.env.PORT),
+  }),
+```
+
 
 ## Available Scripts
 

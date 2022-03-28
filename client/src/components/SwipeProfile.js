@@ -4,6 +4,8 @@ import GithubCard from './GithubCard';
 import './SwipeProfile.css';
 import LinkedInCard from './LinkedInCard';
 import PortfolioCard from './PortfolioCard';
+import arrowLeft from '../assets/images/arrow-left.png';
+import arrowRight from '../assets/images/arrow-right.png';
 
 const SwipeProfile = (props) => {
    const relativePosition = props.relativePosition || [0, 0];
@@ -44,8 +46,8 @@ const SwipeProfile = (props) => {
             }
          </div>
          <div className="arrows">
-            <input type="image" src="/arrow-left.png" class="arrow left" id="left" onClick={props.click} />
-            <input type="image" src="/arrow-right.png" class="arrow right" id="right" onClick={props.click} />
+            <input type="image" src={arrowLeft} className="arrow left" id="left" onClick={props.click} />
+            <input type="image" src={arrowRight} className="arrow right" id="right" onClick={props.click} />
          </div>
       </div>
    )

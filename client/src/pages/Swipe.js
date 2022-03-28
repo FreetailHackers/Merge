@@ -52,7 +52,7 @@ class Swipe extends Component {
     document.body.addEventListener('mouseleave', this.mouseUpOnProfile);
     document.body.addEventListener('mousemove', this.mouseMoveOnProfile);
     document.body.addEventListener('keydown', this.keyDown);
-    document.body.addEventListener('click', this.mouseDown);
+    document.getElementById('swipe-profile').addEventListener('click', this.mouseDown);
   }
 
   componentWillUnmount () {
@@ -265,7 +265,7 @@ class Swipe extends Component {
 
   render () {
     return (
-      <section>
+      <section id={'swipe-profile'}>
         {
           this.state.loadingUserToShow
           ? <center><Loading /></center>
