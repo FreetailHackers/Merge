@@ -10,6 +10,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwt-decode-non-json": "^3.1.2",
     "miragejs": "^0.1.41",
+    "patch-package": "^6.4.7",
     "process": "^0.11.10",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
@@ -29,7 +30,8 @@
     "debug_api_string": "echo $npm_config_api",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "postinstall": "patch-package"
   },
   "eslintConfig": {
     "extends": "react-app"
