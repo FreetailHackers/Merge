@@ -20,7 +20,7 @@ import Chat from "./pages/Chat";
 import "./Theme.css";
 import "./App.css";
 
-createMockServerIfNotProduction();
+// createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -32,6 +32,7 @@ class App extends Component {
             <Switch> {/* this will render the login page WITHOUT the navbar on routes / and /login */}
               <Route exact path="/" component={Login} />
               <Route exact path="/login" component={Login} />
+              // Create register route/path
               <Route path="/:anything" component={Navbar} /> 
             </Switch>
             <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />

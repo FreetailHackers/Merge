@@ -14,8 +14,24 @@ class Edit extends Component {
   
   handleSubmit = (event) => {
     event.preventDefault()
-    this.setState({userProfile: {...this.state.userProfile, [event.target.name]: event.target.value}}, () => {
-      this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.state.userProfile})
+    this.setState({userProfile: {...this.state.userProfile} }, () => {
+      const data = {
+        id: this.props.userID.id,
+        update: {
+          name: this.state.userProfile.name,
+          profile: {},
+        },
+      };
+      for (const prop in this.state.userProfile) {
+        if (prop !== "name") {
+            data.update.profile[prop] = this.state.userProfile[prop];
+        }
+      }
+      axios.post(process.env.REACT_APP_API_URL + "/api/users/update", data).then(res => {
+        this.setState({
+          saved: true
+        })
+      });
     })
   }
 
@@ -34,6 +50,32 @@ class Edit extends Component {
       });
     });
   }
+
+  componentDidMount() {
+    console.log(this.props.userID)
+    var queryParamters = {
+      start: 0,
+      limit: 0,
+      filters: {
+        _id: this.props.userID.id,
+      },
+    };
+    axios
+    .get(process.env.REACT_APP_API_URL + "/api/users/list", { params: queryParamters})
+    .then((res) => {
+      const data = {
+        name: res.data[0].name,
+      };
+      for (const prop in res.data[0].profile[0]) {
+        if (prop !== "_id") {
+          data[prop] = res.data[0].profile[0][prop];
+        }
+      }
+      this.setState({
+        userProfile: data,
+      });
+    });
+  }  
 
   handleNewProfilePicture = (event) => {
     event.preventDefault();

@@ -6,24 +6,36 @@ import { setDefaultUserData } from '../utils/setDefaultUserData';
 
 import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
+import arrowLeft from "../assets/images/arrow-left.png";
+import arrowRight from "../assets/images/arrow-right.png";
 
 class Swipe extends Component {
   getUserToShow = (callback) => {
+    console.log(this.props)
+    console.log(this.props.userID)
+    var queryParamters = {
+      start: 0,
+      limit: 0,
+      filters: {
+        // _id: this.props.userID.id,
+      },
+    }
     this.setState({ loadingUserToShow: true }, () => {
-      axios.get(process.env.REACT_APP_API_URL + "user/").then((res) => {
+      axios.get(process.env.REACT_APP_API_URL + "/api/users/list", {params: queryParamters}).then((res) => {
+        var data = res.data[0].profile[0];
         this.setState({
           userToShow: setDefaultUserData({
-            name: res.data.name,
-            school: res.data.school,
-            major: res.data.major,
-            classStanding: res.data.classStanding,
-            skills: res.data.skills,
-            experienceLevel: res.data.experienceLevel,
-            intro: res.data.intro,
-            profilePictureUrl: res.data.profilePictureUrl,
-            github: res.data.github,
-            linkedin: res.data.linkedin,
-            portfolio: res.data.portfolio
+            name: res.data[0].name,
+            school: data.school,
+            major: data.major,
+            classStanding: data.class,
+            skills: data.skills,
+            experienceLevel: data.experience,
+            intro: data.intro,
+            profilePictureUrl: data.profilePictureUrl,
+            github: data.github,
+            linkedin: data.linkedin,
+            portfolio: data.portfolio
           }),
           loadingUserToShow: false
         }, () => {
@@ -265,12 +277,14 @@ class Swipe extends Component {
 
   render () {
     return (
-      <section id={'swipe-profile'}>
-        {
-          this.state.loadingUserToShow
-          ? <center><Loading /></center>
-          : <SwipeProfile 
-              name={this.state.userToShow.name} 
+        <section id={"swipe-profile"}>
+          {this.state.loadingUserToShow ? (
+            <center>
+              <Loading />
+            </center>
+          ) : (
+            <SwipeProfile
+              name={this.state.userToShow.name}
               school={this.state.userToShow.school}
               intro={this.state.userToShow.intro}
               profilePictureUrl={this.state.userToShow.profilePictureUrl}
@@ -282,8 +296,12 @@ class Swipe extends Component {
               relativeAngle={this.state.profileAngle}
               borderColor={this.state.profileSide}
             />
-        }
-      </section>
+          )}
+          <div className="arrows">
+            <input type="image" src={arrowLeft} className="arrow left" id="left" onClick={this.click} />
+            <input type="image" src={arrowRight} className="arrow right" id="right" onClick={this.click} />
+          </div>
+        </section>
     );
   }
 }

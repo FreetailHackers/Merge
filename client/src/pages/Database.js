@@ -34,29 +34,41 @@ class Database extends Component {
   getUsersFromAPI = () => {
     const filterParameters = {};
     for (const key in this.state.filter) {
-      filterParameters[key + 'Filter'] = this.state.filter[key];
+      if (this.state.filter[key] !== '') filterParameters[key] = this.state.filter[key];
     }
-
     const dateSent = new Date();
-
+    var queryParamters = {
+      start: 0,
+      limit: 10,
+      dateSent: dateSent.toString(),
+      filters: filterParameters,
+    };
     if (dateSent < this.state.lastDateSent) return;
-
     this.setState({
       lastDateSent: dateSent
     }, () => {
-      axios.get(process.env.REACT_APP_API_URL + "/users/", 
-      { 
-        params: {
-          limit: this.state.limit,
-          page: this.state.page,
-          ...filterParameters,
-          dateSent: dateSent.toString()
-        } 
-      }).then((res) => {
+      axios.get(process.env.REACT_APP_API_URL + "/api/users/list", { params: queryParamters })
+      .then((res) => {
         if(res.data && res.data.dateSent.toString() === this.state.lastDateSent.toString()) {
+          const keys = [];
+          const data = [];
+          if (res.data.list[0]) {
+            for (const key in res.data.list[0].profile[0]) {
+              if (key !== '_id') keys.push(key);
+            }
+          }
+          for (const user of res.data.list) {
+            var profile = {}
+            for (const key of keys) {
+              profile[key] = user.profile[0][key];
+            }
+            profile.name = user.name;
+            data.push(profile)
+          }
+          console.log(data);
           this.setState({
-            users: res.data.users, 
-            keys: Object.keys(res.data.users[0]).filter(this.filterOutNameKey)
+            users: data, 
+            keys: keys
           });
         }
       });
@@ -104,7 +116,7 @@ class Database extends Component {
           />  
         </div>)}
         <br /><br />
-        {this.state.users.map((user, index) =>
+        {this.state.users.map((user, index) => 
           <Collapsible key={index} title={user.name}>
             <button className="chat-button">Message</button>
             <UserToParagraph user={user} keys={this.state.keys} />

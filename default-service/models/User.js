@@ -20,14 +20,17 @@ const UserSchema = new Schema({
     default: Date.now
   },
   profile: [{
-    adult: Boolean,
     socialMedia: {String, required: false},
     school: String,
     major: String,
     class: String,
     skills: String,
     experience: String,
-    intro: String
+    intro: String,
+    profilePictureUrl: String,
+    github: String,
+    linkedin: String,
+    portfolio: String
   }]
 });
 

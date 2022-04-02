@@ -1,4 +1,5 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -8,6 +9,7 @@ const passport = require("passport");
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
+const validateProfileUpdateInput = require("../../validation/profileupdate");
 
 // Load User model
 const User = require("../../models/User");
@@ -50,12 +52,12 @@ router.post("/register", (req, res) => {
   });
 });
 
-// @route POST api/users/login
-// @desc Login user and return JWT token
+// @route POST api/users/list
+// @desc Get a list of all users, within a specified starting and ending range
 // @access Public
 router.post("/login", (req, res) => {
   // Form validation
-
+  // console.log(req)
   const { errors, isValid } = validateLoginInput(req.body);
 
   // Check validation
@@ -103,6 +105,76 @@ router.post("/login", (req, res) => {
           .json({ passwordincorrect: "Password incorrect" });
       }
     });
+  });
+});
+
+
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.post("/update", (req, res) => {
+  // Form validation
+  // console.log(req)
+  // const { errors, isValid } = validateProfileUpdateInput(req.body);
+  
+  // // Check validation
+  // if (!isValid) {
+  //   return res.status(400).json(errors);
+  // }
+    
+  const id = req.body.id;
+  console.log('test')
+  console.log(req.body)
+  // var props;
+  // for (prop in req.body) {
+  //   if (prop !== 'id') {
+  //     props[prop] = req.body[prop];
+  //   }
+  // }
+  // console.log(props)
+  console.log('test')
+  const profile = req.body.update;
+  const options = {
+    // new: true,
+    upsert: true,
+    // useFindAndModify: false,
+  }
+  console.log(id, options, { $set: profile })
+
+  // Find user by email
+  // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
+  User.updateOne( { _id: id }, { $set: profile }, options).then(data => {
+    console.log(data)
+    res.json({
+      success: true,
+    });
+  });
+});
+  
+  
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.get("/list", (req, res) => {
+  if (req.query.filters) var filters = JSON.parse(req.query.filters);
+  if (filters._id) filters._id = mongoose.Types.ObjectId(filters._id)
+  var options = {
+    skip: parseInt(req.query.start),
+    limit: parseInt(req.query.limit),
+  }
+  // console.log(filters);
+  // console.log(options);
+  // console.log(props);
+
+  User.find(filters, {}, options, (err, data) => {
+    var result = data;
+    if (req.query.dateSent) {
+      result = {
+        dateSent: req.query.dateSent,
+        list: data,
+      }
+    }
+    res.json(result);
   });
 });
 

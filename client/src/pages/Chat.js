@@ -26,7 +26,7 @@ const getIdToProfileMap = (chats) => {
    }
    return profiles;
 }
-var socket = io("http://localhost:5001", { transports: ["websocket"] });
+var socket = io("http://localhost:5001", { cors: {origin: "http://localhost:5000", credentials: true }, transports: ["websocket"] });
 class Chat extends Component {
    constructor (props) {
       super(props);
