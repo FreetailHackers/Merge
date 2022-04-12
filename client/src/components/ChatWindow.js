@@ -63,6 +63,10 @@ class ChatWindow extends Component {
             <p onClick={() => {this.props.sendMessage('❤️'); this.setState({['update']: ''})}}>❤️</p>
             <p onClick={this.sendMessageButton}>➡️</p>
          </div>
+         <div className='chatWindowHeader'>
+            <button type="button">Block</button>
+            <button type='button'>Report</button>
+         </div>
       </div>
    );
 }
