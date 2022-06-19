@@ -11,8 +11,9 @@ import { Link } from 'react-router-dom';
 import './Edit.css';
 
 class Edit extends Component {
-  
-  handleSubmit = (event) => {
+  //frontend for updating
+  handleSubmit = async (event) => {
+    console.log("got to handleSubmit")
     event.preventDefault()
     this.setState({userProfile: {...this.state.userProfile} }, () => {
       const data = {
@@ -27,6 +28,10 @@ class Edit extends Component {
             data.update.profile[prop] = this.state.userProfile[prop];
         }
       }
+
+      data.update.profile.profilePictureUrl = this.state.profilePictureUrl
+    
+      console.log(data.update)
       axios.post(process.env.REACT_APP_API_URL + "/api/users/update", data).then(res => {
         this.setState({
           saved: true
@@ -36,6 +41,7 @@ class Edit extends Component {
   }
 
   handleUpdate = (event) => {
+    console.log("got to handleUpdate")
     event.preventDefault()
     this.setState({ userProfile: { ...this.state.userProfile, [event.target.name]: event.target.value }, bgColor: "red" }, () => {
       this.props.setCurrentUser(this.props.userID, { ...this.props.user, profile: this.state.userProfile })
@@ -52,6 +58,7 @@ class Edit extends Component {
   }
 
   componentDidMount() {
+    console.log("got to componentDidMount")
     console.log(this.props.userID)
     var queryParamters = {
       start: 0,
@@ -63,6 +70,8 @@ class Edit extends Component {
     axios
     .get(process.env.REACT_APP_API_URL + "/api/users/list", { params: queryParamters})
     .then((res) => {
+      console.log("line 81")
+      console.log(res.data[0].profile[0])
       const data = {
         name: res.data[0].name,
       };
@@ -73,25 +82,32 @@ class Edit extends Component {
       }
       this.setState({
         userProfile: data,
+        profilePictureUrl: data.profilePictureUrl
       });
     });
   }  
 
-  handleNewProfilePicture = (event) => {
+  handleNewProfilePicture = async (event) => {
     event.preventDefault();
-    
     const file = event.target.files[0];
-    const data = new FormData();
-		data.append('file', file);
+    const fd = new FormData();
+    
+    // Setting up S3 upload parameters for folder upload
+    const folder_name = this.props.userID.id + "/"
+    fd.append('folder_name', folder_name)
+    fd.append('file_name', folder_name + file.name)
+    fd.append('file', file);
 
-    axios.post(process.env.REACT_APP_API_URL + "/profile-picture", {
-      auth: this.props.auth,
-      user: this.props.user,
-      data
-    }).then(res => {
+    await axios.post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(async res => {
       this.setState({profilePictureUrl: res.data.url })
       this.props.setCurrentUser(this.props.userID, {...this.props.user, profilePictureUrl: res.data.url})
     });
+
+   
   }
 
 
@@ -101,7 +117,8 @@ class Edit extends Component {
     this.baseState = {userProfile: {...this.props.user.profile}, profilePictureUrl: this.props.user.profilePictureUrl}
   }
 
-  cancelEdit = e => {
+  cancelEdit = async e => {
+    console.log('cancel edit')
     e.preventDefault();
     this.setState(this.baseState)
     this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile, profilePictureUrl: this.baseState.profilePictureUrl})
@@ -110,8 +127,10 @@ class Edit extends Component {
       auth: this.props.auth,
       user: this.props.user
     }).then(() => {
+   
     })
   };
+     
 
   handleEdit = e => {
     this.setState({userProfile: {...this.state.userProfile, [e.target.name]: e.target.value}})
