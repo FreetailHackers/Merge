@@ -14,7 +14,7 @@ export default function(state = initialState, action) {
     case SET_CURRENT_USER:
       return {
         ...state,
-        isAuthenticated: !isEmpty(action.user),
+        isAuthenticated: action.isAuthenticated,
         userID: action.userID,
         user: action.user,
         loading: false

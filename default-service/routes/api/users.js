@@ -56,18 +56,23 @@ router.post("/register", (req, res) => {
 // @desc Get a list of all users, within a specified starting and ending range
 // @access Public
 router.post("/login", (req, res) => {
-  // Form validation
+  // Form validation'
+  //console.log("line 61")
   // console.log(req)
+
+  //checks if email or password is empty
   const { errors, isValid } = validateLoginInput(req.body);
 
   // Check validation
   if (!isValid) {
+    console.log("stopped at 68")
     return res.status(400).json(errors);
   }
 
   const email = req.body.email;
   const password = req.body.password;
-
+  console.log("email: " + email)
+  console.log("pass: " + password)
   // Find user by email
   User.findOne({ email }).then(user => {
     // Check if user exists
@@ -177,5 +182,8 @@ router.get("/list", (req, res) => {
     res.json(result);
   });
 });
-
+// @route POST api/users/profile-picture
+// @desc Update the profile picture for user
+// @access Public
+// router.post("/profile-picture")
 module.exports = router;
