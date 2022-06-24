@@ -30,37 +30,76 @@ const s3 = new AWS.S3({
 // @access Public
 router.post("/register", (req, res) => {
   // Form validation
-
+  console.log("got to register")
   const { errors, isValid } = validateRegisterInput(req.body);
-
   // Check validation
   if (!isValid) {
     return res.status(400).json(errors);
   }
-
+ 
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       return res.status(400).json({ email: "Email already exists" });
     } else {
-      const newUser = new User({
+      var newUser = new User({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password
-      });
+        password: req.body.password,
 
+      });
+      console.log("NEW USER PRINT")
+      console.log(newUser)
       // Hash password before saving in database
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
           newUser.password = hash;
+         
+          console.log(user)
           newUser
             .save()
-            .then(user => res.json(user))
+            .then(user => {
+              let temp = {
+                status:  {
+                  admitted: true
+                }
+              }
+              console.log("user: " + user)
+              const payload = {
+                id: user._id,
+                name: user.name
+              };
+              console.log("id : " + payload.id)
+              console.log("name : " + payload.name)
+              // Sign token
+             jwt.sign(
+                payload,
+                keys.secretOrKey,
+                {
+                  expiresIn: 31556926 // 1 year in seconds
+                },
+                (err, token) => {
+                  console.log("error" + err)
+                  console.log("token: " + token)
+                  res.json({
+                    success: true,
+                    token: "Bearer " + token,
+                    user: temp
+                  });
+                  console.log("generated token: " + token)
+                }
+              );
+            })
             .catch(err => console.log(err));
         });
       });
+      console.log("NEW USER PRINT")
+      console.log(newUser)
     }
-  });
+
+  })
+ 
+  console.log("finished registering??")
 });
 
 // @route POST api/users/list
@@ -156,6 +195,7 @@ router.post("/update", async (req, res) => {
 
 
   //Clear all old s3 files
+  
   profile_pic_link = req.body.update.profile.profilePictureUrl
   folder_name = id + "/"
   var params = {
@@ -179,6 +219,7 @@ router.post("/update", async (req, res) => {
       console.log(data);
     }      
   }).promise();
+  
   console.log(req.body.update)
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
