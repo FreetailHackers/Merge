@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { Component } from "react"; 
+import React, { Component } from "react";
 import './Database.css';
 import Collapsible from "../components/Collapsible";
 import { UserToParagraph } from "../components/UserToParagraph";
@@ -9,16 +9,16 @@ class Database extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        users: [],
-        limit: 8,
-        keys: [],
-        page: this.parsePageNumberHash(window.location.hash),
-        filter: {
-          name: '',
-          university: '',
-          skills: ''
-        },
-        lastDateSent: 0
+      users: [],
+      limit: 8,
+      keys: [],
+      page: this.parsePageNumberHash(window.location.hash),
+      filter: {
+        name: '',
+        university: '',
+        skills: ''
+      },
+      lastDateSent: 0
     };
   }
 
@@ -48,30 +48,32 @@ class Database extends Component {
       lastDateSent: dateSent
     }, () => {
       axios.get(process.env.REACT_APP_API_URL + "/api/users/list", { params: queryParamters })
-      .then((res) => {
-        if(res.data && res.data.dateSent.toString() === this.state.lastDateSent.toString()) {
-          const keys = [];
-          const data = [];
-          if (res.data.list[0]) {
-            for (const key in res.data.list[0].profile[0]) {
-              if (key !== '_id') keys.push(key);
+        .then((res) => {
+          if (res.data && res.data.dateSent.toString() === this.state.lastDateSent.toString()) {
+            const keys = [];
+            const data = [];
+            if (res.data.list[0]) {
+              for (const key in res.data.list[0].profile[0]) {
+                if (key !== '_id') keys.push(key);
+              }
             }
-          }
-          for (const user of res.data.list) {
-            var profile = {}
-            for (const key of keys) {
-              profile[key] = user.profile[0][key];
+            for (const user of res.data.list) {
+              var profile = {};
+              for (const key of keys) {
+                if (user.profile[0] == undefined) {
+                  user.profile[0] = {};
+                }
+                profile[key] = user.profile[0][key];
+              }
+              profile.name = user.name;
+              data.push(profile);
             }
-            profile.name = user.name;
-            data.push(profile)
+            this.setState({
+              users: data,
+              keys: keys
+            });
           }
-          console.log(data);
-          this.setState({
-            users: data, 
-            keys: keys
-          });
-        }
-      });
+        });
     });
   }
 
@@ -79,12 +81,12 @@ class Database extends Component {
     this.getUsersFromAPI();
   }
 
-  filterOutNameKey = (key) => key !== 'name'  
+  filterOutNameKey = (key) => key !== 'name'
 
   setPage = (page, e) => {
     if (e) e.preventDefault();
 
-    this.setState({page}, () => {
+    this.setState({ page }, () => {
       this.getUsersFromAPI();
       this.props.history.push(`#${page}`);
     });
@@ -107,16 +109,16 @@ class Database extends Component {
         <h1 className="headerTitle">{this.props.title || "User Database"}</h1>
         {Object.keys(this.state.filter).map((key, i) => <div key={i} className='filterInput'>
           <label>Filter by {key}</label>
-          <input 
+          <input
             name={key}
-            value={this.state.filter[key]} 
+            value={this.state.filter[key]}
             placeholder={`${key}`}
             type='text'
             onChange={this.updateFilter}
-          />  
+          />
         </div>)}
         <br /><br />
-        {this.state.users.map((user, index) => 
+        {this.state.users.map((user, index) =>
           <Collapsible key={index} title={user.name}>
             <button className="chat-button">Message</button>
             <UserToParagraph user={user} keys={this.state.keys} />
