@@ -24,7 +24,7 @@ module.exports = function validateRegisterInput(data) {
   } else if (!Validator.isEmail(data.email)) {
     errors.email = "Email is invalid";
   }
-
+  var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/
   // Password checks
   if (Validator.isEmpty(data.password)) {
     errors.password = "Password field is required";
@@ -34,14 +34,21 @@ module.exports = function validateRegisterInput(data) {
     errors.password2 = "Confirm password field is required";
   }
 
-  if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
-    errors.password = "Password must be at least 6 characters";
+  if (!Validator.isLength(data.password, { min: 8, max: 30 })) {
+    errors.password = "Password must be at least 8 characters";
+  }
+  
+  if (Validator.equals(data.password, data.password.toLowerCase())) {
+    errors.password = "Password must have 1 capital letter";
+  }
+
+  if (!format.test(data.password)) {
+    errors.password = "Password must have a symbol";
   }
 
   if (!Validator.equals(data.password, data.password2)) {
     errors.password2 = "Passwords must match";
   }
-
   return {
     errors,
     isValid: isEmpty(errors)

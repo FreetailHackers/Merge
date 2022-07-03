@@ -31,15 +31,17 @@ const s3 = new AWS.S3({
 router.post("/register", (req, res) => {
   // Form validation
   console.log("got to register")
-  const { errors, isValid } = validateRegisterInput(req.body);
+  let { errors, isValid } = validateRegisterInput(req.body);
   // Check validation
   if (!isValid) {
-    return res.status(400).json(errors);
+    errors.isValid = false
+    return res.json(errors);
   }
  
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "Email already exists" });
+
+      return res.json({ email: "Email already exists", isValid: false });
     } else {
       var newUser = new User({
         name: req.body.name,
@@ -112,7 +114,8 @@ router.post("/login", (req, res) => {
 
   // Check validation
   if (!isValid) {
-    return res.status(400).json(errors);
+    errors.isValid = false
+    return res.json(errors);
   }
 
   const email = req.body.email;
@@ -122,7 +125,7 @@ router.post("/login", (req, res) => {
   User.findOne({ email }).then(user => {
     // Check if user exists
     if (!user) {
-      return res.status(404).json({ emailnotfound: "Email not found" });
+      return res.json({ email: "Email not found" , isValid : false});
     }
 
     // Check password
@@ -150,9 +153,7 @@ router.post("/login", (req, res) => {
           }
         );
       } else {
-        return res
-          .status(400)
-          .json({ passwordincorrect: "Password incorrect" });
+        return res.json({ password: "Password incorrect" });
       }
     });
   });
