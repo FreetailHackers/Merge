@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index 2b1b3bb..bb21fa1 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -343,6 +343,13 @@ module.exports = function (webpackEnv) {
+           babelRuntimeRegenerator,
+         ]),
+       ],
++      fallback: {
++        buffer : require.resolve('buffer'),
++        process: require.resolve('process/browser'),
++        stream : require.resolve('stream-browserify'),
++        util   : require.resolve('util'),
++        crypto : require.resolve('crypto-browserify')
++      },
+     },
+     module: {
+       strictExportPresence: true,
+@@ -602,6 +609,13 @@ module.exports = function (webpackEnv) {
+       ].filter(Boolean),
+     },
+     plugins: [
++      new webpack.ProvidePlugin({
++        process: 'process/browser',
++      }),
++      new webpack.EnvironmentPlugin(['NODE_ENV', 'REACT_APP_API_URL']),
++      new webpack.DefinePlugin({
++        'process.env.PORT': JSON.stringify(process.env.PORT),
++      }),
+       // Generates an `index.html` file with the <script> injected.
+       new HtmlWebpackPlugin(
+         Object.assign(

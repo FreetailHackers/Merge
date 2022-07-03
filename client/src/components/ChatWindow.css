@@ -130,3 +130,34 @@ Messages
 .message.mergeTop.rightSide .messageContent {
    border-top-right-radius: 4px;
 }
+
+/*action buttons*/
+.chatWindowHeader{
+   position: fixed;
+   top: 0;
+   /*padding-left: 30px;*/
+   width: 55%;
+   background-color: white;
+   border: 1px #eee solid;
+   text-align: right;
+}
+
+.chatWindowHeader button{
+   text-align: center;
+   width: 85px;
+   padding: 10px;
+   margin: 15px 15px 15px 0;
+   background-color: var(--primary);
+
+   color: var(--text-on-primary);
+   border: none;
+   border-radius: 15px;
+   font-size: 1em;
+
+   cursor: pointer;
+
+}
+
+.chatWindowHeader button:hover{
+   background-color: var(--secondary);
+}

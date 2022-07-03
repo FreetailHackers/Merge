@@ -33,7 +33,7 @@ class GithubCard extends Component {
           <div style={{ flexGrow: 2 }}>
             <h5>{this.state.profileData.login}</h5>
             <p>{this.state.profileData.bio}</p>
-            <p class='ligher'>{this.state.profileData.followers} Followers • {this.state.profileData.following} Following • {this.state.profileData.public_repos} Repos</p>
+            <p className='ligher'>{this.state.profileData.followers} Followers • {this.state.profileData.following} Following • {this.state.profileData.public_repos} Repos</p>
           </div>
           <div className='githubLogo'>github</div>
         </a>

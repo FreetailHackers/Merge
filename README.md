@@ -18,14 +18,8 @@ This project uses the following technologies:
 
 ## Configuration
 
-Make sure to add your own `MONGOURI` from your [mLab](http://mlab.com) database in `config/keys.js`.
-
-```javascript
-module.exports = {
-  mongoURI: "YOUR_MONGO_URI_HERE",
-  secretOrKey: "secret"
-};
-```
+Make sure to add your own `process.env.MONGO_URI`.
+Ask Adi for the .env file, or make your own
 
 ## Quick Start
 
