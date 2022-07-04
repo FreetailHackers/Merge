@@ -116,12 +116,12 @@ router.post("/update", (req, res) => {
   // Form validation
   // console.log(req)
   // const { errors, isValid } = validateProfileUpdateInput(req.body);
-  
+
   // // Check validation
   // if (!isValid) {
   //   return res.status(400).json(errors);
   // }
-    
+
   const id = req.body.id;
   console.log('test')
   console.log(req.body)
@@ -143,15 +143,15 @@ router.post("/update", (req, res) => {
 
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
-  User.updateOne( { _id: id }, { $set: profile }, options).then(data => {
+  User.updateOne({ _id: id }, { $set: profile }, options).then(data => {
     console.log(data)
     res.json({
       success: true,
     });
   });
 });
-  
-  
+
+
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
@@ -167,6 +167,10 @@ router.get("/list", (req, res) => {
   // console.log(props);
 
   User.find(filters, {}, options, (err, data) => {
+    // We probably don't want to send over everyone's passwords...
+    for (let user of data) {
+      user.password = undefined;
+    }
     var result = data;
     if (req.query.dateSent) {
       result = {
