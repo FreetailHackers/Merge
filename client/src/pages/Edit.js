@@ -7,11 +7,12 @@ import userProfileFields from "../content/userProfileFields.json"
 import SwipeProfile from "../components/SwipeProfile";
 import { startCase } from "lodash";
 import { Link } from 'react-router-dom';
+import { NumberInput, Select, MultiSelect, RadioGroup, Radio } from '@mantine/core';
 
 import './Edit.css';
 
 class Edit extends Component {
-  
+
   handleSubmit = (event) => {
     event.preventDefault()
     this.setState({userProfile: {...this.state.userProfile} }, () => {
@@ -75,11 +76,11 @@ class Edit extends Component {
         userProfile: data,
       });
     });
-  }  
+  }
 
   handleNewProfilePicture = (event) => {
     event.preventDefault();
-    
+
     const file = event.target.files[0];
     const data = new FormData();
 		data.append('file', file);
@@ -105,7 +106,7 @@ class Edit extends Component {
     e.preventDefault();
     this.setState(this.baseState)
     this.props.setCurrentUser(this.props.userID, {...this.props.user, profile: this.baseState.userProfile, profilePictureUrl: this.baseState.profilePictureUrl})
-    
+
     axios.post(process.env.REACT_APP_API_URL + "user/", {
       auth: this.props.auth,
       user: this.props.user
@@ -139,30 +140,104 @@ class Edit extends Component {
                     <label>
                       {startCase(v)}:
                     </label>
-                    <input 
-                      name={v} 
+                    <input
+                      name={v}
                       placeholder={startCase(v)}
-                      value={this.state.userProfile[v] || ""} 
+                      value={this.state.userProfile[v] || ""}
                       onChange={this.handleEdit}
                       type="text"
                     />
                   </div>
                 ))
               }
+              <NumberInput
+                defaultValue={12}
+                placeholder="Any integer between 1-24 inclusive"
+                label="How many hours are you willing to work?"
+                min={1}
+                max={24}
+                stepHoldDelay={500}
+                stepHoldInterval={100}
+              />
+              <MultiSelect
+                data={[
+                  { value: 'python', label: 'Python' },
+                  { value: 'java', label: 'Java' },
+                  { value: 'c', label: 'C' },
+                ]}
+                label="Languages"
+                searchable
+                placeholder="Python, Java, C, etc."
+                nothingFound="Nothing found"
+              />
+              <MultiSelect
+                data={[
+                  { value: 'react', label: 'React' },
+                  { value: 'express', label: 'Express' },
+                  { value: 'mongodb', label: 'MongoDB' },
+                ]}
+                label="Frameworks"
+                searchable
+                placeholder="React, Express, MongoDB, etc."
+                nothingFound="Nothing found"
+              />
+              <Select
+                label="Years of coding experience"
+                placeholder="Pick one"
+                data={[
+                  { value: '<1', label: 'Less than one year' },
+                  { value: '1-3', label: 'One to three years' },
+                  { value: '>3', label: 'Over three years'},
+                ]}
+              />
+              <RadioGroup
+                label="How competitive are you?"
+              >
+                <Radio value="learn" label="I'm just here to learn and have fun!" />
+                <Radio value="win" label="I'm here to win and want teammates who are aiming to win as well!" />
+              </RadioGroup>
+              <MultiSelect
+                // Placeholder data from HackTX 2021
+                data={[
+                  { value: 'overall', label: 'Overall Best Hack' },
+                  { value: 'google', label: 'Best Use of Google Cloud' },
+                  { value: 'emotion', label: 'Best Real-Time Voice-Based Emotion Classifier' },
+                  { value: 'solidity', label: 'Best Crypto Solidity Project' },
+                  { value: 'misc', label: 'Miscellaneous MLH Prizes' },
+                ]}
+                label="What categories are you planning to submit to?"
+                placeholder="If you haven't decided yet, you can leave this blank"
+              />
+              <MultiSelect
+                data={[
+                  { value: 'frontend', label: 'Frontend' },
+                  { value: 'backend', label: 'Backend' },
+                  { value: 'fullstack', label: 'Full stack' },
+                  { value: 'ml', label: 'ML/Data scientist' },
+                  { value: 'mobile', label: 'Mobile dev' },
+                  { value: 'design', label: 'Design' },
+                ]}
+                label="What roles are you interested in?"
+                placeholder="Pick as many as you want"
+                searchable
+                creatable
+                getCreateLabel={query => `${query}`}
+                onCreate={query => SVGMetadataElement(current => [...current, query])}
+              />
             </form>
-              <button onClick={this.handleSubmit} className='save'>Save</button>
-              <button onClick={this.cancelEdit} className='cancel'>
+              <button onClick={this.handleSubmit} className='action' id='save'>Save</button>
+              <button onClick={this.cancelEdit} className='action' id='cancel'>
                   <Link to="/dashboard">Cancel</Link>
               </button>
           </section>
         </div>
         <div className="profile-child">
-            <SwipeProfile 
-                name={this.getOrEmptyString(this.state.userProfile.name)} 
+            <SwipeProfile
+                name={this.getOrEmptyString(this.state.userProfile.name)}
                 school={this.getOrEmptyString(this.state.userProfile.school)}
                 intro={this.getOrEmptyString(this.state.userProfile.intro)}
                 profilePictureUrl={this.getOrEmptyString(this.state.profilePictureUrl)}
-            />    
+            />
         </div>
       </div>
     );

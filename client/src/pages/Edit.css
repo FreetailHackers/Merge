@@ -9,11 +9,12 @@
    margin-top: 20px;
 }
 
-#settings button {
+#settings button.action {
    display: inline-block;
    width: 140px;
    height: 50px;
-   margin: 10px;
+   margin-top: 10px;
+   margin-right: 10px;
    padding-bottom: 5px;
 
    font-family: var(--font-body);
@@ -28,17 +29,12 @@
    transition: transform 0.3s, opacity 0.3s;
 }
 
-#settings button:first-of-type {
-   margin-top: 40px;
-   margin-left: 140px;
-}
-
-#settings button.save {
+#settings button#save {
    background-color: var(--accept);
    color: var(--text-on-accept);
 }
 
-#settings button.cancel {
+#settings button#cancel {
    border: var(--reject) 2px solid;
    background-color: #fff;
 }
@@ -62,4 +58,4 @@
 .profile-child {
    width: 50%;
    float: left;
-} 
+}
