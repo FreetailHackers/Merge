@@ -167,12 +167,12 @@ router.post("/update", async (req, res) => {
   // Form validation
   // console.log(req)
   // const { errors, isValid } = validateProfileUpdateInput(req.body);
-  
+
   // // Check validation
   // if (!isValid) {
   //   return res.status(400).json(errors);
   // }
-    
+
   const id = req.body.id;
   console.log('test')
   console.log(req.body)
@@ -232,10 +232,10 @@ router.post("/update", async (req, res) => {
     });
   });
 });
-  
-  
-// @route POST api/users/list
-// @desc List all users
+
+
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
 // @access Public
 router.get("/list", (req, res) => {
   if (req.query.filters) var filters = JSON.parse(req.query.filters);
@@ -249,6 +249,10 @@ router.get("/list", (req, res) => {
   // console.log(props);
 
   User.find(filters, {}, options, (err, data) => {
+    // We probably don't want to send over everyone's passwords...
+    for (let user of data) {
+      user.password = undefined;
+    }
     var result = data;
     if (req.query.dateSent) {
       result = {
