@@ -16,6 +16,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
+    console.log("Got to line 19")
     // If logged in and user navigates to Login page, should redirect them to dashboard
     if (this.props.auth.isAuthenticated) {
       this.props.history.push("/dashboard");
@@ -23,6 +24,7 @@ class Login extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log("Got to line 27")
     if (nextProps.auth.isAuthenticated) {
       this.props.history.push("/dashboard");
     }
@@ -45,7 +47,7 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password
     };
-
+    //checking database to see if credentials exist
     this.props.loginUser(userData);
   };
 
@@ -83,6 +85,7 @@ class Login extends Component {
             {errors.password}
             {errors.passwordincorrect}
           </span>
+          <button type="submit">Register</button>
           <button type="submit">Login</button>
           <span className='error'>{errors.status}</span>
         </form>

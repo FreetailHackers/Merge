@@ -39,22 +39,23 @@ export const registerUser = userData => dispatch => {
 };
 
 // Login - get user token
-export const loginUser = userData => dispatch => {
+export const loginUser = userData => async dispatch => {
   dispatch(setUserLoading())
-  axios
+  console.log("line 44")
+  await axios
     .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
     .then(res => {
-
+     
       // Set token to localStorage
       const { token } = res.data;
-
+      console.log("GOT TO HERE")
       localStorage.setItem("jwtToken", token);
       // Set token to Auth header
       setAxiosHeaderAuthToken(token);
       // Decode token to get user data
       const userID = jwt_decode(token);
       // Set current user
-      dispatch(setCurrentUser(userID));
+      dispatch(setCurrentUser(userID, {}, true));
     })
     .catch(err =>
       {
@@ -69,9 +70,10 @@ export const loginUser = userData => dispatch => {
 };
 
 // Set logged in user
-export const setCurrentUser = (userID, user) => {
+export const setCurrentUser = (userID, user, isAuth) => {
   return {
     type: SET_CURRENT_USER,
+    isAuthenticated: isAuth,
     userID,
     user: {
       status: {admitted: true}
