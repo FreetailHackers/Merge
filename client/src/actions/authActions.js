@@ -45,7 +45,7 @@ export const loginUser = userData => async dispatch => {
   await axios
     .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
     .then(res => {
-     
+
       // Set token to localStorage
       const { token } = res.data;
       console.log("GOT TO HERE")
@@ -55,7 +55,7 @@ export const loginUser = userData => async dispatch => {
       // Decode token to get user data
       const userID = jwt_decode(token);
       // Set current user
-      dispatch(setCurrentUser(userID, {}, true));
+      dispatch(setCurrentUser(userID));
     })
     .catch(err =>
       {
@@ -70,10 +70,10 @@ export const loginUser = userData => async dispatch => {
 };
 
 // Set logged in user
-export const setCurrentUser = (userID, user, isAuth) => {
+export const setCurrentUser = (userID) => {
   return {
     type: SET_CURRENT_USER,
-    isAuthenticated: isAuth,
+    isAuthenticated: !!userID,
     userID,
     user: {
       status: {admitted: true}
@@ -103,4 +103,5 @@ export const logoutUser = () => dispatch => {
   setAxiosHeaderAuthToken(false);
   // Set current user to empty object {} which will set isAuthenticated to false
   dispatch(setCurrentUser({}));
+  window.location.href = '/login';
 };

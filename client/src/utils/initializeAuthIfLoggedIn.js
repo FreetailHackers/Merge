@@ -14,22 +14,9 @@ function redirectToLogin () {
 }
 
 function authenticateUserInStore(token) {
-  const decoded = jwt_decode(token);
-  axios.get(process.env.REACT_APP_API_URL + "/api/users/" + decoded).then(
-    (res) => {
-      if(res.data) {
-        const user = res.data;
-        if(user.status.admitted) {
-          store.dispatch(setCurrentUser(decoded, user));
-          return;
-        }
-      }
-
-      logoutUserInStore()
-    }).catch(err => logoutUserInStore())
-  // Didn't pass auth test, get me outta here
-
-
+  axios.get(process.env.REACT_APP_API_URL + "/api/users/validate").then(res => {
+    store.dispatch(setCurrentUser(res));
+  }).catch(err => logoutUserInStore());
 }
 
 function logoutUserInStore () {

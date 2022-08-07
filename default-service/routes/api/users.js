@@ -4,7 +4,6 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
-const passport = require("passport");
 var formidable = require("formidable");
 var fs = require('fs');
 
@@ -37,7 +36,7 @@ router.post("/register", (req, res) => {
     errors.isValid = false
     return res.json(errors);
   }
- 
+
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
 
@@ -56,7 +55,7 @@ router.post("/register", (req, res) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
           newUser.password = hash;
-         
+
           console.log(user)
           newUser
             .save()
@@ -100,7 +99,7 @@ router.post("/register", (req, res) => {
     }
 
   })
- 
+
   console.log("finished registering??")
 });
 
@@ -196,7 +195,7 @@ router.post("/update", async (req, res) => {
 
 
   //Clear all old s3 files
-  
+
   profile_pic_link = req.body.update.profile.profilePictureUrl
   folder_name = id + "/"
   var params = {
@@ -218,9 +217,9 @@ router.post("/update", async (req, res) => {
         }
       }
       console.log(data);
-    }      
+    }
   }).promise();
-  
+
   console.log(req.body.update)
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
@@ -271,7 +270,7 @@ router.get("/list", (req, res) => {
 router.post("/profile-picture", (req, res) => {
  const form = new formidable.IncomingForm();
  form.parse(req, async (err, fields, files) => {
-//we are passing the form's fields that the user had submitted to a new 
+//we are passing the form's fields that the user had submitted to a new
 //object in the line below
 const {folder_name, file_name} = fields;
 // Setting up S3 upload parameters
@@ -281,7 +280,7 @@ const {folder_name, file_name} = fields;
   };
 
   //Uploading folder to bucket, waiting for upload before continuing
-  await s3.putObject(params).promise();   
+  await s3.putObject(params).promise();
   // Setting up S3 upload parameters
   params = {
     Bucket: BUCKET_NAME,
@@ -294,5 +293,24 @@ const {folder_name, file_name} = fields;
   res.json({url: promise.Location})
 })
 });
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['x-access-token'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) {
+    return res.sendStatus(401);
+  }
+  jwt.verify(token, keys.secretOrKey, (err, decoded) => {
+    if (err) {
+       return res.sendStatus(403);
+    }
+    req.user = decoded.id;
+    next();
+  });
+}
+
+router.get('/validate', authenticateToken, (req, res) => {
+  return res.json(req.user);
+})
 
 module.exports = router;
