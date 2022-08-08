@@ -15,7 +15,7 @@ function redirectToLogin () {
 
 function authenticateUserInStore(token) {
   axios.get(process.env.REACT_APP_API_URL + "/api/users/validate").then(res => {
-    store.dispatch(setCurrentUser(res));
+    store.dispatch(setCurrentUser(jwt_decode(token)));
   }).catch(err => logoutUserInStore());
 }
 

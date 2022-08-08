@@ -41,14 +41,12 @@ export const registerUser = userData => dispatch => {
 // Login - get user token
 export const loginUser = userData => async dispatch => {
   dispatch(setUserLoading())
-  console.log("line 44")
   await axios
     .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
     .then(res => {
 
       // Set token to localStorage
       const { token } = res.data;
-      console.log("GOT TO HERE")
       localStorage.setItem("jwtToken", token);
       // Set token to Auth header
       setAxiosHeaderAuthToken(token);
@@ -59,7 +57,7 @@ export const loginUser = userData => async dispatch => {
     })
     .catch(err =>
       {
-        console.log(err)
+        console.log(err);
         dispatch(logoutUser());
         dispatch(setUserNotLoading());
         return dispatch({
@@ -101,7 +99,6 @@ export const logoutUser = () => dispatch => {
   localStorage.removeItem("jwtToken");
   // Remove auth header for future requests
   setAxiosHeaderAuthToken(false);
-  // Set current user to empty object {} which will set isAuthenticated to false
-  dispatch(setCurrentUser({}));
-  window.location.href = '/login';
+  dispatch(setCurrentUser(null));
+  // window.location.href = '/login';
 };

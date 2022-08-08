@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
 
-import  {createMockServerIfNotProduction}  from "./server/index"
 import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
 import Navbar from "./components/Navbar";
@@ -33,7 +32,7 @@ class App extends Component {
               <Route exact path="/" component={Login} />
               <Route exact path="/login" component={Login} />
               // Create register route/path
-              <Route path="/:anything" component={Navbar} /> 
+              <Route path="/:anything" component={Navbar} />
             </Switch>
             <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
             <PrivateRoute exact path="/database" component={Database} />
