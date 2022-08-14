@@ -6,5 +6,5 @@ import testReducer from "./testReducer";
 export default combineReducers({
   auth: authReducer,
   errors: errorReducer,
-  test: testReducer
+  test: testReducer,
 });

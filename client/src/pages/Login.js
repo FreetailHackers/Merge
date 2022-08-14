@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { loginUser } from "../actions/authActions";
 
-import './Login.css';
+import "./Login.css";
 
 class Login extends Component {
   constructor() {
@@ -11,12 +11,12 @@ class Login extends Component {
     this.state = {
       email: "",
       password: "",
-      errors: {}
+      errors: {},
     };
   }
 
   componentDidMount() {
-    console.log("Got to line 19")
+    console.log("Got to line 19");
     // If logged in and user navigates to Login page, should redirect them to dashboard
     if (this.props.auth.isAuthenticated) {
       this.props.history.push("/dashboard");
@@ -24,28 +24,28 @@ class Login extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("Got to line 27")
+    console.log("Got to line 27");
     if (nextProps.auth.isAuthenticated) {
       this.props.history.push("/dashboard");
     }
 
     if (nextProps.errors) {
       this.setState({
-        errors: nextProps.errors
+        errors: nextProps.errors,
       });
     }
   }
 
-  onChange = e => {
+  onChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  onSubmit = e => {
+  onSubmit = (e) => {
     e.preventDefault();
 
     const userData = {
       email: this.state.email,
-      password: this.state.password
+      password: this.state.password,
     };
     //checking database to see if credentials exist
     this.props.loginUser(userData);
@@ -57,7 +57,7 @@ class Login extends Component {
     return (
       <section id="login">
         <form noValidate onSubmit={this.onSubmit}>
-          <div className='logo' />
+          <div className="logo" />
           <hr />
           <label htmlFor="email">Email</label>
           <input
@@ -68,7 +68,7 @@ class Login extends Component {
             type="email"
             placeholder="foo@bar.edu"
           />
-          <span className='error'>
+          <span className="error">
             {errors.email}
             {errors.emailnotfound}
           </span>
@@ -81,13 +81,13 @@ class Login extends Component {
             type="password"
             placeholder="Password (at least 6 characters)"
           />
-          <span className='error'>
+          <span className="error">
             {errors.password}
             {errors.passwordincorrect}
           </span>
           <button type="submit">Register</button>
           <button type="submit">Login</button>
-          <span className='error'>{errors.status}</span>
+          <span className="error">{errors.status}</span>
         </form>
       </section>
     );
@@ -97,16 +97,13 @@ class Login extends Component {
 Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired
+  errors: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   auth: state.auth,
   errors: state.errors,
-  isLoading: state.auth.loading
+  isLoading: state.auth.loading,
 });
 
-export default connect(
-  mapStateToProps,
-  { loginUser }
-)(Login);
+export default connect(mapStateToProps, { loginUser })(Login);

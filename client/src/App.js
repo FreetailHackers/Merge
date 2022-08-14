@@ -28,13 +28,20 @@ class App extends Component {
       <Provider store={store}>
         <Router>
           <div className="App">
-            <Switch> {/* this will render the login page WITHOUT the navbar on routes / and /login */}
+            <Switch>
+              {" "}
+              {/* this will render the login page WITHOUT the navbar on routes / and /login */}
               <Route exact path="/" component={Login} />
               <Route exact path="/login" component={Login} />
-              // Create register route/path
+              {/* Create register route/path */}
               <Route path="/:anything" component={Navbar} />
             </Switch>
-            <PrivateRoute exact path="/admin" component={Database} childProps={{title: 'Admin', admin: true}} />
+            <PrivateRoute
+              exact
+              path="/admin"
+              component={Database}
+              childProps={{ title: "Admin", admin: true }}
+            />
             <PrivateRoute exact path="/database" component={Database} />
             <Route exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />

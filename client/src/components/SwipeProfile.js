@@ -1,54 +1,46 @@
-import React from 'react';
+import React from "react";
 import PropTypes from "prop-types";
-import GithubCard from './GithubCard';
-import './SwipeProfile.css';
-import LinkedInCard from './LinkedInCard';
-import PortfolioCard from './PortfolioCard';
+import GithubCard from "./GithubCard";
+import "./SwipeProfile.css";
+import LinkedInCard from "./LinkedInCard";
+import PortfolioCard from "./PortfolioCard";
 
 const SwipeProfile = (props) => {
-   const relativePosition = props.relativePosition || [0, 0];
-   const angle = props.relativeAngle || 0;
-   const isBeingDragged = relativePosition.some(v => v !== 0); 
+  const relativePosition = props.relativePosition || [0, 0];
+  const angle = props.relativeAngle || 0;
+  const isBeingDragged = relativePosition.some((v) => v !== 0);
 
-   return (
-      <div 
-         className={`swipe-profile ${isBeingDragged ? 'dragged' : ''} ${props.borderColor}-side`}
-         onMouseDown={props.onMouseDown}
-         onMouseUp={props.onMouseUp}
-         onMouseMove={props.onMouseMove}
-         style={{
-            left: `${relativePosition[0]}px`,
-            top: `${relativePosition[1]}px`,
-            transform: `rotate(${angle}deg)`
-         }}
-      >
-         <h3 draggable={false}>{ props.name }</h3>
-         <img src={ props.profilePictureUrl } alt='' />
-         <h4 draggable={false}>{ props.school }</h4>
-         <p draggable={false} style={{ marginBottom: 60 }}>{ props.intro }</p>
-         {
-            props.github 
-            ? <GithubCard username={ props.github } />
-            : null
-         }
-         {
-            props.linkedin
-            ? <LinkedInCard link={ props.linkedin } />
-            : null
-         }
-         {
-            props.portfolio
-            ? <PortfolioCard link={ props.portfolio } />
-            : null
-         }
-      </div>
-   )
+  return (
+    <div
+      className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
+        props.borderColor
+      }-side`}
+      onMouseDown={props.onMouseDown}
+      onMouseUp={props.onMouseUp}
+      onMouseMove={props.onMouseMove}
+      style={{
+        left: `${relativePosition[0]}px`,
+        top: `${relativePosition[1]}px`,
+        transform: `rotate(${angle}deg)`,
+      }}
+    >
+      <h3 draggable={false}>{props.name}</h3>
+      <img src={props.profilePictureUrl} alt="" />
+      <h4 draggable={false}>{props.school}</h4>
+      <p draggable={false} style={{ marginBottom: 60 }}>
+        {props.intro}
+      </p>
+      {props.github ? <GithubCard username={props.github} /> : null}
+      {props.linkedin ? <LinkedInCard link={props.linkedin} /> : null}
+      {props.portfolio ? <PortfolioCard link={props.portfolio} /> : null}
+    </div>
+  );
 };
 
 SwipeProfile.propTypes = {
-   name: PropTypes.string.isRequired,
-   school: PropTypes.string.isRequired,
-   intro: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
+  school: PropTypes.string.isRequired,
+  intro: PropTypes.string.isRequired,
 };
 
 export default SwipeProfile;

@@ -1,9 +1,9 @@
 import axios from "axios";
 import React, { Component } from "react";
-import './Database.css';
+import "./Database.css";
 import Collapsible from "../components/Collapsible";
 import { UserToParagraph } from "../components/UserToParagraph";
-import { Pagination } from '../components/Pagination';
+import { Pagination } from "../components/Pagination";
 
 class Database extends Component {
   constructor(props) {
@@ -14,11 +14,11 @@ class Database extends Component {
       keys: [],
       page: this.parsePageNumberHash(window.location.hash),
       filter: {
-        name: '',
-        university: '',
-        skills: ''
+        name: "",
+        university: "",
+        skills: "",
       },
-      lastDateSent: 0
+      lastDateSent: 0,
     };
   }
 
@@ -29,12 +29,13 @@ class Database extends Component {
     } else {
       return parseInt(hash.substring(1));
     }
-  }
+  };
 
   getUsersFromAPI = () => {
     const filterParameters = {};
     for (const key in this.state.filter) {
-      if (this.state.filter[key] !== '') filterParameters[key] = this.state.filter[key];
+      if (this.state.filter[key] !== "")
+        filterParameters[key] = this.state.filter[key];
     }
     const dateSent = new Date();
     var queryParamters = {
@@ -44,44 +45,54 @@ class Database extends Component {
       filters: filterParameters,
     };
     if (dateSent < this.state.lastDateSent) return;
-    this.setState({
-      lastDateSent: dateSent
-    }, () => {
-      axios.get(process.env.REACT_APP_API_URL + "/api/users/list", { params: queryParamters })
-        .then((res) => {
-          if (res.data && res.data.dateSent.toString() === this.state.lastDateSent.toString()) {
-            const keys = [];
-            const data = [];
-            if (res.data.list[0]) {
-              for (const key in res.data.list[0].profile[0]) {
-                if (key !== '_id') keys.push(key);
-              }
-            }
-            for (const user of res.data.list) {
-              var profile = {};
-              for (const key of keys) {
-                if (user.profile[0] == undefined) {
-                  user.profile[0] = {};
+    this.setState(
+      {
+        lastDateSent: dateSent,
+      },
+      () => {
+        axios
+          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+            params: queryParamters,
+          })
+          .then((res) => {
+            if (
+              res.data &&
+              res.data.dateSent.toString() ===
+                this.state.lastDateSent.toString()
+            ) {
+              const keys = [];
+              const data = [];
+              if (res.data.list[0]) {
+                for (const key in res.data.list[0].profile[0]) {
+                  if (key !== "_id") keys.push(key);
                 }
-                profile[key] = user.profile[0][key];
               }
-              profile.name = user.name;
-              data.push(profile);
+              for (const user of res.data.list) {
+                var profile = {};
+                for (const key of keys) {
+                  if (user.profile[0] === undefined) {
+                    user.profile[0] = {};
+                  }
+                  profile[key] = user.profile[0][key];
+                }
+                profile.name = user.name;
+                data.push(profile);
+              }
+              this.setState({
+                users: data,
+                keys: keys,
+              });
             }
-            this.setState({
-              users: data,
-              keys: keys
-            });
-          }
-        });
-    });
-  }
+          });
+      }
+    );
+  };
 
   componentDidMount() {
     this.getUsersFromAPI();
   }
 
-  filterOutNameKey = (key) => key !== 'name'
+  filterOutNameKey = (key) => key !== "name";
 
   setPage = (page, e) => {
     if (e) e.preventDefault();
@@ -90,40 +101,46 @@ class Database extends Component {
       this.getUsersFromAPI();
       this.props.history.push(`#${page}`);
     });
-  }
+  };
 
   updateFilter = (e) => {
-    this.setState({
-      filter: {
-        ...this.state.filter,
-        [e.target.name]: e.target.value
+    this.setState(
+      {
+        filter: {
+          ...this.state.filter,
+          [e.target.name]: e.target.value,
+        },
+      },
+      () => {
+        this.getUsersFromAPI();
       }
-    }, () => {
-      this.getUsersFromAPI();
-    });
-  }
+    );
+  };
 
   render() {
     return (
       <section>
         <h1 className="headerTitle">{this.props.title || "User Database"}</h1>
-        {Object.keys(this.state.filter).map((key, i) => <div key={i} className='filterInput'>
-          <label>Filter by {key}</label>
-          <input
-            name={key}
-            value={this.state.filter[key]}
-            placeholder={`${key}`}
-            type='text'
-            onChange={this.updateFilter}
-          />
-        </div>)}
-        <br /><br />
-        {this.state.users.map((user, index) =>
+        {Object.keys(this.state.filter).map((key, i) => (
+          <div key={i} className="filterInput">
+            <label>Filter by {key}</label>
+            <input
+              name={key}
+              value={this.state.filter[key]}
+              placeholder={`${key}`}
+              type="text"
+              onChange={this.updateFilter}
+            />
+          </div>
+        ))}
+        <br />
+        <br />
+        {this.state.users.map((user, index) => (
           <Collapsible key={index} title={user.name}>
             <button className="chat-button">Message</button>
             <UserToParagraph user={user} keys={this.state.keys} />
           </Collapsible>
-        )}
+        ))}
         <Pagination page={this.state.page} setPage={this.setPage} />
       </section>
     );
