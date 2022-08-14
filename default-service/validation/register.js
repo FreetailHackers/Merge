@@ -3,10 +3,10 @@ const isEmpty = require("is-empty");
 
 module.exports = function validateRegisterInput(data) {
   let errors = {};
-  console.log("name: " + data.name)
-  console.log("EMAIL: " + data.email)
-  console.log("pass: " + data.password)
-  console.log("pass2: " + data.password2)
+  console.log("name: " + data.name);
+  console.log("EMAIL: " + data.email);
+  console.log("pass: " + data.password);
+  console.log("pass2: " + data.password2);
   // Convert empty fields to an empty string so we can use validator functions
   data.name = !isEmpty(data.name) ? data.name : "";
   data.email = !isEmpty(data.email) ? data.email : "";
@@ -24,7 +24,7 @@ module.exports = function validateRegisterInput(data) {
   } else if (!Validator.isEmail(data.email)) {
     errors.email = "Email is invalid";
   }
-  var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/
+  var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
   // Password checks
   if (Validator.isEmpty(data.password)) {
     errors.password = "Password field is required";
@@ -37,7 +37,7 @@ module.exports = function validateRegisterInput(data) {
   if (!Validator.isLength(data.password, { min: 8, max: 30 })) {
     errors.password = "Password must be at least 8 characters";
   }
-  
+
   if (Validator.equals(data.password, data.password.toLowerCase())) {
     errors.password = "Password must have 1 capital letter";
   }
@@ -51,6 +51,6 @@ module.exports = function validateRegisterInput(data) {
   }
   return {
     errors,
-    isValid: isEmpty(errors)
+    isValid: isEmpty(errors),
   };
 };

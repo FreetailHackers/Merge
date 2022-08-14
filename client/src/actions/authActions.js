@@ -2,15 +2,19 @@ import axios from "axios";
 import setAxiosHeaderAuthToken from "../utils/setAxiosHeaderAuthToken";
 import jwt_decode from "jwt-decode-non-json";
 
-import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "./types";
+import {
+  GET_ERRORS,
+  SET_CURRENT_USER,
+  USER_LOADING,
+  USER_NOT_LOADING,
+} from "./types";
 
 // Register - create user in database and get token
-export const registerUser = userData => dispatch => {
-  dispatch(setUserLoading())
+export const registerUser = (userData) => (dispatch) => {
+  dispatch(setUserLoading());
   axios
     .post(process.env.REACT_APP_API_URL + "/api/users/register", userData)
-    .then(res => {
-
+    .then((res) => {
       // // Set token to localStorage
       // const { token, user } = res.data;
       // const isAdmitted = user.status.admitted;
@@ -19,7 +23,6 @@ export const registerUser = userData => dispatch => {
       //   // Get outta here!
       //   throw new Error("User is not admitted")
       // }
-
       // localStorage.setItem("jwtToken", token);
       // // Set token to Auth header
       // setAxiosHeaderAuthToken(token);
@@ -28,23 +31,22 @@ export const registerUser = userData => dispatch => {
       // // Set current user
       // dispatch(setCurrentUser(userID, user));
     })
-    .catch(err => {
+    .catch((err) => {
       dispatch(logoutUser());
       dispatch(setUserNotLoading());
       return dispatch({
         type: GET_ERRORS,
-        payload: {"status" : err.message}
+        payload: { status: err.message },
       });
     });
 };
 
 // Login - get user token
-export const loginUser = userData => async dispatch => {
-  dispatch(setUserLoading())
+export const loginUser = (userData) => async (dispatch) => {
+  dispatch(setUserLoading());
   await axios
     .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
-    .then(res => {
-
+    .then((res) => {
       // Set token to localStorage
       const { token } = res.data;
       localStorage.setItem("jwtToken", token);
@@ -55,16 +57,15 @@ export const loginUser = userData => async dispatch => {
       // Set current user
       dispatch(setCurrentUser(userID));
     })
-    .catch(err =>
-      {
-        console.log(err);
-        dispatch(logoutUser());
-        dispatch(setUserNotLoading());
-        return dispatch({
-          type: GET_ERRORS,
-          payload: {"status" : err.message}
-        });
+    .catch((err) => {
+      console.log(err);
+      dispatch(logoutUser());
+      dispatch(setUserNotLoading());
+      return dispatch({
+        type: GET_ERRORS,
+        payload: { status: err.message },
       });
+    });
 };
 
 // Set logged in user
@@ -74,27 +75,27 @@ export const setCurrentUser = (userID) => {
     isAuthenticated: !!userID,
     userID,
     user: {
-      status: {admitted: true}
-    }
+      status: { admitted: true },
+    },
   };
 };
 
 // User loading
 export const setUserLoading = () => {
   return {
-    type: USER_LOADING
+    type: USER_LOADING,
   };
 };
 
 // User no longer loading
 export const setUserNotLoading = () => {
   return {
-    type: USER_NOT_LOADING
+    type: USER_NOT_LOADING,
   };
 };
 
 // Log user out
-export const logoutUser = () => dispatch => {
+export const logoutUser = () => (dispatch) => {
   // Remove token from local storage
   localStorage.removeItem("jwtToken");
   // Remove auth header for future requests

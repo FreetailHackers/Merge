@@ -1,0 +1,5 @@
+# Source: https://eslint.org/docs/user-guide/configuring/ignoring-code#the-eslintignore-file
+!build
+build/*
+!build/test.js
+!build/index.js

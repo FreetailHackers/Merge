@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 var formidable = require("formidable");
-var fs = require('fs');
+var fs = require("fs");
 
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
@@ -16,91 +16,88 @@ const validateProfileUpdateInput = require("../../validation/profileupdate");
 const User = require("../../models/User");
 
 //AWS credentials
-const AWS = require('aws-sdk')
+const AWS = require("aws-sdk");
 const ID = "AKIARX7Y5NJLCNITEIMW";
-const SECRET = "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"
-const BUCKET_NAME = "merge2022"
+const SECRET = "4GYRJ9ct3bq+imACkHa3wwWdDtUbsAwMrMK6/xvO";
+const BUCKET_NAME = "merge2022";
 const s3 = new AWS.S3({
   accessKeyId: ID,
-  secretAccessKey: SECRET
+  secretAccessKey: SECRET,
 });
 // @route POST api/users/register
 // @desc Register user
 // @access Public
 router.post("/register", (req, res) => {
   // Form validation
-  console.log("got to register")
+  console.log("got to register");
   let { errors, isValid } = validateRegisterInput(req.body);
   // Check validation
   if (!isValid) {
-    errors.isValid = false
+    errors.isValid = false;
     return res.json(errors);
   }
 
-  User.findOne({ email: req.body.email }).then(user => {
+  User.findOne({ email: req.body.email }).then((user) => {
     if (user) {
-
       return res.json({ email: "Email already exists", isValid: false });
     } else {
       var newUser = new User({
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-
       });
-      console.log("NEW USER PRINT")
-      console.log(newUser)
+      console.log("NEW USER PRINT");
+      console.log(newUser);
       // Hash password before saving in database
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
           newUser.password = hash;
 
-          console.log(user)
+          console.log(user);
           newUser
             .save()
-            .then(user => {
+            .then((user) => {
               let temp = {
-                status:  {
-                  admitted: true
-                }
-              }
-              console.log("user: " + user)
+                status: {
+                  admitted: true,
+                },
+              };
+              console.log("user: " + user);
               const payload = {
                 id: user._id,
-                name: user.name
+                name: user.name,
               };
-              console.log("id : " + payload.id)
-              console.log("name : " + payload.name)
+              console.log("id : " + payload.id);
+              console.log("name : " + payload.name);
               // Sign token
-             jwt.sign(
+              jwt.sign(
                 payload,
                 keys.secretOrKey,
                 {
-                  expiresIn: 31556926 // 1 year in seconds
+                  expiresIn: 31556926, // 1 year in seconds
                 },
                 (err, token) => {
-                  console.log("error" + err)
-                  console.log("token: " + token)
+                  console.log("error" + err);
+                  console.log("token: " + token);
                   res.json({
                     success: true,
                     token: "Bearer " + token,
-                    user: temp
+                    user: temp,
                   });
-                  console.log("generated token: " + token)
+                  console.log("generated token: " + token);
                 }
               );
             })
-            .catch(err => console.log(err));
+            .catch((err) => console.log(err));
         });
       });
-      console.log("NEW USER PRINT")
-      console.log(newUser)
+      console.log("NEW USER PRINT");
+      console.log(newUser);
     }
+  });
 
-  })
-
-  console.log("finished registering??")
+  console.log("finished registering??");
 });
 
 // @route POST api/users/list
@@ -113,7 +110,7 @@ router.post("/login", (req, res) => {
 
   // Check validation
   if (!isValid) {
-    errors.isValid = false
+    errors.isValid = false;
     return res.json(errors);
   }
 
@@ -121,20 +118,20 @@ router.post("/login", (req, res) => {
   const password = req.body.password;
 
   // Find user by email
-  User.findOne({ email }).then(user => {
+  User.findOne({ email }).then((user) => {
     // Check if user exists
     if (!user) {
-      return res.json({ email: "Email not found" , isValid : false});
+      return res.json({ email: "Email not found", isValid: false });
     }
 
     // Check password
-    bcrypt.compare(password, user.password).then(isMatch => {
+    bcrypt.compare(password, user.password).then((isMatch) => {
       if (isMatch) {
         // User matched
         // Create JWT Payload
         const payload = {
           id: user.id,
-          name: user.name
+          name: user.name,
         };
 
         // Sign token
@@ -142,12 +139,12 @@ router.post("/login", (req, res) => {
           payload,
           keys.secretOrKey,
           {
-            expiresIn: 31556926 // 1 year in seconds
+            expiresIn: 31556926, // 1 year in seconds
           },
           (err, token) => {
             res.json({
               success: true,
-              token: "Bearer " + token
+              token: "Bearer " + token,
             });
           }
         );
@@ -157,7 +154,6 @@ router.post("/login", (req, res) => {
     });
   });
 });
-
 
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
@@ -173,8 +169,8 @@ router.post("/update", async (req, res) => {
   // }
 
   const id = req.body.id;
-  console.log('test')
-  console.log(req.body)
+  console.log("test");
+  console.log(req.body);
 
   // var props;
   // for (prop in req.body) {
@@ -183,66 +179,69 @@ router.post("/update", async (req, res) => {
   //   }
   // }
   // console.log(props)
-  console.log('test')
+  console.log("test");
   const profile = req.body.update;
   const options = {
     // new: true,
     upsert: true,
     // useFindAndModify: false,
-  }
-  console.log(profile)
-  console.log(id, options, { $set: profile })
-
+  };
+  console.log(profile);
+  console.log(id, options, { $set: profile });
 
   //Clear all old s3 files
 
-  profile_pic_link = req.body.update.profile.profilePictureUrl
-  folder_name = id + "/"
+  profile_pic_link = req.body.update.profile.profilePictureUrl;
+  folder_name = id + "/";
   var params = {
     Bucket: BUCKET_NAME,
-    Prefix: id + "/"
+    Prefix: id + "/",
   };
-  await s3.listObjectsV2(params, async function(err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
-    else  {
-      listOfObjects = data.Contents
-      newimg = profile_pic_link.replace("https://merge2022.s3.amazonaws.com/", "")
-      console.log(newimg)
-      for(let i = 1; i < data.KeyCount; i++) {
-        nameOfFile = listOfObjects[i].Key
-        console.log(nameOfFile)
-        if (nameOfFile !== newimg) {
-          var params = {  Bucket: BUCKET_NAME, Key: nameOfFile};
-          await s3.deleteObject(params).promise()
+  await s3
+    .listObjectsV2(params, async function (err, data) {
+      if (err) console.log(err, err.stack); // an error occurred
+      else {
+        listOfObjects = data.Contents;
+        newimg = profile_pic_link.replace(
+          "https://merge2022.s3.amazonaws.com/",
+          ""
+        );
+        console.log(newimg);
+        for (let i = 1; i < data.KeyCount; i++) {
+          nameOfFile = listOfObjects[i].Key;
+          console.log(nameOfFile);
+          if (nameOfFile !== newimg) {
+            var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
+            await s3.deleteObject(params).promise();
+          }
         }
+        console.log(data);
       }
-      console.log(data);
-    }
-  }).promise();
+    })
+    .promise();
 
-  console.log(req.body.update)
+  console.log(req.body.update);
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
   // Look at mongoose docs
-  User.updateOne( { _id: id }, { $set: profile }, options).then(data => {
-    console.log(data)
+  User.updateOne({ _id: id }, { $set: profile }, options).then((data) => {
+    console.log(data);
     res.json({
       success: true,
     });
   });
 });
 
-
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
 router.get("/list", (req, res) => {
   if (req.query.filters) var filters = JSON.parse(req.query.filters);
-  if (filters._id) filters._id = mongoose.Types.ObjectId(filters._id)
+  if (filters._id) filters._id = mongoose.Types.ObjectId(filters._id);
   var options = {
     skip: parseInt(req.query.start),
     limit: parseInt(req.query.limit),
-  }
+  };
   // console.log(filters);
   // console.log(options);
   // console.log(props);
@@ -257,9 +256,9 @@ router.get("/list", (req, res) => {
       result = {
         dateSent: req.query.dateSent,
         list: data,
-      }
+      };
     }
-    console.log(result)
+    console.log(result);
     res.json(result);
   });
 });
@@ -268,49 +267,49 @@ router.get("/list", (req, res) => {
 // @desc Update the profile information of a sepcific user
 // @access Public
 router.post("/profile-picture", (req, res) => {
- const form = new formidable.IncomingForm();
- form.parse(req, async (err, fields, files) => {
-//we are passing the form's fields that the user had submitted to a new
-//object in the line below
-const {folder_name, file_name} = fields;
-// Setting up S3 upload parameters
-  var params = {
-    Bucket: BUCKET_NAME,
-    Key: folder_name //creating folder in s3
-  };
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    //we are passing the form's fields that the user had submitted to a new
+    //object in the line below
+    const { folder_name, file_name } = fields;
+    // Setting up S3 upload parameters
+    var params = {
+      Bucket: BUCKET_NAME,
+      Key: folder_name, //creating folder in s3
+    };
 
-  //Uploading folder to bucket, waiting for upload before continuing
-  await s3.putObject(params).promise();
-  // Setting up S3 upload parameters
-  params = {
-    Bucket: BUCKET_NAME,
-    Key: file_name, // File name in S3 = user's name
-    Body: fs.createReadStream(files.file.filepath),
-    ContentType: files.file.mimetype
-  };
-  // Uploading files to the bucket, waiting for upload before continuing
-  var promise = await s3.upload(params).promise();
-  res.json({url: promise.Location})
-})
+    //Uploading folder to bucket, waiting for upload before continuing
+    await s3.putObject(params).promise();
+    // Setting up S3 upload parameters
+    params = {
+      Bucket: BUCKET_NAME,
+      Key: file_name, // File name in S3 = user's name
+      Body: fs.createReadStream(files.file.filepath),
+      ContentType: files.file.mimetype,
+    };
+    // Uploading files to the bucket, waiting for upload before continuing
+    var promise = await s3.upload(params).promise();
+    res.json({ url: promise.Location });
+  });
 });
 
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers['x-access-token'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["x-access-token"];
+  const token = authHeader && authHeader.split(" ")[1];
   if (token == null) {
     return res.sendStatus(401);
   }
   jwt.verify(token, keys.secretOrKey, (err, decoded) => {
     if (err) {
-       return res.sendStatus(403);
+      return res.sendStatus(403);
     }
     req.user = decoded.id;
     next();
   });
 }
 
-router.get('/validate', authenticateToken, (req, res) => {
+router.get("/validate", authenticateToken, (req, res) => {
   return res.json(req.user);
-})
+});
 
 module.exports = router;

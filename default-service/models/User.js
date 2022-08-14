@@ -5,33 +5,35 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
-  profile: [{
-    socialMedia: {String, required: false},
-    school: String,
-    major: String,
-    class: String,
-    skills: String,
-    experience: String,
-    intro: String,
-    profilePictureUrl: String,
-    github: String,
-    linkedin: String,
-    portfolio: String
-  }]
+  profile: [
+    {
+      socialMedia: { String, required: false },
+      school: String,
+      major: String,
+      class: String,
+      skills: String,
+      experience: String,
+      intro: String,
+      profilePictureUrl: String,
+      github: String,
+      linkedin: String,
+      portfolio: String,
+    },
+  ],
 });
 
 module.exports = User = mongoose.model("users", UserSchema);

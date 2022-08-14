@@ -1,15 +1,17 @@
-import { SET_CURRENT_USER, USER_LOADING, USER_NOT_LOADING } from "../actions/types";
-
-import isEmpty from "is-empty";
+import {
+  SET_CURRENT_USER,
+  USER_LOADING,
+  USER_NOT_LOADING,
+} from "../actions/types";
 
 const initialState = {
   isAuthenticated: false,
   userID: null,
   user: {},
-  loading: true
+  loading: true,
 };
 
-export default function(state = initialState, action) {
+export default function authActions (state = initialState, action) {
   switch (action.type) {
     case SET_CURRENT_USER:
       return {
@@ -17,17 +19,17 @@ export default function(state = initialState, action) {
         isAuthenticated: action.isAuthenticated,
         userID: action.userID,
         user: action.user,
-        loading: false
+        loading: false,
       };
     case USER_LOADING:
       return {
         ...state,
-        loading: true
+        loading: true,
       };
     case USER_NOT_LOADING:
       return {
         ...state,
-        loading: false
+        loading: false,
       };
     default:
       return state;

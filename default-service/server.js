@@ -12,16 +12,16 @@ dotenv.config();
 const app = express();
 
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000"); 
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, X-ACCESS-TOKEN, Content-Type, *, Accept"
-    );
-    res.header(
-        "Access-Control-Allow-Methods",
-        "POST, GET, PUT, DELETE, OPTIONS" //maybe HEAD, PATCH
-    );
-    next();
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, X-ACCESS-TOKEN, Content-Type, *, Accept"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "POST, GET, PUT, DELETE, OPTIONS" //maybe HEAD, PATCH
+  );
+  next();
 });
 
 app.use(cors());
@@ -29,7 +29,7 @@ app.use(cors());
 // Bodyparser middleware
 app.use(
   bodyParser.urlencoded({
-    extended: false
+    extended: false,
   })
 );
 app.use(bodyParser.json());
@@ -39,12 +39,9 @@ const db = process.env.MONGO_URI;
 
 // Connect to MongoDB
 mongoose
-  .connect(
-    db,
-    { useNewUrlParser: true }
-  )
+  .connect(db, { useNewUrlParser: true })
   .then(() => console.log("MongoDB successfully connected"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
 // Passport middleware
 app.use(passport.initialize());
