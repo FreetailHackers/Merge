@@ -1,6 +1,7 @@
 import React from "react";
 import ChatPreview from "./ChatPreview";
 import "./ChatSidebar.css";
+import PropTypes from "prop-types";
 
 const ChatSidebar = ({ chats, setActiveChatIndex, activeChatIndex }) => (
   <div className="chatSidebar">
@@ -19,5 +20,11 @@ const ChatSidebar = ({ chats, setActiveChatIndex, activeChatIndex }) => (
     ))}
   </div>
 );
+
+ChatSidebar.propTypes = {
+  activeChatIndex: PropTypes.number.isRequired,
+  setActiveChatIndex: PropTypes.func.isRequired,
+  chats: PropTypes.object.isRequired,
+};
 
 export default ChatSidebar;

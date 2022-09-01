@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export const PaginationButton = ({ n, setPage }) =>
   n > 0 ? (
@@ -32,3 +33,13 @@ export const Pagination = ({ page, setPage }) => (
     <PaginationButton n={page + 10} setPage={setPage} />
   </p>
 );
+
+Pagination.propTypes = {
+  page: PropTypes.number.isRequired,
+  setPage: PropTypes.func.isRequired,
+};
+
+PaginationButton.propTypes = {
+  n: PropTypes.number.isRequired,
+  setPage: PropTypes.func.isRequired,
+};

@@ -11,7 +11,7 @@ const initialState = {
   loading: true,
 };
 
-export default function authActions (state = initialState, action) {
+export default function authActions(state = initialState, action) {
   switch (action.type) {
     case SET_CURRENT_USER:
       return {

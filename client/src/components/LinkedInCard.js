@@ -35,6 +35,7 @@ class LinkedInCard extends Component {
 
 LinkedInCard.propTypes = {
   username: PropTypes.string.isRequired,
+  link: PropTypes.string.isRequired,
 };
 
 export default LinkedInCard;

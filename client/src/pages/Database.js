@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import "./Database.css";
 import Collapsible from "../components/Collapsible";
 import { UserToParagraph } from "../components/UserToParagraph";
@@ -146,5 +147,10 @@ class Database extends Component {
     );
   }
 }
+
+Database.propTypes = {
+  history: PropTypes.object.isRequired,
+  title: PropTypes.object.isRequired,
+};
 
 export default Database;

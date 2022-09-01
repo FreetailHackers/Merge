@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const Message = ({
   fromSelf,
@@ -32,5 +33,15 @@ const Message = ({
     </div>
   </div>
 );
+
+Message.propTypes = {
+  fromSelf: PropTypes.bool.isRequired,
+  content: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired,
+  timestamp: PropTypes.string.isRequired,
+  mergeBottom: PropTypes.bool.isRequired,
+  mergeTop: PropTypes.bool.isRequired,
+};
 
 export default Message;

@@ -36,6 +36,8 @@ const Navbar = (props) => {
 
 Navbar.propTypes = {
   auth: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  logoutUser: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

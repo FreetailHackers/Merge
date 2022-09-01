@@ -5,7 +5,12 @@ module.exports = {
     node: true,
     jest: true,
   },
-  extends: ["eslint:recommended", "prettier"],
+  extends: [
+    "eslint:recommended",
+    "react-app",
+    "plugin:react/recommended",
+    "prettier",
+  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -14,8 +19,5 @@ module.exports = {
     sourceType: "module",
   },
   plugins: [],
-  rules: {
-    "no-unused-vars": "warn",
-    "no-undef": "warn",
-  },
+  rules: {},
 };

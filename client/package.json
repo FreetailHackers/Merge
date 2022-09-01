@@ -14,6 +14,7 @@
     "miragejs": "^0.1.41",
     "patch-package": "^6.4.7",
     "process": "^0.11.10",
+    "prop-types": "^15.8.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-icons": "^4.2.0",
@@ -30,10 +31,18 @@
     "start": " react-scripts start",
     "start-windows": "set PORT=5000 && cross-env REACT_APP_API_URL=$npm_config_api REACT_APP_CHAT_URL=$npm_config_chat_api react-scripts start",
     "debug_api_string": "echo $npm_config_api",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "build": "PORT=5000 REACT_APP_API_URL=$npm_config_api react-scripts build",
+    "test": "jest",
     "eject": "react-scripts eject",
+    "format": "npx prettier --write '**/*.js'",
+    "lint": "npx eslint '**/*.js'",
     "postinstall": "patch-package"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sss|styl|jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/node_modules/jest-css-modules"
+    },
+    "testEnvironment": "jsdom"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -48,6 +57,11 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.30.1",
+    "jest": "^28.1.3",
+    "jest-css-modules": "^2.1.0",
+    "jest-environment-jsdom": "^28.1.3",
     "prettier": "^2.7.1"
   }
 }
