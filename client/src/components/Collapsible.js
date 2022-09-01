@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { BsArrowsCollapse, BsArrowsExpand } from "react-icons/bs";
+import PropTypes from "prop-types";
 
 class Collapsible extends Component {
   constructor(props) {
@@ -37,4 +38,8 @@ class Collapsible extends Component {
   }
 }
 
+Collapsible.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 export default Collapsible;

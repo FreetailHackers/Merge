@@ -41,6 +41,16 @@ SwipeProfile.propTypes = {
   name: PropTypes.string.isRequired,
   school: PropTypes.string.isRequired,
   intro: PropTypes.string.isRequired,
+  relativePosition: PropTypes.array.isRequired,
+  relativeAngle: PropTypes.number.isRequired,
+  borderColor: PropTypes.string.isRequired,
+  onMouseDown: PropTypes.func.isRequired,
+  onMouseUp: PropTypes.func.isRequired,
+  onMouseMove: PropTypes.func.isRequired,
+  profilePictureUrl: PropTypes.string.isRequired,
+  github: PropTypes.object.isRequired,
+  linkedin: PropTypes.object.isRequired,
+  portfolio: PropTypes.object.isRequired,
 };
 
 export default SwipeProfile;

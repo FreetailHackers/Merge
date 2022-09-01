@@ -360,6 +360,7 @@ class Swipe extends Component {
 
 Swipe.propTypes = {
   auth: PropTypes.object.isRequired,
+  userID: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

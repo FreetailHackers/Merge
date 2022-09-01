@@ -10,16 +10,17 @@ var fs = require("fs");
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
-const validateProfileUpdateInput = require("../../validation/profileupdate");
+// const validateProfileUpdateInput = require("../../validation/profileupdate");
 
 // Load User model
 const User = require("../../models/User");
 
 //AWS credentials
+require("dotenv").config();
 const AWS = require("aws-sdk");
-const ID = "AKIARX7Y5NJLCNITEIMW";
-const SECRET = "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";
-const BUCKET_NAME = "merge2022";
+const ID = process.env.AWS_ID;
+const SECRET = process.env.AWS_SECRET;
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const s3 = new AWS.S3({
   accessKeyId: ID,
   secretAccessKey: SECRET,
@@ -191,24 +192,24 @@ router.post("/update", async (req, res) => {
 
   //Clear all old s3 files
 
-  profile_pic_link = req.body.update.profile.profilePictureUrl;
-  folder_name = id + "/";
+  const profile_pic_link = req.body.update.profile.profilePictureUrl;
+  const folder_name = id + "/";
   var params = {
     Bucket: BUCKET_NAME,
-    Prefix: id + "/",
+    Prefix: folder_name,
   };
   await s3
     .listObjectsV2(params, async function (err, data) {
       if (err) console.log(err, err.stack); // an error occurred
       else {
-        listOfObjects = data.Contents;
-        newimg = profile_pic_link.replace(
+        let listOfObjects = data.Contents;
+        let newimg = profile_pic_link.replace(
           "https://merge2022.s3.amazonaws.com/",
           ""
         );
         console.log(newimg);
         for (let i = 1; i < data.KeyCount; i++) {
-          nameOfFile = listOfObjects[i].Key;
+          let nameOfFile = listOfObjects[i].Key;
           console.log(nameOfFile);
           if (nameOfFile !== newimg) {
             var params = { Bucket: BUCKET_NAME, Key: nameOfFile };

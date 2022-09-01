@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Message from "./Message";
 import "./ChatWindow.css";
+import PropTypes from "prop-types";
 
 class ChatWindow extends Component {
   constructor(props) {
@@ -36,7 +37,7 @@ class ChatWindow extends Component {
     if (message === "") return;
     this.props.sendMessage(message);
     this.setState({
-      "update": "",
+      update: "",
     });
   };
 
@@ -55,6 +56,7 @@ class ChatWindow extends Component {
           : "";
         return (
           <Message
+            key={timestamp}
             fromSelf={message.fromUserId === "0" /*TODO: use redux user id*/}
             content={message.message}
             image={image}
@@ -86,7 +88,7 @@ class ChatWindow extends Component {
         <p
           onClick={() => {
             this.props.sendMessage("❤️");
-            this.setState({ "update": "" });
+            this.setState({ update: "" });
           }}
         >
           ❤️
@@ -100,5 +102,11 @@ class ChatWindow extends Component {
     </div>
   );
 }
+
+ChatWindow.propTypes = {
+  chat: PropTypes.object.isRequired,
+  sendMessage: PropTypes.func.isRequired,
+  profiles: PropTypes.array.isRequired,
+};
 
 export default ChatWindow;

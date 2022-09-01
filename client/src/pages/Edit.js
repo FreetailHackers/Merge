@@ -322,6 +322,9 @@ class Edit extends Component {
 
 Edit.propTypes = {
   auth: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  userID: PropTypes.object.isRequired,
+  setCurrentUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({

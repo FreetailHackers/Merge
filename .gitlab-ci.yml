@@ -1,0 +1,41 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS"
+      when: never
+    - if: "$CI_COMMIT_BRANCH"
+
+stages:
+  - build
+  - staging
+  - test
+  - production
+
+build_backend:
+  image: node
+  stage: build
+  variables:
+    FOLDER: default-service
+  before_script:
+    - cd $FOLDER
+    - npm install
+  script: npm run test -- --bail --passWithNoTests
+
+build_frontend:
+  extends: build_backend
+  variables:
+    FOLDER: client
+  script:
+    - npm run build
+    - npm run test -- --bail --passWithNoTests
+
+lint_format_frontend:
+  extends: build_frontend
+  script:
+    - npx prettier --check "**/*.js"
+    - npm run lint
+
+lint_format_backend:
+  extends: lint_format_frontend
+  variables:
+    FOLDER: default-service
