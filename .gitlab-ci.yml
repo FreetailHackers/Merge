@@ -7,8 +7,10 @@ workflow:
 
 stages:
   - build
+  - pre-staging
   - staging
   - test
+  - pre-production
   - production
 
 build_backend:
@@ -39,3 +41,88 @@ lint_format_backend:
   extends: lint_format_frontend
   variables:
     FOLDER: default-service
+
+create_integ:
+  stage: pre-staging
+  image: $EB_IMAGE
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  environment:
+    name: integ
+    url: http://freetail-merge-integ.us-east-1.elasticbeanstalk.com
+  variables:
+    EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
+    FOLDER: .
+  before_script:
+    - mkdir ~/.aws/
+    - touch ~/.aws/credentials
+    - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
+    - rm .gitignore
+    - mv .elasticbeanstalk $FOLDER/.elasticbeanstalk
+    - mv .ebextensions $FOLDER/.ebextensions
+    - echo $EB_ENVIRONMENT
+    - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL" > ./client/.env
+    - cd $FOLDER
+  script:
+    - eb create $EB_ENVIRONMENT -d -c $EB_ENVIRONMENT -r us-east-1 --single -i t2.micro,t3.micro || exit_code=$?
+    - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
+  after_script: sleep 5
+
+deploy_integ:
+  extends: create_integ
+  stage: staging
+  retry: 2
+  script:
+    - mv $CI_ENV_FILE_INTEG ./default-service/.env
+    - git add .
+    - git status
+    - ls -al
+    - eb deploy --staged $EB_ENVIRONMENT
+
+acceptance_test:
+  image: alpine
+  stage: test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+  script:
+    - echo "Acceptance tests not yet implemented, please add and replace this script!"
+    - echo "For now, this is just a manual acceptance step"
+  # TODO: add script here
+
+cleanup_integ:
+  extends: deploy_integ
+  stage: pre-production
+  environment:
+    action: stop
+  script: eb terminate --force $EB_ENVIRONMENT
+
+# deploy_prod:
+#   extends: deploy_integ
+#   stage: production
+#   environment:
+#     name: prod
+#     url: https://merge-api.freetailhackers.com/
+#   variables:
+#     FOLDER: default-service
+#   script:
+#     - mv $CI_ENV_FILE_PROD .env
+#     - mv $PROD_HTTPS_ALB .ebextensions/securelistener-alb.config
+#     - git add .
+#     - git status
+#     - ls -al
+#     - eb deploy --staged $EB_ENVIRONMENT
+
+# stop_prod:
+#   extends: deploy_prod
+#   when: manual
+#   environment:
+#     action: stop
+#   script: eb terminate --force $EB_ENVIRONMENT
+
+# create_prod:
+#   stage: pre-production
+#   extends: deploy_prod
+#   script:
+#     - eb create $EB_ENVIRONMENT -d -c $EB_ENVIRONMENT -r us-east-1 -i t2.micro,t3.micro --elb-type application -im 1 -ix 6 || exit_code=$?
+#     - if [ $exit_code -ne 0 ]; then echo "Failed to create prod environment"; fi;

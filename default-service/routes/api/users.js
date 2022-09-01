@@ -204,7 +204,7 @@ router.post("/update", async (req, res) => {
       else {
         let listOfObjects = data.Contents;
         let newimg = profile_pic_link.replace(
-          "https://merge2022.s3.amazonaws.com/",
+          "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
           ""
         );
         console.log(newimg);
