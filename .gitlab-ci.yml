@@ -71,7 +71,8 @@ deploy_integ:
   stage: staging
   retry: 2
   script:
-    - mv $CI_ENV_FILE_INTEG ./default-service/.env
+    - cp default-service/package.json .
+    - mv $CI_ENV_FILE_INTEG default-service/.env
     - git add .
     - git status
     - ls -al
