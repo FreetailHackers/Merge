@@ -13,6 +13,10 @@
     "lint": "npx eslint '**/*.js'",
     "test": "jest --coverage"
   },
+  "engines" : { 
+    "node" : ">=16.13.2",
+    "npm" : ">=8.1.2"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
