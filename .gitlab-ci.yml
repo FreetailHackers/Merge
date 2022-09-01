@@ -58,8 +58,6 @@ create_integ:
     - touch ~/.aws/credentials
     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
     - rm .gitignore
-    - mv .elasticbeanstalk $FOLDER/.elasticbeanstalk
-    - mv .ebextensions $FOLDER/.ebextensions
     - echo $EB_ENVIRONMENT
     - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL" > ./client/.env
     - cd $FOLDER
@@ -107,6 +105,8 @@ cleanup_integ:
 #     FOLDER: default-service
 #   script:
 #     - mv $CI_ENV_FILE_PROD .env
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - mv ../.ebextensions .ebextensions
 #     - mv $PROD_HTTPS_ALB .ebextensions/securelistener-alb.config
 #     - git add .
 #     - git status
@@ -118,11 +118,14 @@ cleanup_integ:
 #   when: manual
 #   environment:
 #     action: stop
-#   script: eb terminate --force $EB_ENVIRONMENT
+#   script: 
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - eb terminate --force $EB_ENVIRONMENT
 
 # create_prod:
 #   stage: pre-production
 #   extends: deploy_prod
 #   script:
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
 #     - eb create $EB_ENVIRONMENT -d -c $EB_ENVIRONMENT -r us-east-1 -i t2.micro,t3.micro --elb-type application -im 1 -ix 6 || exit_code=$?
 #     - if [ $exit_code -ne 0 ]; then echo "Failed to create prod environment"; fi;
