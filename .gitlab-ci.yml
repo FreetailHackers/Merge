@@ -63,9 +63,9 @@ create_integ:
     - echo "PORT=5000" >> ./client/.env
     - cd $FOLDER
   script:
-    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t2.micro,t3.micro || exit_code=$?
+    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t2.small,t3.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
-  after_script: sleep 5
+  after_script: sleep 180
 
 deploy_integ:
   extends: create_integ
@@ -129,5 +129,5 @@ cleanup_integ:
 #   extends: deploy_prod
 #   script:
 #     - mv ../.elasticbeanstalk .elasticbeanstalk
-#     - eb create $EB_ENVIRONMENT -d --timeout 40 -c $EB_ENVIRONMENT -r us-east-1 -i t2.micro,t3.micro --elb-type application -im 1 -ix 6 || exit_code=$?
+#     - eb create $EB_ENVIRONMENT -d --timeout 40 -c $EB_ENVIRONMENT -r us-east-1 -i t2.small,t3.small --elb-type application -im 1 -ix 6 || exit_code=$?
 #     - if [ $exit_code -ne 0 ]; then echo "Failed to create prod environment"; fi;
