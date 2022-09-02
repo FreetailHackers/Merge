@@ -65,7 +65,7 @@ create_integ:
   script:
     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t2.small,t3.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
-  after_script: sleep 180
+  after_script: sleep 5
 
 deploy_integ:
   extends: create_integ
@@ -78,6 +78,7 @@ deploy_integ:
     - git status
     - ls -al
     - eb deploy --staged $EB_ENVIRONMENT
+after_script: sleep 180
 
 acceptance_test:
   image: alpine
