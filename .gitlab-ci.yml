@@ -62,7 +62,7 @@ create_integ:
     - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
     - cd $FOLDER
   script:
-    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t3.small,t4g.small || exit_code=$?
+    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
   after_script: sleep 5
 
@@ -129,5 +129,5 @@ cleanup_integ:
 #   extends: deploy_prod
 #   script:
 #     - mv ../.elasticbeanstalk .elasticbeanstalk
-#     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 -i t2.small,t3.small --elb-type application -im 1 -ix 6 || exit_code=$?
+#     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 -i t4g.small,t4g.medium --elb-type application -im 1 -ix 6 || exit_code=$?
 #     - if [ $exit_code -ne 0 ]; then echo "Failed to create prod environment"; fi;
