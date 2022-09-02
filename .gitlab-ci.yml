@@ -77,7 +77,7 @@ deploy_integ:
     - git status
     - ls -al
     - eb deploy --staged $EB_ENVIRONMENT
-after_script: sleep 180
+  after_script: sleep 180
 
 acceptance_test:
   image: alpine
