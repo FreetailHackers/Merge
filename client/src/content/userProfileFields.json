@@ -1,12 +1,12 @@
 [
-    "name",
-    "school",
-    "major",
-    "class",
-    "skills",
-    "experience",
-    "intro",
-    "githubUsername",
-    "linkedinLink",
-    "portfolioLink"
+  "name",
+  "school",
+  "major",
+  "class",
+  "skills",
+  "experience",
+  "intro",
+  "githubUsername",
+  "linkedinLink",
+  "portfolioLink"
 ]

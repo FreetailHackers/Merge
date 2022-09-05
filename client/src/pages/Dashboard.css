@@ -1,50 +1,50 @@
 #dashboard {
-   text-align: center;
+  text-align: center;
 }
 
 #dashboard h1 {
-   margin: 200px auto 0 auto;
+  margin: 200px auto 0 auto;
 }
 
 .team-image {
-   position: relative;
-   margin: 0 auto;
-   width: 500px;
+  position: relative;
+  margin: 0 auto;
+  width: 500px;
 }
 
 .team-image div {
-   position: absolute;
+  position: absolute;
 }
 
 .team-image .background {
-   background-color: var(--primary);
-   opacity: 0.2;
-   width: 500px;
-   height: 500px;
-   -webkit-mask-image: url('../assets/images/dashboard-image/background.svg');
-   mask-image: url('../assets/images/dashboard-image/background.svg');
+  background-color: var(--primary);
+  opacity: 0.2;
+  width: 500px;
+  height: 500px;
+  -webkit-mask-image: url("../assets/images/dashboard-image/background.svg");
+  mask-image: url("../assets/images/dashboard-image/background.svg");
 }
 
 .team-image .main {
-   width: 500px;
-   height: 500px;
-   background-image: url('../assets/images/dashboard-image/team.svg');
+  width: 500px;
+  height: 500px;
+  background-image: url("../assets/images/dashboard-image/team.svg");
 }
 
 .team-image .primary {
-   background-color: var(--primary);
-   opacity: 1;
-   width: 500px;
-   height: 500px;
-   -webkit-mask-image: url('../assets/images/dashboard-image/primary.svg');
-   mask-image: url('../assets/images/dashboard-image/primary.svg');
+  background-color: var(--primary);
+  opacity: 1;
+  width: 500px;
+  height: 500px;
+  -webkit-mask-image: url("../assets/images/dashboard-image/primary.svg");
+  mask-image: url("../assets/images/dashboard-image/primary.svg");
 }
 
 .team-image .secondary {
-   background-color: var(--primary);
-   opacity: 1;
-   width: 500px;
-   height: 500px;
-   -webkit-mask-image: url('../assets/images/dashboard-image/secondary.svg');
-   mask-image: url('../assets/images/dashboard-image/secondary.svg');
+  background-color: var(--primary);
+  opacity: 1;
+  width: 500px;
+  height: 500px;
+  -webkit-mask-image: url("../assets/images/dashboard-image/secondary.svg");
+  mask-image: url("../assets/images/dashboard-image/secondary.svg");
 }

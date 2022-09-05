@@ -1,123 +1,129 @@
 .chatSidebar {
-   height: calc(100vh - 20px);
-   width: 300px;
-   min-width: 300px;
-   padding: 10px;
+  height: calc(100vh - 20px);
+  width: 300px;
+  min-width: 300px;
+  padding: 10px;
 
-   border-right: 1px #ddd solid;
+  border-right: 1px #ddd solid;
 
-   overflow-y: auto;
+  overflow-y: auto;
 }
 
 .chatPreview {
-   padding: 15px 5px;
-   border-radius: 12px;
-   margin-top: 2px;
+  padding: 15px 5px;
+  border-radius: 12px;
+  margin-top: 2px;
 
-   display: flex;
-   flex-wrap: wrap;
-   align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 
-   cursor: pointer;
+  cursor: pointer;
 
-   transition: background 0.1s;
+  transition: background 0.1s;
 }
 
-.chatPreview:hover, .chatPreview.active {
-   background: #eee;
+.chatPreview:hover,
+.chatPreview.active {
+  background: #eee;
 }
 
 .chatPreview div.text {
-   flex-grow: 2;
+  flex-grow: 2;
 }
 
-.chatPreview h4, .chatPreview p {
-   margin: 0;
-   font-weight: normal;
+.chatPreview h4,
+.chatPreview p {
+  margin: 0;
+  font-weight: normal;
 }
 
 .chatPreview h4 {
-   font-size: 1em;
+  font-size: 1em;
 }
 
 .chatPreview p {
-   color: #888;
-   margin-top: 3px;
-   font-size: 0.85em;
+  color: #888;
+  margin-top: 3px;
+  font-size: 0.85em;
 }
 
-.chatPreview p span.messagePreview, .chatPreview h4 {
-   display: inline-block;
-   white-space: nowrap;
-   overflow: hidden;
-   text-overflow: ellipsis;
-   max-width: 150px;
-   vertical-align: top;
+.chatPreview p span.messagePreview,
+.chatPreview h4 {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  vertical-align: top;
 }
 
-.chatPreview.unread p, .chatPreview.unread h4 {
-   font-weight: bold;
+.chatPreview.unread p,
+.chatPreview.unread h4 {
+  font-weight: bold;
 }
 
 .chatPreview.unread p {
-   color: #333;
+  color: #333;
 }
 
 .chatPreview .smallDivider {
-   display: inline-block;
+  display: inline-block;
 
-   width: 3px;
-   height: 3px;
-   margin: 0 4px;
+  width: 3px;
+  height: 3px;
+  margin: 0 4px;
 
-   vertical-align: middle;
+  vertical-align: middle;
 
-   background: #888;
-   border-radius: 50%;
+  background: #888;
+  border-radius: 50%;
 }
 
 .chatPreview.unread .smallDivider {
-   background: #000;
+  background: #000;
 }
 
 .chatPreview.chatrequest {
-   background: rgb(198, 211, 253);
+  background: rgb(198, 211, 253);
 }
 
 .chatPicture {
-   width:45px;
-   height:45px;
-   margin-right: 10px;
-   margin-left: 5px;
+  width: 45px;
+  height: 45px;
+  margin-right: 10px;
+  margin-left: 5px;
 
-   background-size: cover;
-   background-position: center;
+  background-size: cover;
+  background-position: center;
 
-   border-radius: 50%;
+  border-radius: 50%;
 }
 
 .chatPreview .unreadBubble {
-   width: 12px;
-   height: 12px;
-   margin-right: 5px;
-   background: var(--primary);
-   border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  background: var(--primary);
+  border-radius: 50%;
 }
 
 @media screen and (max-width: 1000px) {
-   .chatSidebar {
-      min-width: 60px;
-      width: 60px;
-      overflow-x: hidden;
-   }
+  .chatSidebar {
+    min-width: 60px;
+    width: 60px;
+    overflow-x: hidden;
+  }
 
-   .chatSidebar .chatPreview {
-      width: 60px;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-   }
+  .chatSidebar .chatPreview {
+    width: 60px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
-   .chatSidebar p, .chatSidebar h4, .chatSidebar .unreadBubble {
-      display: none;
-   }
+  .chatSidebar p,
+  .chatSidebar h4,
+  .chatSidebar .unreadBubble {
+    display: none;
+  }
 }

@@ -96,7 +96,6 @@ cleanup_integ:
   environment:
     action: stop
   script: eb terminate --force $EB_ENVIRONMENT
-
 # deploy_prod:
 #   extends: deploy_integ
 #   stage: production
@@ -120,7 +119,7 @@ cleanup_integ:
 #   when: manual
 #   environment:
 #     action: stop
-#   script: 
+#   script:
 #     - mv ../.elasticbeanstalk .elasticbeanstalk
 #     - eb terminate --force $EB_ENVIRONMENT
 
