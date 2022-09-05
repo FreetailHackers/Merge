@@ -1,18 +1,18 @@
 .chatsMissingWindow {
-    /* child flex properties */
-    flex-grow: 1;
+  /* child flex properties */
+  flex-grow: 1;
 
-    /* parent flex properties */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  /* parent flex properties */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-    height: 50vh;
+  height: 50vh;
 }
 
 .chatsMissingWindow h1 {
-    font-size: 1.5em;
-    margin-left: 0;
-    margin-right: 0;
+  font-size: 1.5em;
+  margin-left: 0;
+  margin-right: 0;
 }

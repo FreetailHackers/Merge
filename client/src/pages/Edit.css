@@ -1,61 +1,62 @@
 #settings {
-   padding: 20px;
-   font-size: 1.1em;
+  padding: 20px;
+  font-size: 1.1em;
 }
 
 #settings label {
-   display: inline-block;
-   width: 140px;
-   margin-top: 20px;
+  display: inline-block;
+  width: 140px;
+  margin-top: 20px;
 }
 
 #settings button.action {
-   display: inline-block;
-   width: 140px;
-   height: 50px;
-   margin-top: 10px;
-   margin-right: 10px;
-   padding-bottom: 5px;
+  display: inline-block;
+  width: 140px;
+  height: 50px;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding-bottom: 5px;
 
-   font-family: var(--font-body);
-   font-size: 1.2em;
+  font-family: var(--font-body);
+  font-size: 1.2em;
 
-   outline: none;
-   border: none;
-   border-radius: 0;
+  outline: none;
+  border: none;
+  border-radius: 0;
 
-   cursor: pointer;
-   transform: scale(1);
-   transition: transform 0.3s, opacity 0.3s;
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.3s, opacity 0.3s;
 }
 
 #settings button#save {
-   background-color: var(--accept);
-   color: var(--text-on-accept);
+  background-color: var(--accept);
+  color: var(--text-on-accept);
 }
 
 #settings button#cancel {
-   border: var(--reject) 2px solid;
-   background-color: #fff;
+  border: var(--reject) 2px solid;
+  background-color: #fff;
 }
 
 #settings a {
-   text-decoration: none;
-   color: var(--reject);
-   display: block;
+  text-decoration: none;
+  color: var(--reject);
+  display: block;
 }
 
-#settings button:hover, #settings button:focus {
-   transform: scale(1.1);
-   opacity: 0.8;
+#settings button:hover,
+#settings button:focus {
+  transform: scale(1.1);
+  opacity: 0.8;
 }
 
 .profile-container {
-   width: 100%;
-   padding: 20px;
+  width: 100%;
+  padding: 20px;
 }
 
 .profile-child {
-   width: 50%;
-   float: left;
+  width: 50%;
+  float: left;
 }

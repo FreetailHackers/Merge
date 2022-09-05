@@ -1,13 +1,13 @@
 .chatWindow {
-   /* child flex properties */
-   flex-grow: 1;
+  /* child flex properties */
+  flex-grow: 1;
 
-   /* parent flex properties */
-   display: flex;
-   flex-direction: column;
-   justify-content: flex-end;
+  /* parent flex properties */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 
-   height: 100vh;
+  height: 100vh;
 }
 
 /*
@@ -15,46 +15,46 @@ New message box
 */
 
 .newMessageBox {
-   height: 40px;
-   width: calc(100% - 20px);
-   padding: 10px;
+  height: 40px;
+  width: calc(100% - 20px);
+  padding: 10px;
 
-   display: flex;
-   justify-content: center;
-   vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
 }
 
 .newMessageBox input {
-   border: none;
-   background: #eee;
-   border-radius: 999px;
-   flex-grow: 1;
-   vertical-align: middle;
+  border: none;
+  background: #eee;
+  border-radius: 999px;
+  flex-grow: 1;
+  vertical-align: middle;
 }
 
 .newMessageBox input:focus {
-   outline: none;
+  outline: none;
 }
 
 .newMessageBox p {
-   display: inline-block;
-   width: 30px;
-   height: 30px;
-   margin: 0 10px;
-   padding: 5px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  margin: 0 10px;
+  padding: 5px;
 
-   vertical-align: middle;
-   text-align: center;
-   
-   font-size: 25px;
-   border-radius: 50%;
-   
-   transition: background 0.1s;
-   cursor: pointer;
+  vertical-align: middle;
+  text-align: center;
+
+  font-size: 25px;
+  border-radius: 50%;
+
+  transition: background 0.1s;
+  cursor: pointer;
 }
 
 .newMessageBox p:hover {
-   background: #eee;
+  background: #eee;
 }
 
 /*
@@ -62,102 +62,101 @@ Messages
 */
 
 .message {
-   max-width: 60%;
-   margin-bottom: 14px;
+  max-width: 60%;
+  margin-bottom: 14px;
 
-   display: flex;
-   align-items: flex-end;
+  display: flex;
+  align-items: flex-end;
 }
 
 .message.rightSide {
-   align-self: flex-end;
-   flex-direction: row-reverse;
-   text-align: right;
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  text-align: right;
 }
 
 .message.mergeBottom {
-   margin: 0 60px 2px 60px;
+  margin: 0 60px 2px 60px;
 }
 
 .messageImage {
-   width: 39px;
-   min-width: 39px;
-   height: 39px;
-   border-radius: 50%;
-   margin: 0 10px;
+  width: 39px;
+  min-width: 39px;
+  height: 39px;
+  border-radius: 50%;
+  margin: 0 10px;
 
-   background-size: cover;
-   background-position: center;
+  background-size: cover;
+  background-position: center;
 }
 
 .messageName {
-   margin: 0 10px;
-   color: #888;
-   font-size: 0.8em;
+  margin: 0 10px;
+  color: #888;
+  font-size: 0.8em;
 }
 
 .messageContent {
-   flex-grow: 1;
-   padding: 10px;
-   border-radius: 20px;
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 20px;
 
-   background: #eee;
+  background: #eee;
 }
 .messageTimestamp {
-   margin: 6px 4px 2px 4px;
-   color: #888;
-   font-size: 0.8em;
+  margin: 6px 4px 2px 4px;
+  color: #888;
+  font-size: 0.8em;
 }
 
 .message.rightSide .messageContent {
-   background: var(--primary);
-   color: var(--text-on-primary);
-   text-align: left;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  text-align: left;
 }
 
 .message.mergeBottom:not(.rightSide) .messageContent {
-   border-bottom-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
 .message.mergeTop:not(.rightSide) .messageContent {
-   border-top-left-radius: 4px;
+  border-top-left-radius: 4px;
 }
 
 .message.mergeBottom.rightSide .messageContent {
-   border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .message.mergeTop.rightSide .messageContent {
-   border-top-right-radius: 4px;
+  border-top-right-radius: 4px;
 }
 
 /*action buttons*/
-.chatWindowHeader{
-   position: fixed;
-   top: 0;
-   /*padding-left: 30px;*/
-   width: 55%;
-   background-color: white;
-   border: 1px #eee solid;
-   text-align: right;
+.chatWindowHeader {
+  position: fixed;
+  top: 0;
+  /*padding-left: 30px;*/
+  width: 55%;
+  background-color: white;
+  border: 1px #eee solid;
+  text-align: right;
 }
 
-.chatWindowHeader button{
-   text-align: center;
-   width: 85px;
-   padding: 10px;
-   margin: 15px 15px 15px 0;
-   background-color: var(--primary);
+.chatWindowHeader button {
+  text-align: center;
+  width: 85px;
+  padding: 10px;
+  margin: 15px 15px 15px 0;
+  background-color: var(--primary);
 
-   color: var(--text-on-primary);
-   border: none;
-   border-radius: 15px;
-   font-size: 1em;
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: 15px;
+  font-size: 1em;
 
-   cursor: pointer;
-
+  cursor: pointer;
 }
 
-.chatWindowHeader button:hover{
-   background-color: var(--secondary);
+.chatWindowHeader button:hover {
+  background-color: var(--secondary);
 }
