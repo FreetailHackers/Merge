@@ -1,0 +1,16 @@
+#!/bin/bash
+
+FRONTEND_DIR="client/"
+BACKEND_DIR="default-service/"
+FOLDER=""
+
+if [ "$1" == "frontend" ]; then
+    FOLDER=$FRONTEND_DIR
+elif [ "$1" == "backend" ]; then
+    FOLDER=$BACKEND_DIR
+fi
+
+echo ""
+echo "Formating $1 code"
+cd $FOLDER
+npm run format

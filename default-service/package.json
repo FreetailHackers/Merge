@@ -11,7 +11,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "format": "npx prettier --write '**/*.js'",
     "lint": "npx eslint '**/*.js'",
-    "test": "jest --coverage"
+    "test": "jest --coverage --passWithNoTests"
   },
   "engines": {
     "node": ">=16.13.2",

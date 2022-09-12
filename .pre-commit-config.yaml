@@ -9,19 +9,60 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
       - id: check-json
-      #   - id: pretty-format-json
       - id: check-merge-conflict
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.23.0
+  - repo: local
     hooks:
-      - id: eslint
-        additional_dependencies:
-          - eslint@^8.22.0
-          - eslint-plugin-react@^7.30.1
-          - eslint-config-react-app@^7.0.1
-          - eslint-config-prettier@^8.5.0
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
-    hooks:
-      - id: prettier
+
+      ## Frontend Build Hook
+      - id: build
+        name: frontend_build
+        entry: ./scripts/build.sh
+        language: script
+        # verbose: true
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+
+      # Backend Unit Test Hook
+      - id: test
+        name: backend_test
+        entry: ./scripts/test.sh
+        language: script
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+
+      ## Linting hooks
+      - id: frontend_lint
+        name: frontend_lint
+        entry: ./scripts/lint.sh frontend
+        language: script
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+
+      - id: backend_lint
+        name: backend_lint
+        entry: ./scripts/lint.sh backend
+        language: script
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+
+      ## Formatting hooks
+      - id: frontend_format
+        name: frontend_format
+        entry: ./scripts/format.sh frontend
+        language: script
+        pass_filenames: false
+        always_run: true
+        require_serial: true
+
+      - id: backend_format
+        name: backend_format
+        entry: ./scripts/format.sh backend
+        language: script
+        pass_filenames: false
+        always_run: true
+        require_serial: true
