@@ -19,5 +19,8 @@ module.exports = {
     sourceType: "module",
   },
   plugins: [],
-  rules: {},
+  rules: {
+    "no-unused-vars": "error",
+    "no-undef": "error",
+  },
 };

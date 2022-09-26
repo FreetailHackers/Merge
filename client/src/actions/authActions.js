@@ -101,5 +101,6 @@ export const logoutUser = () => (dispatch) => {
   // Remove auth header for future requests
   setAxiosHeaderAuthToken(false);
   dispatch(setCurrentUser(null));
+  this.history.push("/login");
   // window.location.href = '/login';
 };

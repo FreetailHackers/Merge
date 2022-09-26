@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { loginUser } from "../actions/authActions";
+import { loginUser, registerUser } from "../actions/authActions";
 
 import "./Login.css";
 
@@ -51,19 +51,22 @@ class Login extends Component {
     this.props.loginUser(userData);
   };
 
+  onRegister = (e) => {
+    this.props.history.push("/register");
+  };
   render() {
     const { errors } = this.state;
 
     return (
       <section id="login">
-        <form noValidate onSubmit={this.onSubmit}>
+        <form id="fields">
           <div className="logo" />
           <hr />
           <label htmlFor="email">Email</label>
           <input
             onChange={this.onChange}
             value={this.state.email}
-            error={errors.email}
+            //error={errors.email}
             id="email"
             type="email"
             placeholder="foo@bar.edu"
@@ -76,7 +79,7 @@ class Login extends Component {
           <input
             onChange={this.onChange}
             value={this.state.password}
-            error={errors.password}
+            //error={errors.password}
             id="password"
             type="password"
             placeholder="Password (at least 6 characters)"
@@ -85,9 +88,15 @@ class Login extends Component {
             {errors.password}
             {errors.passwordincorrect}
           </span>
-          <button type="submit">Register</button>
-          <button type="submit">Login</button>
-          <span className="error">{errors.status}</span>
+
+          <form noValidate onSubmit={this.onSubmit}>
+            <button type="submit">Login</button>
+            <span className="error">{errors.status}</span>
+          </form>
+
+          <form noValidate onSubmit={this.onRegister}>
+            <button type="submit">Register</button>
+          </form>
         </form>
       </section>
     );
@@ -96,6 +105,7 @@ class Login extends Component {
 
 Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
+  registerUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
@@ -107,4 +117,4 @@ const mapStateToProps = (state) => ({
   isLoading: state.auth.loading,
 });
 
-export default connect(mapStateToProps, { loginUser })(Login);
+export default connect(mapStateToProps, { loginUser, registerUser })(Login);
