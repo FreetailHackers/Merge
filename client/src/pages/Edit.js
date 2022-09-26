@@ -117,7 +117,6 @@ class Edit extends Component {
 
     // Setting up S3 upload parameters for folder upload
     const folder_name = this.props.userID.id + "/";
-    fd.append("folder_name", folder_name);
     fd.append("file_name", folder_name + file.name);
     fd.append("file", file);
 

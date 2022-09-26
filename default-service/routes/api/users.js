@@ -28,10 +28,124 @@ const s3 = new AWS.S3({
 // @route POST api/users/register
 // @desc Register user
 // @access Public
-router.post("/register", (req, res) => {
+router.post("/register", async (req, res) => register_func(req, res));
+// @route POST api/users/list
+// @desc Get a list of all users, within a specified starting and ending range
+// @access Public
+router.post("/login", async (req, res) => login(req, res));
+
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.post("/update", async (req, res) => update(req, res));
+
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.get("/list", (req, res) => list_func(req, res));
+
+async function list_func(req, res) {
+  // Parse query parameters
+  let filters =
+    req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
+  if (filters._id) {
+    filters._id = mongoose.Types.ObjectId(filters._id);
+  }
+  var options = {
+    skip: Math.max(0, parseInt(req.query.start)),
+    limit: Math.max(0, parseInt(req.query.limit)),
+  };
+  User.find(filters, {}, options)
+    .then((data) => {
+      // We probably don't want to send over everyone's PII...
+      for (let user of data) {
+        user.email = undefined;
+        user.password = undefined;
+      }
+      var result = data;
+
+      if (req.query.dateSent) {
+        result = {
+          dateSent: req.query.dateSent,
+          list: data,
+        };
+      }
+
+      return res.json(result);
+    })
+    .catch((err) => console.log(err));
+}
+
+// @route POST api/users/list
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.post("/profile-picture", async (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    if (err) return res.json({ err: err.message });
+    else {
+      const { file_name } = fields;
+      await s3Upload(file_name, files, res);
+    }
+  });
+});
+
+function login(req, res) {
   // Form validation
-  console.log("got to register");
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  // Check validation
+  if (!isValid) {
+    errors.isValid = false;
+    return res.json(errors);
+  }
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Find user by email
+  User.findOne({ email })
+    .then((user) => {
+      // Check if user exists
+      if (!user) {
+        return res.json({ email: "Email not found", isValid: false });
+      }
+      // Check password
+      bcrypt.compare(password, user.password).then((isMatch) => {
+        if (isMatch) {
+          // User matched
+          // Create JWT Payload
+          const payload = {
+            id: user.id,
+            name: user.name,
+          };
+
+          // Sign token
+          jwt.sign(
+            payload,
+            keys.secretOrKey,
+            {
+              expiresIn: 31556926, // 1 year in seconds
+            },
+            (err, token) => {
+              res.json({
+                success: true,
+                token: "Bearer " + token,
+              });
+            }
+          );
+        } else {
+          return res.json({ password: "Password incorrect" });
+        }
+      });
+    })
+    .catch((err) => console.log(err));
+}
+
+function register_func(req, res) {
+  // Form validation
   let { errors, isValid } = validateRegisterInput(req.body);
+
   // Check validation
   if (!isValid) {
     errors.isValid = false;
@@ -47,15 +161,11 @@ router.post("/register", (req, res) => {
         email: req.body.email,
         password: req.body.password,
       });
-      console.log("NEW USER PRINT");
-      console.log(newUser);
       // Hash password before saving in database
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
           newUser.password = hash;
-
-          console.log(user);
           newUser
             .save()
             .then((user) => {
@@ -64,13 +174,10 @@ router.post("/register", (req, res) => {
                   admitted: true,
                 },
               };
-              console.log("user: " + user);
               const payload = {
                 id: user._id,
                 name: user.name,
               };
-              console.log("id : " + payload.id);
-              console.log("name : " + payload.name);
               // Sign token
               jwt.sign(
                 payload,
@@ -79,119 +186,33 @@ router.post("/register", (req, res) => {
                   expiresIn: 31556926, // 1 year in seconds
                 },
                 (err, token) => {
-                  console.log("error" + err);
-                  console.log("token: " + token);
                   res.json({
                     success: true,
                     token: "Bearer " + token,
                     user: temp,
                   });
-                  console.log("generated token: " + token);
                 }
               );
             })
             .catch((err) => console.log(err));
         });
       });
-      console.log("NEW USER PRINT");
-      console.log(newUser);
     }
   });
-
-  console.log("finished registering??");
-});
-
-// @route POST api/users/list
-// @desc Get a list of all users, within a specified starting and ending range
-// @access Public
-router.post("/login", (req, res) => {
-  // Form validation
-  // console.log(req)
-  const { errors, isValid } = validateLoginInput(req.body);
-
-  // Check validation
-  if (!isValid) {
-    errors.isValid = false;
-    return res.json(errors);
-  }
-
-  const email = req.body.email;
-  const password = req.body.password;
-
-  // Find user by email
-  User.findOne({ email }).then((user) => {
-    // Check if user exists
-    if (!user) {
-      return res.json({ email: "Email not found", isValid: false });
-    }
-
-    // Check password
-    bcrypt.compare(password, user.password).then((isMatch) => {
-      if (isMatch) {
-        // User matched
-        // Create JWT Payload
-        const payload = {
-          id: user.id,
-          name: user.name,
-        };
-
-        // Sign token
-        jwt.sign(
-          payload,
-          keys.secretOrKey,
-          {
-            expiresIn: 31556926, // 1 year in seconds
-          },
-          (err, token) => {
-            res.json({
-              success: true,
-              token: "Bearer " + token,
-            });
-          }
-        );
-      } else {
-        return res.json({ password: "Password incorrect" });
-      }
-    });
-  });
-});
-
-// @route POST api/users/update
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.post("/update", async (req, res) => {
-  // Form validation
-  // console.log(req)
-  // const { errors, isValid } = validateProfileUpdateInput(req.body);
-
-  // // Check validation
-  // if (!isValid) {
-  //   return res.status(400).json(errors);
-  // }
-
-  const id = req.body.id;
-  console.log("test");
-  console.log(req.body);
-
-  // var props;
-  // for (prop in req.body) {
-  //   if (prop !== 'id') {
-  //     props[prop] = req.body[prop];
-  //   }
-  // }
-  // console.log(props)
-  console.log("test");
-  const profile = req.body.update;
-  const options = {
-    // new: true,
-    upsert: true,
-    // useFindAndModify: false,
+}
+async function s3Upload(file_name, files, res) {
+  var params = {
+    Bucket: BUCKET_NAME,
+    Key: file_name, // File name in S3 = user's name
+    Body: fs.createReadStream(files.file.filepath),
+    ContentType: files.file.mimetype,
   };
-  console.log(profile);
-  console.log(id, options, { $set: profile });
+  var promise = await s3.upload(params).promise();
+  res.json({ url: promise.Location });
+}
 
-  //Clear all old s3 files
-
+async function clear_old_pictures(req) {
+  const id = req.body.id;
   const profile_pic_link = req.body.update.profile.profilePictureUrl;
   const folder_name = id + "/";
   var params = {
@@ -207,110 +228,44 @@ router.post("/update", async (req, res) => {
           "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
           ""
         );
-        console.log(newimg);
         for (let i = 1; i < data.KeyCount; i++) {
           let nameOfFile = listOfObjects[i].Key;
-          console.log(nameOfFile);
           if (nameOfFile !== newimg) {
             var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
             await s3.deleteObject(params).promise();
           }
         }
-        console.log(data);
       }
     })
     .promise();
+}
 
-  console.log(req.body.update);
+function update(req, res) {
+  const id = req.body.id;
+  const profile = req.body.update;
+  const options = {
+    upsert: true,
+  };
+
+  //Clear all old s3 files
+  clear_old_pictures(req);
+
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
   // Look at mongoose docs
-  User.updateOne({ _id: id }, { $set: profile }, options).then((data) => {
-    console.log(data);
-    res.json({
-      success: true,
-    });
-  });
-});
-
-// @route POST api/users/update
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.get("/list", (req, res) => {
-  if (req.query.filters) var filters = JSON.parse(req.query.filters);
-  if (filters._id) filters._id = mongoose.Types.ObjectId(filters._id);
-  var options = {
-    skip: parseInt(req.query.start),
-    limit: parseInt(req.query.limit),
-  };
-  // console.log(filters);
-  // console.log(options);
-  // console.log(props);
-
-  User.find(filters, {}, options, (err, data) => {
-    // We probably don't want to send over everyone's passwords...
-    for (let user of data) {
-      user.password = undefined;
-    }
-    var result = data;
-    if (req.query.dateSent) {
-      result = {
-        dateSent: req.query.dateSent,
-        list: data,
-      };
-    }
-    console.log(result);
-    res.json(result);
-  });
-});
-
-// @route POST api/users/list
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.post("/profile-picture", (req, res) => {
-  const form = new formidable.IncomingForm();
-  form.parse(req, async (err, fields, files) => {
-    //we are passing the form's fields that the user had submitted to a new
-    //object in the line below
-    const { folder_name, file_name } = fields;
-    // Setting up S3 upload parameters
-    var params = {
-      Bucket: BUCKET_NAME,
-      Key: folder_name, //creating folder in s3
-    };
-
-    //Uploading folder to bucket, waiting for upload before continuing
-    await s3.putObject(params).promise();
-    // Setting up S3 upload parameters
-    params = {
-      Bucket: BUCKET_NAME,
-      Key: file_name, // File name in S3 = user's name
-      Body: fs.createReadStream(files.file.filepath),
-      ContentType: files.file.mimetype,
-    };
-    // Uploading files to the bucket, waiting for upload before continuing
-    var promise = await s3.upload(params).promise();
-    res.json({ url: promise.Location });
-  });
-});
-
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["x-access-token"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) {
-    return res.sendStatus(401);
-  }
-  jwt.verify(token, keys.secretOrKey, (err, decoded) => {
-    if (err) {
-      return res.sendStatus(403);
-    }
-    req.user = decoded.id;
-    next();
-  });
+  User.updateOne({ _id: id }, { $set: profile }, options)
+    .then(() => {
+      res.json({
+        success: true,
+      });
+    })
+    .catch((err) => console.log(err));
 }
-
-router.get("/validate", authenticateToken, (req, res) => {
-  return res.json(req.user);
-});
-
-module.exports = router;
+module.exports = {
+  router,
+  login,
+  register_func,
+  update,
+  list_func,
+  s3Upload,
+};

@@ -50,7 +50,7 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 
 // Routes
-app.use("/api/users", users);
+app.use("/api/users", users.router);
 
 const port = process.env.PORT || 5000;
 
