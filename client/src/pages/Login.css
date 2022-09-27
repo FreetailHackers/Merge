@@ -3,13 +3,12 @@ section#login {
   width: 100vw;
   height: 100vh;
 
-  background-image: var(--login-background);
-  background-color: var(--primary);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  align-items: center;
+   background-image: var(--login-background);
+   background-color: var(--primary);
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+   align-items: center;
 }
 
 section#login form {

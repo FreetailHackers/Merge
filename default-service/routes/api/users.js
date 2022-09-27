@@ -169,11 +169,6 @@ function register_func(req, res) {
           newUser
             .save()
             .then((user) => {
-              let temp = {
-                status: {
-                  admitted: true,
-                },
-              };
               const payload = {
                 id: user._id,
                 name: user.name,
@@ -189,7 +184,11 @@ function register_func(req, res) {
                   res.json({
                     success: true,
                     token: "Bearer " + token,
-                    user: temp,
+                    user: {
+                      status: {
+                        admitted: true,
+                      },
+                    },
                   });
                 }
               );

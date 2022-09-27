@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Database from "./pages/Database";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
@@ -33,7 +34,7 @@ class App extends Component {
               {/* this will render the login page WITHOUT the navbar on routes / and /login */}
               <Route exact path="/" component={Login} />
               <Route exact path="/login" component={Login} />
-              {/* Create register route/path */}
+              <Route exact path="/register" component={Register} />
               <Route path="/:anything" component={Navbar} />
             </Switch>
             <PrivateRoute

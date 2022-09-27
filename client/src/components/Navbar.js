@@ -12,6 +12,7 @@ const Navbar = (props) => {
   const onLogoutClick = (e) => {
     e.preventDefault();
     props.logoutUser();
+    props.history.push("/login");
   };
 
   return (
@@ -38,6 +39,7 @@ Navbar.propTypes = {
   auth: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
   logoutUser: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

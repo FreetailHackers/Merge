@@ -11,8 +11,6 @@ import arrowRight from "../assets/images/arrow-right.png";
 
 class Swipe extends Component {
   getUserToShow = (callback) => {
-    console.log(this.props);
-    console.log(this.props.userID);
     var queryParamters = {
       start: 0,
       limit: 0,

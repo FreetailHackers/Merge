@@ -1,16 +1,18 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { loginUser, registerUser } from "../actions/authActions";
+import { registerUser } from "../actions/authActions";
 
 import "./Login.css";
 
-class Login extends Component {
+class Register extends Component {
   constructor() {
     super();
     this.state = {
+      name: "",
       email: "",
       password: "",
+      password2: "",
       errors: {},
     };
   }
@@ -18,13 +20,13 @@ class Login extends Component {
   componentDidMount() {
     // If logged in and user navigates to Login page, should redirect them to dashboard
     if (this.props.auth.isAuthenticated) {
-      this.props.history.push("/dashboard");
+      this.props.history.push("/edit");
     }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.auth.isAuthenticated) {
-      this.props.history.push("/dashboard");
+      this.props.history.push("/edit");
     }
 
     if (nextProps.errors) {
@@ -38,33 +40,43 @@ class Login extends Component {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  onSubmit = (e) => {
+  onRegister = (e) => {
     e.preventDefault();
-
     const userData = {
+      name: this.state.name,
       email: this.state.email,
       password: this.state.password,
+      password2: this.state.password2,
     };
     //checking database to see if credentials exist
-    this.props.loginUser(userData);
+    this.props.registerUser(userData);
   };
 
-  onRegister = (e) => {
-    this.props.history.push("/register");
-  };
   render() {
     const { errors } = this.state;
 
     return (
       <section id="login">
-        <form id="fields">
+        <form noValidate onSubmit={this.onRegister}>
           <div className="logo" />
           <hr />
+          <label htmlFor="name">Name</label>
+          <input
+            onChange={this.onChange}
+            value={this.state.name}
+            id="name"
+            type="name"
+            placeholder="Enter your name"
+          />
+          <span className="error">
+            {errors.name}
+            {errors.namenotfound}
+          </span>
+
           <label htmlFor="email">Email</label>
           <input
             onChange={this.onChange}
             value={this.state.email}
-            //error={errors.email}
             id="email"
             type="email"
             placeholder="foo@bar.edu"
@@ -73,11 +85,11 @@ class Login extends Component {
             {errors.email}
             {errors.emailnotfound}
           </span>
+
           <label htmlFor="password">Password</label>
           <input
             onChange={this.onChange}
             value={this.state.password}
-            //error={errors.password}
             id="password"
             type="password"
             placeholder="Password (at least 8 characters)"
@@ -87,22 +99,27 @@ class Login extends Component {
             {errors.passwordincorrect}
           </span>
 
-          <form noValidate onSubmit={this.onSubmit}>
-            <button type="submit">Login</button>
-            <span className="error">{errors.status}</span>
-          </form>
-
-          <form noValidate onSubmit={this.onRegister}>
-            <button type="submit">Register</button>
-          </form>
+          <label htmlFor="password2">Confirm password</label>
+          <input
+            onChange={this.onChange}
+            value={this.state.password2}
+            id="password2"
+            type="password"
+            placeholder="Reenter your password"
+          />
+          <span className="error">
+            {errors.password2}
+            {errors.password2incorrect}
+          </span>
+          <button type="submit">Register</button>
+          <span className="error">{errors.status}</span>
         </form>
       </section>
     );
   }
 }
 
-Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
+Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired,
@@ -115,4 +132,4 @@ const mapStateToProps = (state) => ({
   isLoading: state.auth.loading,
 });
 
-export default connect(mapStateToProps, { loginUser, registerUser })(Login);
+export default connect(mapStateToProps, { registerUser })(Register);
