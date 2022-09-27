@@ -15,7 +15,11 @@ class GithubCard extends Component {
 
   componentDidMount() {
     axios
-      .get(process.env.REACT_APP_API_URL + `github/user/${this.props.username}`)
+      .get(process.env.REACT_APP_API_URL + "/api/users/github/user", {
+        params: {
+          username: this.props.username,
+        },
+      })
       .then((response) => {
         this.setState({
           profileData: response.data,

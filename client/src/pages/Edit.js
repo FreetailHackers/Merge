@@ -36,7 +36,6 @@ class Edit extends Component {
 
       data.update.profile.profilePictureUrl = this.state.profilePictureUrl;
 
-      console.log(data.update);
       axios
         .post(process.env.REACT_APP_API_URL + "/api/users/update", data)
         .then((res) => {
@@ -48,7 +47,6 @@ class Edit extends Component {
   };
 
   handleUpdate = (event) => {
-    console.log("got to handleUpdate");
     event.preventDefault();
     this.setState(
       {
@@ -79,8 +77,6 @@ class Edit extends Component {
   };
 
   componentDidMount() {
-    console.log("got to componentDidMount");
-    console.log(this.props.userID);
     var queryParamters = {
       start: 0,
       limit: 0,
@@ -93,8 +89,6 @@ class Edit extends Component {
         params: queryParamters,
       })
       .then((res) => {
-        console.log("line 81");
-        console.log(res.data[0].profile[0]);
         const data = {
           name: res.data[0].name,
         };
@@ -149,7 +143,6 @@ class Edit extends Component {
   }
 
   cancelEdit = async (e) => {
-    console.log("cancel edit");
     e.preventDefault();
     this.setState(this.baseState);
     this.props.setCurrentUser(this.props.userID, {

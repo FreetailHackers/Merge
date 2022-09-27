@@ -9,6 +9,7 @@ class Dashboard extends Component {
   onLogoutClick = (e) => {
     e.preventDefault();
     this.props.logoutUser();
+    this.props.history.push("/login");
   };
 
   render() {
@@ -32,6 +33,7 @@ class Dashboard extends Component {
 Dashboard.propTypes = {
   auth: PropTypes.object.isRequired,
   logoutUser: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
 };
 
