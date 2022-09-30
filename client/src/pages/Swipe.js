@@ -8,6 +8,7 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
+// import { addListener } from "process";
 
 class Swipe extends Component {
   getUserToShow = (callback) => {
@@ -18,35 +19,89 @@ class Swipe extends Component {
         // _id: this.props.userID.id,
       },
     };
-    this.setState({ loadingUserToShow: true }, () => {
-      axios
+    this.setState({ loadingUserToShow: true }, async () => {
+      //getting my swipeList
+      let myswipeList = null;
+      let myswipeReady = false;
+      await axios
         .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-          params: queryParamters,
+          params: {
+            start: 0,
+            limit: 0,
+            filters: {
+              _id: this.props.auth.userID.id,
+            },
+          },
         })
         .then((res) => {
-          var data = res.data[0].profile[0];
-          this.setState(
-            {
-              userToShow: setDefaultUserData({
-                name: res.data[0].name,
-                school: data.school,
-                major: data.major,
-                classStanding: data.class,
-                skills: data.skills,
-                experienceLevel: data.experience,
-                intro: data.intro,
-                profilePictureUrl: data.profilePictureUrl,
-                github: data.github,
-                linkedin: data.linkedin,
-                portfolio: data.portfolio,
-              }),
-              loadingUserToShow: false,
-            },
-            () => {
-              if (callback) callback();
-            }
-          );
+          myswipeList = res.data[0].swipeList;
+          if (
+            res.data[0].profile[0] !== undefined &&
+            "swipeReady" in res.data[0].profile[0]
+          )
+            myswipeReady = res.data[0].profile[0].swipeReady;
         });
+      if (!myswipeReady) {
+        this.setState({
+          usersLeft: false,
+          loadingUserToShow: false,
+        });
+      } else {
+        axios
+          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+            params: queryParamters,
+          })
+          .then((res) => {
+            let foundSomeone = false;
+            let i = 0;
+            while (i < res.data.length) {
+              let temp = res.data[i];
+              if (
+                !myswipeList.includes(temp._id) &&
+                temp._id !== this.props.auth.userID.id
+              ) {
+                foundSomeone = true;
+                break;
+              }
+              i++;
+            }
+            if (foundSomeone) {
+              var data = res.data[i].profile[0];
+              this.setState(
+                {
+                  userToShow: setDefaultUserData({
+                    name: res.data[i].name,
+                    school: data.school,
+                    major: data.major,
+                    classStanding: data.class,
+                    skills: data.skills,
+                    experienceLevel: data.experience,
+                    intro: data.intro,
+                    profilePictureUrl: data.profilePictureUrl,
+                    github: data.github,
+                    linkedin: data.linkedin,
+                    portfolio: data.portfolio,
+                    _id: res.data[i]._id,
+                  }),
+                  loadingUserToShow: false,
+                },
+                () => {
+                  if (callback) callback();
+                }
+              );
+            } else {
+              this.setState(
+                {
+                  usersLeft: false,
+                  loadingUserToShow: false,
+                },
+                () => {
+                  if (callback) callback();
+                }
+              );
+            }
+          });
+      }
     });
   };
 
@@ -54,6 +109,7 @@ class Swipe extends Component {
     super();
     this.state = {
       loadingUserToShow: true,
+      usersLeft: true,
       userToShow: {},
       cursorDown: false,
       mouseDownPosition: [0, 0],
@@ -98,7 +154,7 @@ class Swipe extends Component {
           },
           () => {
             axios
-              .post(process.env.REACT_APP_API_URL + "swipe/", {
+              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
@@ -124,7 +180,7 @@ class Swipe extends Component {
           },
           () => {
             axios
-              .post(process.env.REACT_APP_API_URL + "swipe/", {
+              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
@@ -161,7 +217,7 @@ class Swipe extends Component {
           },
           () => {
             axios
-              .post(process.env.REACT_APP_API_URL + "swipe/", {
+              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
@@ -189,7 +245,7 @@ class Swipe extends Component {
           },
           () => {
             axios
-              .post(process.env.REACT_APP_API_URL + "swipe/", {
+              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
@@ -253,7 +309,7 @@ class Swipe extends Component {
         },
         () => {
           axios
-            .post(process.env.REACT_APP_API_URL + "swipe/", {
+            .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
               auth: this.props.auth,
               otherUser: this.state.userToShow,
               decision: this.state.profileSide,
@@ -318,7 +374,7 @@ class Swipe extends Component {
           <center>
             <Loading />
           </center>
-        ) : (
+        ) : this.state.usersLeft ? (
           <SwipeProfile
             name={this.state.userToShow.name}
             school={this.state.userToShow.school}
@@ -332,22 +388,29 @@ class Swipe extends Component {
             relativeAngle={this.state.profileAngle}
             borderColor={this.state.profileSide}
           />
+        ) : (
+          <center>
+            <label>
+              <font size="+20"> No Users Left to Swipe</font>{" "}
+            </label>
+          </center>
         )}
+
         <div className="arrows">
           <input
             type="image"
             src={arrowLeft}
+            alt="Arrow Left"
             className="arrow left"
             id="left"
             onClick={this.click}
-            alt="arrow pointing left"
           />
           <input
             type="image"
             src={arrowRight}
+            alt="Arror Right"
             className="arrow right"
             id="right"
-            alt="arrow pointing right"
             onClick={this.click}
           />
         </div>

@@ -87,14 +87,13 @@ class Login extends Component {
             {errors.passwordincorrect}
           </span>
 
-          <form noValidate onSubmit={this.onSubmit}>
-            <button type="submit">Login</button>
-            <span className="error">{errors.status}</span>
-          </form>
-
-          <form noValidate onSubmit={this.onRegister}>
-            <button type="submit">Register</button>
-          </form>
+          <button onClick={this.onSubmit} className="action" type="submit">
+            Login
+          </button>
+          <span className="error">{errors.status}</span>
+          <button onClick={this.onRegister} className="action" type="submit">
+            Register
+          </button>
         </form>
       </section>
     );
