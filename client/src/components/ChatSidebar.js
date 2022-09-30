@@ -2,20 +2,54 @@ import React from "react";
 import ChatPreview from "./ChatPreview";
 import "./ChatSidebar.css";
 import PropTypes from "prop-types";
+import { MultiSelect } from "@mantine/core";
 
-const ChatSidebar = ({ chats, setActiveChatIndex, activeChatIndex }) => (
+const ChatSidebar = ({
+  createChat,
+  newChatInput,
+  updateNewChatInput,
+  otherUsers,
+  chats,
+  changeChat,
+  activeChatIndex,
+}) => (
   <div className="chatSidebar">
+    <div className="chatSidebarTop">
+      <button className="newChatButton" onClick={createChat}>
+        New Chat
+      </button>
+      <MultiSelect
+        value={newChatInput}
+        onChange={(values) => updateNewChatInput(values)}
+        placeholder="Search for people to add"
+        searchable
+        data={
+          otherUsers &&
+          otherUsers.map((user) => ({
+            value: user._id,
+            label: user.name,
+            image:
+              user.profile &&
+              user.profile[0] &&
+              user.profile[0].profilePictureUrl &&
+              user.profile[0].profilePictureUrl,
+          }))
+        }
+      />
+    </div>
     {chats.map((chat, i) => (
       <ChatPreview
         key={i}
         active={i === activeChatIndex}
-        users={chat.userNames}
-        chatRequest={chat.chatRequest}
-        lastMessage={chat.messages[0].message}
-        lastMessageDate={chat.messages[0].date}
-        profilePicture={chat.userImages[0]}
-        seen={chat.messages[0].seen}
-        onClick={() => setActiveChatIndex(i)}
+        title={chat.name}
+        chatRequest={chat.lastMessage === null}
+        lastMessage={chat.lastMessage?.contents}
+        lastMessageDate={chat.lastMessage?.timestamp}
+        profilePictures={Object.entries(chat.profiles).map(
+          (profile) => profile[1].profilePicture
+        )}
+        seen={chat.seen}
+        onClick={() => changeChat(i)}
       />
     ))}
   </div>
@@ -23,8 +57,13 @@ const ChatSidebar = ({ chats, setActiveChatIndex, activeChatIndex }) => (
 
 ChatSidebar.propTypes = {
   activeChatIndex: PropTypes.number.isRequired,
-  setActiveChatIndex: PropTypes.func.isRequired,
-  chats: PropTypes.object.isRequired,
+  setActiveChatIndex: PropTypes.func,
+  chats: PropTypes.array.isRequired,
+  createChat: PropTypes.func.isRequired,
+  changeChat: PropTypes.func.isRequired,
+  newChatInput: PropTypes.array.isRequired,
+  updateNewChatInput: PropTypes.func.isRequired,
+  otherUsers: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ChatSidebar;

@@ -20,7 +20,6 @@ import Chat from "./pages/Chat";
 import "./Theme.css";
 import "./App.css";
 
-// createMockServerIfNotProduction();
 initializeAuthIfLoggedIn();
 
 class App extends Component {
@@ -47,7 +46,7 @@ class App extends Component {
             <Route exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
             <PrivateRoute exact path="/edit" component={Edit} />
-            <Route exact path="/chat" component={Chat} />
+            <PrivateRoute exact path="/chat" component={Chat} />
           </div>
         </Router>
       </Provider>
