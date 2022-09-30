@@ -7,6 +7,7 @@ import userProfileFields from "../content/userProfileFields.json";
 import SwipeProfile from "../components/SwipeProfile";
 import { startCase } from "lodash";
 import { Link } from "react-router-dom";
+
 import {
   NumberInput,
   Select,
@@ -18,7 +19,8 @@ import {
 import "./Edit.css";
 
 class Edit extends Component {
-  handleSubmit = (event) => {
+  //frontend for updating
+  handleSubmit = async (event) => {
     event.preventDefault();
     this.setState({ userProfile: { ...this.state.userProfile } }, () => {
       const data = {
@@ -35,7 +37,6 @@ class Edit extends Component {
       }
 
       data.update.profile.profilePictureUrl = this.state.profilePictureUrl;
-
       axios
         .post(process.env.REACT_APP_API_URL + "/api/users/update", data)
         .then((res) => {
@@ -44,6 +45,7 @@ class Edit extends Component {
           });
         });
     });
+    // this.props.history.push("/dashboard");
   };
 
   handleUpdate = (event) => {
@@ -97,6 +99,7 @@ class Edit extends Component {
             data[prop] = res.data[0].profile[0][prop];
           }
         }
+        if (!("swipeReady" in data)) data.swipeReady = true;
         this.setState({
           userProfile: data,
           profilePictureUrl: data.profilePictureUrl,
@@ -160,6 +163,7 @@ class Edit extends Component {
   };
 
   handleEdit = (e) => {
+    if (e.target.name === "swipeReady") e.target.value = e.target.checked;
     this.setState({
       userProfile: {
         ...this.state.userProfile,
@@ -176,7 +180,7 @@ class Edit extends Component {
         <div className="profile-child">
           <section id="settings">
             <form>
-              <div>
+              {/* <div>
                 <label>Current Picture:</label>
                 <img
                   src={this.state.profilePictureUrl}
@@ -184,13 +188,29 @@ class Edit extends Component {
                   width="200"
                   height="200"
                 />
-              </div>
+              </div> */}
               <div>
                 <label>Upload Picture:</label>
                 <input
                   type="file"
                   name="filename"
                   onChange={this.handleNewProfilePicture}
+                />
+              </div>
+              <div>
+                <label> Ready to swipe?</label>
+                <input
+                  type="checkbox"
+                  id="swipeReady"
+                  name="swipeReady"
+                  onChange={this.handleEdit}
+                  checked={
+                    this.state.userProfile.swipeReady === "false"
+                      ? false
+                      : this.state.userProfile.swipeReady === "true"
+                      ? true
+                      : this.state.userProfile.swipeReady
+                  }
                 />
               </div>
               {userProfileFields.map((v, i) => (
@@ -317,6 +337,7 @@ Edit.propTypes = {
   user: PropTypes.object.isRequired,
   userID: PropTypes.object.isRequired,
   setCurrentUser: PropTypes.func.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

@@ -3,6 +3,7 @@ export function setDefaultUserData(currentData) {
     name: "[name empty]",
     school: "[missing university]",
     major: "[missing major]",
+    swipeReady: true,
     classStanding: "[missing class standing]",
     skills: [],
     experienceLevel: "[missing experience level]",
@@ -11,6 +12,7 @@ export function setDefaultUserData(currentData) {
     github: null,
     linkedin: null,
     portfolio: null,
+    _id: null,
   };
 
   for (const key in defaultUserData) {

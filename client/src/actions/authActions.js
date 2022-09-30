@@ -85,7 +85,11 @@ export const loginUser = (userData) => async (dispatch) => {
 };
 
 // Set logged in user
-export const setCurrentUser = (userID) => {
+export const setCurrentUser = (
+  userID
+  // user,
+  // isAuth = this.props.auth.isAuthenticated
+) => {
   return {
     type: SET_CURRENT_USER,
     isAuthenticated: !!userID,

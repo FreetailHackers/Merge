@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 var formidable = require("formidable");
+//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var fs = require("fs");
 
 // Load input validation
@@ -43,7 +44,23 @@ router.post("/update", async (req, res) => update(req, res));
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.get("/list", (req, res) => list_func(req, res));
+router.get("/list", async (req, res) => list_func(req, res));
+
+router.post("/swipe", async (req, res) => swipe(req, res));
+
+// @route POST api/users/list
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.post("/profile-picture", async (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    if (err) return res.json({ err: err.message });
+    else {
+      const { file_name } = fields;
+      await s3Upload(file_name, files, res);
+    }
+  });
+});
 
 async function list_func(req, res) {
   // Parse query parameters
@@ -76,20 +93,6 @@ async function list_func(req, res) {
     })
     .catch((err) => console.log(err));
 }
-
-// @route POST api/users/list
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.post("/profile-picture", async (req, res) => {
-  const form = new formidable.IncomingForm();
-  form.parse(req, async (err, fields, files) => {
-    if (err) return res.json({ err: err.message });
-    else {
-      const { file_name } = fields;
-      await s3Upload(file_name, files, res);
-    }
-  });
-});
 
 function login(req, res) {
   // Form validation
@@ -200,6 +203,24 @@ function register_func(req, res) {
     }
   });
 }
+
+async function swipe(req, res) {
+  const options = {
+    upsert: true,
+  };
+  User.updateOne(
+    { _id: req.body.auth.userID.id },
+    { $push: { swipeList: req.body.otherUser._id } },
+    options
+  )
+    .then(() => {
+      res.json({
+        success: true,
+      });
+    })
+    .catch((err) => console.log(err));
+}
+
 async function s3Upload(file_name, files, res) {
   var params = {
     Bucket: BUCKET_NAME,
@@ -214,6 +235,10 @@ async function s3Upload(file_name, files, res) {
 async function clear_old_pictures(req) {
   const id = req.body.id;
   const profile_pic_link = req.body.update.profile.profilePictureUrl;
+  if (!profile_pic_link) {
+    console.log("No profile pic link");
+    return;
+  }
   const folder_name = id + "/";
   var params = {
     Bucket: BUCKET_NAME,
@@ -240,7 +265,7 @@ async function clear_old_pictures(req) {
     .promise();
 }
 
-function update(req, res) {
+async function update(req, res) {
   const id = req.body.id;
   const profile = req.body.update;
   const options = {
@@ -248,7 +273,7 @@ function update(req, res) {
   };
 
   //Clear all old s3 files
-  clear_old_pictures(req);
+  await clear_old_pictures(req);
 
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
@@ -260,6 +285,7 @@ function update(req, res) {
       });
     })
     .catch((err) => console.log(err));
+  //return res.json({success: false})
 }
 
 // @route POST api/users/update

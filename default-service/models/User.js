@@ -22,6 +22,7 @@ const UserSchema = new Schema({
     {
       socialMedia: { String, required: false },
       school: String,
+      swipeReady: Boolean,
       major: String,
       class: String,
       skills: String,
@@ -33,6 +34,8 @@ const UserSchema = new Schema({
       portfolio: String,
     },
   ],
+  //make this a set
+  swipeList: [],
 });
 
 module.exports = mongoose.model("users", UserSchema);
