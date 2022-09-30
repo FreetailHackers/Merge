@@ -59,7 +59,7 @@ create_integ:
     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
     - rm .gitignore
     - echo $EB_ENVIRONMENT
-    - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
+    - echo "REACT_APP_API_URL=http://localhost:5002" > ./client/.env
     - cd $FOLDER
   script:
     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
