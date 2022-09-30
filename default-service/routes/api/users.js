@@ -10,10 +10,11 @@ var fs = require("fs");
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
-// const validateProfileUpdateInput = require("../../validation/profileupdate");
+const authenticateToken = require("../helpers/authentication");
 
 // Load User model
 const User = require("../../models/User");
+const Report = require("../../models/Report");
 
 //AWS credentials
 require("dotenv").config();
@@ -260,6 +261,124 @@ function update(req, res) {
     })
     .catch((err) => console.log(err));
 }
+
+// @route POST api/users/update
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.get("/list", (req, res) => {
+  try {
+    // Parse query parameters
+    let filters =
+      req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
+    if (filters._id) {
+      filters._id = mongoose.Types.ObjectId(filters._id);
+    }
+    var options = {
+      skip: Math.max(0, parseInt(req.query.start)),
+      limit: Math.max(0, parseInt(req.query.limit)),
+    };
+
+    User.find(filters, {}, options, (err, data) => {
+      // We probably don't want to send over everyone's PII...
+      for (let user of data) {
+        user.email = undefined;
+        user.password = undefined;
+      }
+      var result = data;
+      if (req.query.dateSent) {
+        result = {
+          dateSent: req.query.dateSent,
+          list: data,
+        };
+      }
+      res.json(result);
+    });
+  } catch (e) {
+    return res.sendStatus(400);
+  }
+});
+
+// @route POST api/users/list
+// @desc Update the profile information of a sepcific user
+// @access Public
+router.post("/profile-picture", (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, async (err, fields, files) => {
+    //we are passing the form's fields that the user had submitted to a new
+    //object in the line below
+    const { folder_name, file_name } = fields;
+    // Setting up S3 upload parameters
+    var params = {
+      Bucket: BUCKET_NAME,
+      Key: folder_name, //creating folder in s3
+    };
+
+    //Uploading folder to bucket, waiting for upload before continuing
+    await s3.putObject(params).promise();
+    // Setting up S3 upload parameters
+    params = {
+      Bucket: BUCKET_NAME,
+      Key: file_name, // File name in S3 = user's name
+      Body: fs.createReadStream(files.file.filepath),
+      ContentType: files.file.mimetype,
+    };
+    // Uploading files to the bucket, waiting for upload before continuing
+    var promise = await s3.upload(params).promise();
+    res.json({ url: promise.Location });
+  });
+});
+
+router.get("/validate", authenticateToken, (req, res) => {
+  return res.json(req.user);
+});
+
+/**
+ * Get all information on file for a user.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ * RETURNS a User Object
+ */
+router.get("/:user", (req, res) => {
+  User.findById(req.params.user, (err, user) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    user.email = undefined;
+    user.password = undefined;
+    return res.json(user);
+  });
+});
+
+/**
+ * Report a user.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ * RETURNS the Report Object
+ */
+router.post("/:user/report", (req, res) => {
+  User.findById(req.params.users, (err, user) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    var newReport = new Report({
+      contents: req.body.contents,
+      reported: req.params.user,
+    });
+    newReport
+      .save()
+      .then((saved) => res.json(saved))
+      .catch(() => res.sendStatus(400));
+  });
+});
+
 module.exports = {
   router,
   login,

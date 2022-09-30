@@ -5,6 +5,7 @@ const passport = require("passport");
 const cors = require("cors");
 
 const users = require("./routes/api/users");
+const chats = require("./routes/api/chats");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -51,7 +52,10 @@ require("./config/passport")(passport);
 
 // Routes
 app.use("/api/users", users.router);
+app.use("/api/chats", chats.router);
 
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server up and running on port ${port} !`));
+
+// module.exports = { router, login };

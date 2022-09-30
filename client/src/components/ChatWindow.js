@@ -2,19 +2,15 @@ import React, { Component } from "react";
 import Message from "./Message";
 import "./ChatWindow.css";
 import PropTypes from "prop-types";
+import { MultiSelect } from "@mantine/core";
 
 class ChatWindow extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       newMessage: "",
+      newUserIDs: [],
     };
-
-    // sort messages before printing them out based on timestamp
-    this.props.chat.messages = this.props.chat.messages
-      .slice()
-      .sort((a, b) => a.date - b.date);
   }
 
   onType = (e) => {
@@ -32,52 +28,95 @@ class ChatWindow extends Component {
     }
   };
 
+  titleOnKeyDown = (e) => {
+    const key = e.key.toLowerCase();
+    if (key === "escape") {
+      this.props.setEditingTitle(false);
+      this.props.setTitleInput(this.props.title ? this.props.title : "");
+    } else if (key === "enter") {
+      this.props.setEditingTitle(false);
+      this.props.setTitle(this.props.titleInput);
+    }
+  };
+
   sendMessageButton = () => {
     let message = document.getElementById("newMessageInput").value;
     if (message === "") return;
     this.props.sendMessage(message);
-    this.setState({
-      update: "",
-    });
+  };
+
+  report = () => {
+    this.setState({ reportPressed: true });
+    // send to database
   };
 
   render = () => (
     <div className="chatWindow">
-      {this.props.chat.messages.map((message, index) => {
-        console.log(this.props);
-        const profile = this.props.profiles[message.fromUserId];
-        const image = profile ? profile.image : "";
-        const name = profile ? profile.name : "Profile missing";
-        const timestamp = message
-          ? new Date(message.date).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : "";
-        return (
-          <Message
-            key={timestamp}
-            fromSelf={message.fromUserId === "0" /*TODO: use redux user id*/}
-            content={message.message}
-            image={image}
-            name={name}
-            timestamp={timestamp}
-            mergeTop={
-              index > 0 &&
-              message.fromUserId ===
-                this.props.chat.messages[index - 1].fromUserId
-            }
-            mergeBottom={
-              index < this.props.chat.messages.length - 1 &&
-              message.fromUserId ===
-                this.props.chat.messages[index + 1].fromUserId
-            }
+      <div id="chatScrollBox" className="chatScrollBox">
+        {this.props.messages.map((message, index) => {
+          return (
+            <Message
+              key={message._id}
+              fromSelf={message.author === this.props.selfID}
+              content={message.contents}
+              image={this.props.profile[message.author].profilePicture ?? null}
+              name={this.props.profile[message.author].name}
+              timestamp={new Date(message.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              mergeTop={
+                index > 0 &&
+                message.author === this.props.messages[index - 1].author
+              }
+              mergeBottom={
+                index < this.props.messages.length - 1 &&
+                message.author === this.props.messages[index + 1].author
+              }
+            />
+          );
+        })}
+      </div>
+      {
+        <div
+          id="reportFloatingWindow"
+          className={
+            this.state.reportPressed ? "reportFloatingWindow" : "hidden"
+          }
+        >
+          <button
+            id="exit"
+            className="exitButton"
+            onClick={() => this.setState({ reportPressed: false })}
+          >
+            ✖
+          </button>
+          <MultiSelect
+            value={this.state.newUserIDs}
+            onChange={(values) => this.setState({ newUserIDs: values })}
+            placeholder="Search for people"
+            searchable
+            data={this.props.chat.users.map((userID) => ({
+              value: userID,
+              label: this.props.chat.profiles[userID].name,
+            }))}
           />
-        );
-      })}
+          <textarea id="reason" placeholder="Reason for reporting" />
+          <button
+            id="submit"
+            className="submitButton"
+            onClick={() => {
+              this.setState({ reportPressed: false });
+            }}
+          >
+            ➡️
+          </button>
+        </div>
+      }
       <div className="newMessageBox">
         <input
           id="newMessageInput"
+          autoComplete="off"
           name="newMessage"
           type="text"
           value={this.state.newMessage}
@@ -88,7 +127,6 @@ class ChatWindow extends Component {
         <p
           onClick={() => {
             this.props.sendMessage("❤️");
-            this.setState({ update: "" });
           }}
         >
           ❤️
@@ -96,8 +134,59 @@ class ChatWindow extends Component {
         <p onClick={this.sendMessageButton}>➡️</p>
       </div>
       <div className="chatWindowHeader">
-        <button type="button">Block</button>
-        <button type="button">Report</button>
+        {this.props.editingTitle ? (
+          <input
+            value={this.props.titleInput}
+            onChange={(e) => this.props.setTitleInput(e.target.value)}
+            onKeyDown={this.titleOnKeyDown}
+            placeholder="New Chat Title"
+            autoComplete="off"
+          ></input>
+        ) : (
+          <h3
+            className="chatTitle"
+            onClick={() => this.props.setEditingTitle(true)}
+          >
+            {this.props.title}
+          </h3>
+        )}
+        <MultiSelect
+          value={this.state.newUserIDs}
+          onChange={(values) => this.setState({ newUserIDs: values })}
+          placeholder="Search for people"
+          searchable
+          data={
+            this.props.otherUsers &&
+            this.props.otherUsers.map((user) => ({
+              value: user._id,
+              label: user.name,
+              image:
+                user.profile &&
+                user.profile[0] &&
+                user.profile[0].profilePictureUrl &&
+                user.profile[0].profilePictureUrl,
+            }))
+          }
+        />
+        <button
+          onClick={() => {
+            this.props.addUsers(this.state.newUserIDs);
+            this.setState({ newUserIDs: [] });
+          }}
+        >
+          Add User
+        </button>
+        <button type="button" id="block" onClick={this.block}>
+          Block
+        </button>
+        <button type="button" id="report" onClick={this.report}>
+          Report
+        </button>
+        {this.props.chat.owner === this.props.selfID && (
+          <button type="button" id="delete" onClick={this.leave}>
+            Delete Chat
+          </button>
+        )}
       </div>
     </div>
   );
@@ -106,7 +195,18 @@ class ChatWindow extends Component {
 ChatWindow.propTypes = {
   chat: PropTypes.object.isRequired,
   sendMessage: PropTypes.func.isRequired,
-  profiles: PropTypes.array.isRequired,
+  profiles: PropTypes.array,
+  title: PropTypes.string.isRequired,
+  messages: PropTypes.arrayOf(PropTypes.object),
+  otherUsers: PropTypes.arrayOf(PropTypes.object),
+  addUsers: PropTypes.func.isRequired,
+  setEditingTitle: PropTypes.func.isRequired,
+  setTitleInput: PropTypes.func.isRequired,
+  setTitle: PropTypes.func.isRequired,
+  selfID: PropTypes.string.isRequired,
+  profile: PropTypes.object.isRequired,
+  titleInput: PropTypes.string.isRequired,
+  editingTitle: PropTypes.bool.isRequired,
 };
 
 export default ChatWindow;

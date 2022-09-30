@@ -3,9 +3,7 @@
   width: 300px;
   min-width: 300px;
   padding: 10px;
-
   border-right: 1px #ddd solid;
-
   overflow-y: auto;
 }
 
@@ -13,13 +11,10 @@
   padding: 15px 5px;
   border-radius: 12px;
   margin-top: 2px;
-
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-
   cursor: pointer;
-
   transition: background 0.1s;
 }
 
@@ -69,13 +64,10 @@
 
 .chatPreview .smallDivider {
   display: inline-block;
-
   width: 3px;
   height: 3px;
   margin: 0 4px;
-
   vertical-align: middle;
-
   background: #888;
   border-radius: 50%;
 }
@@ -93,11 +85,10 @@
   height: 45px;
   margin-right: 10px;
   margin-left: 5px;
-
   background-size: cover;
   background-position: center;
-
   border-radius: 50%;
+  position: relative
 }
 
 .chatPreview .unreadBubble {
@@ -106,6 +97,31 @@
   margin-right: 5px;
   background: var(--primary);
   border-radius: 50%;
+}
+
+.newChatButton {
+   text-align: center;
+   padding: 10px;
+   background-color: var(--primary);
+   color: var(--text-on-primary);
+   border: none;
+   border-radius: 15px;
+   font-size: 0.8em;
+   cursor: pointer;
+   margin-right: 10px;
+   width: 100px;
+}
+
+.chatSidebarTop {
+   padding: 10px;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+}
+
+.chatSidebarTop div {
+   margin-top: 0;
+   margin-bottom: 0;
 }
 
 @media screen and (max-width: 1000px) {

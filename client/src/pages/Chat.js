@@ -1,277 +1,337 @@
 import React, { Component } from "react";
-import io from "socket.io-client";
+import { connect } from "react-redux";
+import axios from "axios";
+import { logoutUser, setCurrentUser } from "../actions/authActions";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWindow from "../components/ChatWindow";
 import ChatMissing from "../components/ChatsMissing";
+import PropTypes from "prop-types";
+import io from "socket.io-client";
 
-const filterOutSelfFromChat = (chat) => {
-  const chatCopy = JSON.parse(JSON.stringify(chat));
-  const selfId = "0"; // todo: get this from redux
-  const selfIndexInChat = chat.userIds.indexOf(selfId);
-  chatCopy.userIds.splice(selfIndexInChat, 1);
-  chatCopy.userNames.splice(selfIndexInChat, 1);
-  chatCopy.userImages.splice(selfIndexInChat, 1);
-  return chatCopy;
-};
-
-const getIdToProfileMap = (chats) => {
-  const profiles = {};
-  for (const chat of chats) {
-    for (const key in chat.userIds) {
-      profiles[chat.userIds[key]] = {
-        image: chat.userImages[key],
-        name: chat.userNames[key],
-      };
-    }
-  }
-  return profiles;
-};
-var socket = io("http://localhost:5001", {
-  cors: { origin: "http://localhost:5000", credentials: true },
-  transports: ["websocket"],
-});
 class Chat extends Component {
   constructor(props) {
     super(props);
-    const tempMessages = [
-      // temp data while socketio team works
-      {
-        _id: "0",
-        userIds: ["1", "0"],
-        userNames: ["Raffer", "Ben"],
-        userImages: [
-          "https://www.animalspot.net/wp-content/uploads/2017/03/Chinstrap-Penguin.jpg",
-          "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw",
-        ],
-        messages: [
-          {
-            fromUserId: "1",
-            message: "Hello, world!",
-            date: new Date() - 1000 * 60 * 60 * 4.3,
-            seen: false,
-          },
-          {
-            fromUserId: "0",
-            message: "Hi!",
-            date: new Date() - 1000 * 60 * 60 * 4.4,
-            seen: false,
-          },
-          {
-            fromUserId: "0",
-            message: "Tilo is Awesome!",
-            date: new Date() - 1000 * 60 * 60 * 4.4,
-            seen: false,
-          },
-        ],
-      },
-      {
-        _id: "1",
-        userIds: ["2", "0"],
-        userNames: ["Jason", "Ben"],
-        userImages: [
-          "https://th.bing.com/th/id/Rd9accff7c37684e159f050d299998c7b?rik=KPh19WNdTrp3yw&riu=http%3a%2f%2fweknowyourdreams.com%2fimages%2fpenguin%2fpenguin-12.jpg&ehk=GOxVirbOiTqX4u20wBBKB8fW9Kjt3N1ht1vKGt9O58A%3d&risl=&pid=ImgRaw",
-          "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw",
-        ],
-        messages: [
-          {
-            fromUserId: "2",
-            message: "Hey!",
-            date: new Date() - 1000 * 60 * 60 * 4.5,
-            seen: true,
-          },
-          {
-            fromUserId: "0",
-            message: "Hi!",
-            date: new Date() - 1000 * 60 * 60 * 4.8,
-            seen: true,
-          },
-          {
-            fromUserId: "0",
-            message:
-              "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.",
-            date: new Date() - 1000 * 60 * 60 * 5.1,
-            seen: true,
-          },
-          {
-            fromUserId: "0",
-            message: "Hi 3!",
-            date: new Date() - 1000 * 60 * 60 * 5.2,
-            seen: true,
-          },
-          {
-            fromUserId: "2",
-            message: "Hi 4!",
-            date: new Date() - 1000 * 60 * 60 * 5.4,
-            seen: true,
-          },
-          {
-            fromUserId: "2",
-            message:
-              "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible.",
-            date: new Date() - 1000 * 60 * 60 * 5.5,
-            seen: true,
-          },
-        ],
-      },
-      {
-        _id: "2",
-        userIds: ["0", "4"],
-        userNames: ["Ben", "Ryan"],
-        userImages: [
-          "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw",
-          "https://artprojectsforkids.org/wp-content/uploads/2019/08/Penguin-Easy-1.jpg",
-        ],
-        messages: [
-          {
-            fromUserId: "0",
-            message: "Penguins are pretty cool, do you like penguins?",
-            date: new Date() - 1000 * 60 * 60 * 4.7,
-            seen: false,
-          },
-          {
-            fromUserId: "0",
-            message: "Hi!",
-            date: new Date() - 1000 * 60 * 60 * 4.9,
-            seen: false,
-          },
-        ],
-      },
-      {
-        _id: "3",
-        userIds: ["0", "5"],
-        chatRequest: false,
-        userNames: ["Ben", "Nikhil"],
-        userImages: [
-          "https://th.bing.com/th/id/Rbb7e9c68670b8fde1ad6d3d25650b8fa?rik=29F1dKYOdJDuwg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-BfVzqdb71vY%2fTmxNj_ILPrI%2fAAAAAAAAA4A%2fXgJvH2HN_-4%2fs1600%2fpenguin_1.jpg&ehk=UkBnTpiw5MJu1e9zoszx0kjQsIMOGqFTGIiQq3j2ZBA%3d&risl=&pid=ImgRaw",
-          "https://media.istockphoto.com/vectors/cute-penguin-icon-in-flat-style-vector-id868646936?s=612x612",
-        ],
-        messages: [
-          {
-            fromUserId: "5",
-            message: "Hey, wanna form a team?",
-            date: new Date() - 1000 * 60 * 60 * 4.7,
-            seen: false,
-          },
-        ],
-      },
-    ];
     this.state = {
       activeChatIndex: 0,
-      chats: tempMessages,
+      chats: [],
+      messages: [],
+      newChatInput: [],
+      editingTitle: false,
+      titleInput: "",
+      otherUsers: [],
     };
+    this.socket = io.connect("http://localhost:8080");
+  }
 
-    // sort all messages once here based on time after retrieving + check which ones are chat requests
-    this.state.chats.forEach(function sortMessages(chat) {
-      chat.messages = chat.messages.sort((a, b) => a.date - b.date);
-      let chatMessages = chat.messages.map((obj) => obj.fromUserId);
-      // is the current user present in the chat?
-      if (!chatMessages.includes("0")) {
-        chat.chatRequest = true;
-      }
-    });
+  getMessages(index) {
+    const chat = this.state.chats[index];
+    this.setState({ editingTitle: false, titleInput: chat.name });
+    axios
+      .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
+      .then((res) => {
+        chat.seen = true;
+        this.setState(
+          {
+            chats: this.chatStateCopy(chat, false, index),
+            activeChatIndex: index,
+            messages: res.data,
+          },
+          () => {
+            document
+              .getElementById("chatScrollBox")
+              .scrollTo(
+                0,
+                document.getElementById("chatScrollBox").scrollHeight
+              );
+          }
+        );
+      });
+    document.getElementById("newMessageInput").focus();
   }
 
   componentDidMount() {
-    // load previous chats into left bar
-    console.log("connecting to socket");
-    socket.on("connect", () => {
-      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-    });
-    socket.on("connect_error", function (err) {
-      console.log("client connect_error: ", err);
-    });
-
-    socket.on("connect_timeout", function (err) {
-      console.log("client connect_timeout: ", err);
-    });
-    console.log("check 1 ", socket.connected);
-    socket.on("chats", (data) => {
-      console.log("chats", data);
+    axios.get(process.env.REACT_APP_API_URL + "/api/users/list").then((res) => {
       this.setState({
-        chats: JSON.parse(data),
-        profiles: getIdToProfileMap(JSON.parse(data)),
+        otherUsers: res.data.filter(
+          (user) => user._id && user._id !== this.props.userID.id
+        ),
       });
     });
+    this.socket.emit("new-connection", { userID: this.props.userID.id });
+    axios
+      .get(process.env.REACT_APP_API_URL + "/api/chats")
+      .then(async (res) => {
+        for (const chat of res.data) {
+          // join websocket room
+          this.socket.emit("join-room", { id: chat._id });
 
-    this.setState({
-      profiles: getIdToProfileMap(this.state.chats),
+          chat.profiles = {};
+          for (const user of chat.users) {
+            const { data } = await axios.get(
+              process.env.REACT_APP_API_URL + "/api/users/" + user
+            );
+            chat.profiles[user] = {
+              id: data._id,
+              name: data.name,
+              profilePicture: data.profile[0]?.profilePictureUrl,
+            };
+          }
+          chat.seen = chat.readBy.includes(this.props.userID.id);
+        }
+        this.setState({ chats: res.data });
+        if (res.data.length > 0) {
+          this.getMessages(0);
+        }
+      });
+
+    this.socket.on("broadcast-message", (data) => {
+      this.setState({ messages: [...this.state.messages, data] });
+      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chat);
+      const chat = this.state.chats[chatIndex];
+      if (chatIndex !== this.state.activeChatIndex) {
+        chat.seen = false;
+      } else {
+        axios.post(
+          process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/read`
+        );
+      }
+      chat.lastMessage = data;
+      let chatStateCopy = [
+        chat,
+        ...this.state.chats.slice(0, chatIndex),
+        ...this.state.chats.slice(chatIndex + 1, this.state.chats.length),
+      ];
+      let newActiveChatIndex = this.state.activeChatIndex;
+      if (chatIndex === this.state.activeChatIndex) {
+        newActiveChatIndex = 0;
+      } else if (chatIndex > this.state.activeChatIndex) {
+        newActiveChatIndex++;
+      }
+      this.setState(
+        { chats: chatStateCopy, activeChatIndex: newActiveChatIndex },
+        () => {
+          newActiveChatIndex === 0 &&
+            document
+              .getElementById("chatScrollBox")
+              .scrollTo(
+                0,
+                document.getElementById("chatScrollBox").scrollHeight
+              );
+        }
+      );
+    });
+    this.socket.on("added-to-room", async (chat) => {
+      chat.seen = false;
+      this.socket.emit("join-room", { id: chat._id });
+      this.setState({ chats: [...this.state.chats, chat] });
+    });
+    this.socket.on("new-user-added", async (chat) => {
+      let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
+      this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+    });
+    this.socket.on("chat-renamed", (data) => {
+      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
+      let chat = this.state.chats[chatIndex];
+      chat.name = data.newName;
+      this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
     });
   }
 
   componentWillUnmount() {
-    console.log("disconnecting from socket");
-    socket.on("disconnect", () => {
-      console.log(socket.id); // undefined
-    });
-    socket.disconnect();
+    this.socket.disconnect({ userID: this.props.userID.id });
   }
 
-  getMessages() {
-    const activeChat = this.state.chats[this.state.activeChatIndex];
-    socket.emit(
-      "request messages",
-      JSON.stringify({
-        chatId: activeChat._id,
-        page: 1,
-      })
-    );
-    socket.on("messages", (data) => {
-      console.log(data);
-      console.log("in messages");
-      const parsed = JSON.parse(data);
-      const messages = parsed.chatMessages;
-      console.log(messages);
-      return messages;
-    });
-  }
-
-  sendMessage = (message) => {
-    // push one more message onto chat document
-    console.log(message);
-    const activeChat = this.state.chats[this.state.activeChatIndex];
-    console.log(activeChat._id);
-
-    var messages = {
-      fromUserId: "0",
-      message: message,
-      date: new Date() - 1000 * 60 * 60 * 4.3,
-      seen: false,
+  sendMessage = (contents) => {
+    if (contents === "") return;
+    const chat = this.state.chats[this.state.activeChatIndex];
+    const message = {
+      author: this.props.userID.id,
+      contents: contents,
+      chat: chat._id,
+      recipients: chat.users,
+      timestamp: new Date().toISOString(),
     };
-    this.state.chats[0].messages.push(messages);
-
-    socket.emit(
-      "send message",
-      JSON.stringify({
-        chatId: activeChat._id,
-        userId: "10",
-        message: message,
+    this.setState({ messages: [...this.state.messages, message] }, () => {
+      document
+        .getElementById("chatScrollBox")
+        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
+    });
+    axios
+      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`, {
+        contents,
       })
-    );
+      .then((res) => {
+        // Update the last message of the chat and move it to the top
+        //this.setState({ messages: [...this.state.messages, res.data] });
+        this.socket.emit("new-message", message);
+        chat.lastMessage = res.data;
+        const chatStateCopy = [...this.state.chats];
+        chatStateCopy.splice(this.state.activeChatIndex, 1);
+        this.setState({ activeChatIndex: 0, chats: [chat, ...chatStateCopy] });
+      });
   };
 
-  render() {
-    if (this.state.chats.length === 0) {
-      return (
-        <div style={{ display: "flex", width: "100%" }}>
-          <ChatMissing />
-        </div>
-      );
+  createChat() {
+    const name = "New Chat";
+    axios
+      .post(process.env.REACT_APP_API_URL + `/api/chats/new`, { name })
+      .then(async (res) => {
+        let chat = res.data;
+        chat.seen = true;
+        chat.profiles = {};
+        const users = this.state.newChatInput.map((u) => u.trim());
+        chat.users = [...chat.users, ...users];
+
+        for (const user of [...users, this.props.userID.id]) {
+          axios.post(
+            process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`,
+            { user }
+          );
+          const { data } = await axios.get(
+            process.env.REACT_APP_API_URL + "/api/users/" + user
+          );
+          chat.profiles[user] = {
+            id: data._id,
+            name: data.name,
+            profilePicture: data.profile[0]
+              ? data.profile[0].profilePictureUrl
+              : "",
+          };
+        }
+        chat.lastMessage = null;
+
+        this.socket.emit("create-room", {
+          _id: chat._id,
+          otherUsers: users,
+          chat: chat,
+        });
+        this.setState({ chats: [...this.state.chats, chat], newChatInput: [] });
+      });
+  }
+
+  addUsers(newUserIDs) {
+    const chat = this.state.chats[this.state.activeChatIndex];
+    for (const user of newUserIDs) {
+      axios
+        .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`, {
+          user,
+        })
+        .then(async () => {
+          const { data } = await axios.get(
+            process.env.REACT_APP_API_URL + "/api/users/" + user
+          );
+          chat.profiles[user] = {
+            id: data._id,
+            name: data.name,
+            profilePicture: data.profile[0]
+              ? data.profile[0].profilePictureUrl
+              : "",
+          };
+          chat.users.push(user);
+          const chatStateCopy = [...this.state.chats];
+          chatStateCopy.splice(this.state.activeChatIndex, 1);
+          this.setState({
+            activeChatIndex: 0,
+            chats: [chat, ...chatStateCopy],
+          });
+          this.socket.emit("add-user", { userID: user, chat: chat });
+          // tell the others!!
+        });
     }
+  }
+
+  setTitle(newTitle) {
+    let chat = this.state.chats[this.state.activeChatIndex];
+    axios
+      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/rename`, {
+        name: newTitle,
+      })
+      .then(() => {
+        chat.name = newTitle;
+        this.setState({ chats: this.chatStateCopy(chat, true, 0) });
+        this.socket.emit("rename-chat", {
+          chatID: chat._id,
+          newName: chat.name,
+        });
+      });
+  }
+
+  chatStateCopy(chat, isActive, index) {
+    return isActive
+      ? [
+          ...this.state.chats.slice(0, this.state.activeChatIndex),
+          chat,
+          ...this.state.chats.slice(this.state.activeChatIndex + 1),
+        ]
+      : [
+          ...this.state.chats.slice(0, index),
+          chat,
+          ...this.state.chats.slice(index + 1),
+        ];
+  }
+
+  render() {
     return (
       <div style={{ display: "flex", width: "100%" }}>
         <ChatSidebar
-          chats={this.state.chats.map((chat) => filterOutSelfFromChat(chat))}
-          setActiveChatIndex={(i) => this.setState({ activeChatIndex: i })}
+          chats={this.state.chats}
+          changeChat={this.getMessages.bind(this)}
           activeChatIndex={this.state.activeChatIndex}
+          createChat={this.createChat.bind(this)}
+          newChatInput={this.state.newChatInput}
+          updateNewChatInput={(values) => {
+            this.setState({ newChatInput: values }, () =>
+              console.log(this.state.newChatInput)
+            );
+          }}
+          otherUsers={this.state.otherUsers}
         />
-        <ChatWindow
-          profiles={this.state.profiles || []}
-          chat={this.state.chats[this.state.activeChatIndex]}
-          sendMessage={this.sendMessage}
-        />
+        {this.state.chats.length === 0 ? (
+          <ChatMissing />
+        ) : (
+          <ChatWindow
+            profile={this.state.chats[this.state.activeChatIndex].profiles}
+            messages={this.state.messages.filter(
+              (message) =>
+                message.chat ===
+                this.state.chats[this.state.activeChatIndex]._id
+            )}
+            sendMessage={this.sendMessage}
+            selfID={this.props.userID.id}
+            addUsers={this.addUsers.bind(this)}
+            title={this.state.chats[this.state.activeChatIndex].name}
+            titleInput={this.state.titleInput}
+            editingTitle={this.state.editingTitle}
+            setEditingTitle={(editingTitle) =>
+              this.setState({ editingTitle: editingTitle })
+            }
+            setTitleInput={(newTitleInput) =>
+              this.setState({ titleInput: newTitleInput })
+            }
+            setTitle={(newTitle) => this.setTitle(newTitle)}
+            otherUsers={
+              this.state.otherUsers &&
+              this.state.otherUsers.filter(
+                (user) =>
+                  !this.state.chats[this.state.activeChatIndex].users.includes(
+                    user._id
+                  )
+              )
+            }
+            chat={this.state.chats[this.state.activeChatIndex]}
+          />
+        )}
       </div>
     );
   }
 }
 
-export default Chat;
+const mapStateToProps = (state) => ({
+  userID: state.auth.userID,
+});
+
+Chat.propTypes = {
+  userID: PropTypes.object.isRequired,
+};
+
+export default connect(mapStateToProps, { logoutUser, setCurrentUser })(Chat);

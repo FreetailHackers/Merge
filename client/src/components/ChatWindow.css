@@ -1,13 +1,59 @@
 .chatWindow {
-  /* child flex properties */
   flex-grow: 1;
-
-  /* parent flex properties */
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-
   height: 100vh;
+}
+
+.hidden {
+  display: none;
+}
+
+.reportFloatingWindow {
+  position: fixed;
+  display: block;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  width: 50%;
+  height: 50%;
+  top: 20%;
+  padding-top: 2%;
+  background-color: white;
+}
+
+.reportFloatingWindow .mantine-MultiSelect-root {
+  margin: 0 auto;
+  width: 50%;
+}
+
+.reportFloatingWindow textarea {
+  width: 95%;
+  height: 50%;
+  resize: none;
+  display: block;
+  margin: 0 auto;
+  margin-top: 3%;
+}
+
+.exitButton {
+  transform: scale(2);
+  float: right;
+  margin: -3% 5% 0 0;
+}
+
+#submit {
+  position: relative;
+  margin: 3% 5% 0 0;
+  float: right;
+  transform: scale(2) scaleX(2);
+}
+
+.exitButton,
+#submit {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 /*
@@ -18,7 +64,6 @@ New message box
   height: 40px;
   width: calc(100% - 20px);
   padding: 10px;
-
   display: flex;
   justify-content: center;
   vertical-align: middle;
@@ -42,13 +87,10 @@ New message box
   height: 30px;
   margin: 0 10px;
   padding: 5px;
-
   vertical-align: middle;
   text-align: center;
-
   font-size: 25px;
   border-radius: 50%;
-
   transition: background 0.1s;
   cursor: pointer;
 }
@@ -64,7 +106,6 @@ Messages
 .message {
   max-width: 60%;
   margin-bottom: 14px;
-
   display: flex;
   align-items: flex-end;
 }
@@ -85,7 +126,6 @@ Messages
   height: 39px;
   border-radius: 50%;
   margin: 0 10px;
-
   background-size: cover;
   background-position: center;
 }
@@ -100,7 +140,6 @@ Messages
   flex-grow: 1;
   padding: 10px;
   border-radius: 20px;
-
   background: #eee;
 }
 .messageTimestamp {
@@ -135,28 +174,62 @@ Messages
 .chatWindowHeader {
   position: fixed;
   top: 0;
-  /*padding-left: 30px;*/
   width: 55%;
   background-color: white;
   border: 1px #eee solid;
   text-align: right;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
-.chatWindowHeader button {
+.chatWindowHeader > button {
   text-align: center;
-  width: 85px;
+  min-width: 85px;
   padding: 10px;
-  margin: 15px 15px 15px 0;
   background-color: var(--primary);
-
   color: var(--text-on-primary);
   border: none;
   border-radius: 15px;
   font-size: 1em;
-
   cursor: pointer;
 }
 
-.chatWindowHeader button:hover {
+.chatWindowHeader > button:hover {
   background-color: var(--secondary);
+}
+
+.chatWindowHeader input {
+  width: 20%;
+}
+
+.chatTitle {
+  display: inline-block;
+  margin-block-end: 0;
+  margin-block-start: 0;
+  min-width: 100px;
+  max-width: 400px;
+  padding: 5px;
+}
+.chatTitle:hover {
+  background-color: #eee;
+}
+
+.chatWindowHeader input,
+.chatWindowHeader h3,
+.chatWindowHeader button {
+  margin: 15px 8px 15px;
+}
+
+.chatWindowHeader div {
+  margin: 0px;
+}
+
+.chatScrollBox {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  height: calc(100% - 140px);
 }
