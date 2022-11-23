@@ -65,7 +65,6 @@ describe("Login route tests", () => {
     });
   });
 });
-
 describe("Register route tests", () => {
   test("Email is already registered", async () => {
     const req = {

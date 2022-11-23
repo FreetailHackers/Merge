@@ -62,6 +62,12 @@ router.post("/profile-picture", async (req, res) => {
   });
 });
 
+router.get("/github/user", async (req, res) => {
+  const api_url = "https://api.github.com/users/" + req.query.username;
+  const response = await fetch(api_url);
+  res.json(await response.json());
+});
+
 async function list_func(req, res) {
   // Parse query parameters
   let filters =
@@ -81,7 +87,6 @@ async function list_func(req, res) {
         user.password = undefined;
       }
       var result = data;
-
       if (req.query.dateSent) {
         result = {
           dateSent: req.query.dateSent,
@@ -287,72 +292,6 @@ async function update(req, res) {
     .catch((err) => console.log(err));
   //return res.json({success: false})
 }
-
-// @route POST api/users/update
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.get("/list", (req, res) => {
-  try {
-    // Parse query parameters
-    let filters =
-      req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
-    if (filters._id) {
-      filters._id = mongoose.Types.ObjectId(filters._id);
-    }
-    var options = {
-      skip: Math.max(0, parseInt(req.query.start)),
-      limit: Math.max(0, parseInt(req.query.limit)),
-    };
-
-    User.find(filters, {}, options, (err, data) => {
-      // We probably don't want to send over everyone's PII...
-      for (let user of data) {
-        user.email = undefined;
-        user.password = undefined;
-      }
-      var result = data;
-      if (req.query.dateSent) {
-        result = {
-          dateSent: req.query.dateSent,
-          list: data,
-        };
-      }
-      res.json(result);
-    });
-  } catch (e) {
-    return res.sendStatus(400);
-  }
-});
-
-// @route POST api/users/list
-// @desc Update the profile information of a sepcific user
-// @access Public
-router.post("/profile-picture", (req, res) => {
-  const form = new formidable.IncomingForm();
-  form.parse(req, async (err, fields, files) => {
-    //we are passing the form's fields that the user had submitted to a new
-    //object in the line below
-    const { folder_name, file_name } = fields;
-    // Setting up S3 upload parameters
-    var params = {
-      Bucket: BUCKET_NAME,
-      Key: folder_name, //creating folder in s3
-    };
-
-    //Uploading folder to bucket, waiting for upload before continuing
-    await s3.putObject(params).promise();
-    // Setting up S3 upload parameters
-    params = {
-      Bucket: BUCKET_NAME,
-      Key: file_name, // File name in S3 = user's name
-      Body: fs.createReadStream(files.file.filepath),
-      ContentType: files.file.mimetype,
-    };
-    // Uploading files to the bucket, waiting for upload before continuing
-    var promise = await s3.upload(params).promise();
-    res.json({ url: promise.Location });
-  });
-});
 
 router.get("/validate", authenticateToken, (req, res) => {
   return res.json(req.user);
