@@ -1,2 +1,2 @@
-web: cd default-service/ && npm install && PORT=5002 npm run server
+web: cd default-service/ && npm install && PORT=5002 npm run server && PORT=5003 npm run chat
 client: cd client/ && npm install && npm start

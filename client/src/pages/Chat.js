@@ -20,7 +20,9 @@ class Chat extends Component {
       titleInput: "",
       otherUsers: [],
     };
-    this.socket = io.connect("http://localhost:8080");
+    this.socket = io.connect(process.env.REACT_APP_CHAT_URL, {
+      transports: ["websocket"],
+    });
   }
 
   getMessages(index) {

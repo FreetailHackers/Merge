@@ -1,29 +1,15 @@
-var http = require("http");
-const APP_PORT = 8080;
-const app = http.createServer();
-
-app.listen(APP_PORT);
-console.log(`🖥 HTTP Server running at ${APP_PORT}`);
-// SOCKET.IO CHAT EVENT HANDLING
-
-const io = require("socket.io")(app, {
-  path: "/socket.io",
-});
-
-io.attach(app, {
-  // includes local domain to avoid CORS error locally
-  // configure it accordingly for production
+require("dotenv").config();
+const io = require("socket.io")(process.env.CHAT_PORT, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
     credentials: true,
-    transports: ["websocket", "polling"],
   },
-  allowEIO3: true,
 });
+const { createClient } = require("redis");
+const redisAdapter = require("@socket.io/redis-adapter");
 
-let userSockets = {}; // maps a user ID to a list of socket IDs
-let socketUser = {}; // maps a socket ID to a user ID
+const pubClient = createClient({ url: process.env.REDIS_URL });
+const subClient = pubClient.duplicate();
+io.adapter(redisAdapter(pubClient, subClient));
 
 io.on("connection", (socket) => {
   // handles new connection
@@ -39,8 +25,6 @@ io.on("connection", (socket) => {
   socket.on("add-user", (data) => addUser(data, socket));
 
   socket.on("rename-chat", (data) => renameChat(data, socket));
-
-  socket.on("disconnect", () => disconnect(socket));
 });
 
 // error handler function
@@ -53,13 +37,10 @@ function errHandler(data, socket) {
   return;
 }
 
-function newConnection(data, socket) {
+async function newConnection(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
-    userSockets[data.userID] = userSockets[data.userID]
-      ? [...userSockets[data.userID], socket.id]
-      : [socket.id];
-    socketUser[socket.id] = data.userID;
+    socket.data.mongoID = data.userID;
   }
 }
 
@@ -77,53 +58,44 @@ function joinRoom(data, socket) {
   }
 }
 
-function createRoom(data, socket) {
+async function createRoom(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
     socket.join(data._id);
-    const users = [...data.otherUsers, socketUser[socket.id]];
-    users.forEach((userID) => {
-      // last bit avoids sending to the socket who created
-      const sockets = userSockets[userID]
-        ? userSockets[userID].filter((e) => e !== socket.id)
-        : null;
-      if (!sockets) {
-        console.error("No sockets found for selected users");
-      } else {
-        sockets.forEach((socketID) => {
-          socket.to(socketID).emit("added-to-room", data.chat);
-        });
+    let fetched = await io.fetchSockets();
+    let foundSocket = false;
+    for (let fetchedSocket of fetched) {
+      if (data.otherUsers.includes(fetchedSocket.data.mongoID)) {
+        socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
+        foundSocket = true;
       }
-    });
+    }
+    if (!foundSocket) {
+      console.error("No sockets found for selected users");
+    }
   }
 }
 
-function addUser(data, socket) {
+async function addUser(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
-    const newUserSockets = userSockets[data.userID]
-      ? userSockets[data.userID].filter((e) => e !== socket.id)
-      : null;
-    if (!newUserSockets) {
-      console.error("Added users do not have sockets");
-    } else {
-      newUserSockets.forEach((socketID) => {
-        socket.to(socketID).emit("added-to-room", data.chat);
-      });
-    }
-    const bystanders = data.chat.users.filter((user) => user !== data.userID);
-    bystanders.forEach((userID) => {
-      const sockets = userSockets[userID]
-        ? userSockets[userID].filter((e) => e !== socket.id)
-        : null;
-      if (!sockets) {
-        console.error("No sockets found for selected users");
-      } else {
-        sockets.forEach((socketID) => {
-          socket.to(socketID).emit("new-user-added", data.chat);
-        });
+    let fetched = await io.fetchSockets();
+    let foundSocket = false;
+    for (let fetchedSocket of fetched) {
+      if (data.userID == fetchedSocket.data.mongoID) {
+        foundSocket = true;
+      } else if (
+        data.chat.users.includes(fetchedSocket.data.mongoID) &&
+        data.userID != fetchedSocket.data.mongoID &&
+        socket.id != fetchedSocket.id
+      ) {
+        socket.to(fetchedSocket.id).emit("new-user-added", data.chat);
+        foundSocket = true;
       }
-    });
+    }
+    if (!foundSocket) {
+      console.error("Added users do not have sockets");
+    }
   }
 }
 
@@ -131,22 +103,5 @@ function renameChat(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
     socket.to(data.chatID).emit("chat-renamed", data);
-  }
-}
-
-function disconnect(socket) {
-  if (!socket) {
-    console.error("No socket provided");
-    return;
-  } else {
-    if (userSockets[socketUser[socket.id]]) {
-      userSockets[socketUser[socket.id]] = userSockets[
-        socketUser[socket.id]
-      ].filter((e) => e !== socket.id);
-      if (userSockets[socketUser[socket.id]].length === 0) {
-        delete userSockets[socketUser[socket.id]];
-      }
-    }
-    delete socketUser[socket.id];
   }
 }
