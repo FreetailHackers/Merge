@@ -1,5 +1,5 @@
 {
-  "name": "Merge",
+  "name": "mern-auth",
   "version": "1.0.0",
   "description": "Merge",
   "main": "server.js",
@@ -8,8 +8,9 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix ../client",
-    "chat": "node chatServer.js",
+    "chat": "nodemon chatServer.js",
     "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run chat\"",
+    "dev-ports": "concurrently \"PORT=$MONGO npm run server\" \"CHAT_PORT=$CHAT npm run chat\" \"PORT=$CLIENT npm run client\"",
     "format": "npx prettier --write '**/*.js'",
     "lint": "npx eslint '**/*.js'",
     "test": "jest --coverage --detectOpenHandles --passWithNoTests"
@@ -21,6 +22,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@socket.io/redis-adapter": "^7.2.0",
     "aws-sdk": "2.1189.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -36,6 +38,7 @@
     "nodemon": "^2.0.15",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
+    "redis": "3.1.2",
     "socket.io": "^4.5.2",
     "validator": "^13.7.0"
   },
