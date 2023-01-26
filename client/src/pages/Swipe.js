@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import axios from "axios";
-import { setDefaultUserData } from "../utils/setDefaultUserData";
 
 import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
@@ -69,7 +68,7 @@ class Swipe extends Component {
               var data = res.data[i].profile[0];
               this.setState(
                 {
-                  userToShow: setDefaultUserData({
+                  userToShow: {
                     name: res.data[i].name,
                     school: data.school,
                     major: data.major,
@@ -82,7 +81,7 @@ class Swipe extends Component {
                     linkedin: data.linkedin,
                     portfolio: data.portfolio,
                     _id: res.data[i]._id,
-                  }),
+                  },
                   loadingUserToShow: false,
                 },
                 () => {

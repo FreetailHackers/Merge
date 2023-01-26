@@ -169,6 +169,10 @@ function register_func(req, res) {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
+        profile: {
+          profilePictureUrl:
+            "https://ui-avatars.com/api/?name=" + req.body.name,
+        },
       });
       // Hash password before saving in database
       bcrypt.genSalt(10, (err, salt) => {
@@ -233,6 +237,9 @@ async function s3Upload(file_name, files, res) {
     Body: fs.createReadStream(files.file.filepath),
     ContentType: files.file.mimetype,
   };
+  if (files.file.size > 10_000_000) {
+    return res.sendStatus(413);
+  }
   var promise = await s3.upload(params).promise();
   res.json({ url: promise.Location });
 }
@@ -279,6 +286,14 @@ async function update(req, res) {
 
   //Clear all old s3 files
   await clear_old_pictures(req);
+  if (profile.name?.length > 1000) {
+    return res.sendStatus(413);
+  }
+  for (const key in profile.profile) {
+    if (profile.profile[key]?.length > 1000) {
+      return res.sendStatus(413);
+    }
+  }
 
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {

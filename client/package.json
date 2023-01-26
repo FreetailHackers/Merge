@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@mantine/core": "^4.2.12",
-    "@mantine/hooks": "^4.2.12",
+    "@mantine/core": "^5.7.1",
+    "@mantine/hooks": "^5.7.1",
     "axios": "^0.22.0",
     "buffer": "^6.0.3",
     "buil": "^0.0.0",
