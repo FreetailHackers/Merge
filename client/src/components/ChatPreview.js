@@ -43,7 +43,7 @@ const ChatPreview = ({
             <div
               key={i}
               style={{
-                backgroundImage: `url(${pic})`,
+                backgroundImage: `url("${pic}")`,
                 position: "absolute",
                 top: top,
                 left: left,

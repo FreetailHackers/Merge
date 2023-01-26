@@ -21,7 +21,9 @@ const Message = ({
     {mergeBottom ? null : (
       <div
         className="messageImage"
-        style={{ backgroundImage: `url(${image})` }}
+        style={{
+          backgroundImage: `url("${image}")`,
+        }}
       />
     )}
     <div>
@@ -38,7 +40,7 @@ Message.propTypes = {
   fromSelf: PropTypes.bool.isRequired,
   content: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired,
+  image: PropTypes.string,
   timestamp: PropTypes.string.isRequired,
   mergeBottom: PropTypes.bool.isRequired,
   mergeTop: PropTypes.bool.isRequired,

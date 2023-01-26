@@ -59,7 +59,7 @@ class ChatWindow extends Component {
               key={message._id}
               fromSelf={message.author === this.props.selfID}
               content={message.contents}
-              image={this.props.profile[message.author].profilePicture ?? null}
+              image={this.props.profile[message.author].profilePicture}
               name={this.props.profile[message.author].name}
               timestamp={new Date(message.timestamp).toLocaleTimeString([], {
                 hour: "2-digit",

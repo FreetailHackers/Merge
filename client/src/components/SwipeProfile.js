@@ -39,7 +39,7 @@ const SwipeProfile = (props) => {
 
 SwipeProfile.propTypes = {
   name: PropTypes.string.isRequired,
-  school: PropTypes.string.isRequired,
+  school: PropTypes.string,
   intro: PropTypes.string.isRequired,
   relativePosition: PropTypes.array.isRequired,
   relativeAngle: PropTypes.number.isRequired,
@@ -47,10 +47,10 @@ SwipeProfile.propTypes = {
   onMouseDown: PropTypes.func.isRequired,
   onMouseUp: PropTypes.func.isRequired,
   onMouseMove: PropTypes.func.isRequired,
-  profilePictureUrl: PropTypes.string.isRequired,
-  github: PropTypes.object.isRequired,
-  linkedin: PropTypes.object.isRequired,
-  portfolio: PropTypes.object.isRequired,
+  profilePictureUrl: PropTypes.string,
+  github: PropTypes.object,
+  linkedin: PropTypes.object,
+  portfolio: PropTypes.object,
 };
 
 export default SwipeProfile;

@@ -195,9 +195,7 @@ class Chat extends Component {
           chat.profiles[user] = {
             id: data._id,
             name: data.name,
-            profilePicture: data.profile[0]
-              ? data.profile[0].profilePictureUrl
-              : "",
+            profilePicture: data.profile[0]?.profilePictureUrl,
           };
         }
         chat.lastMessage = null;
@@ -225,9 +223,7 @@ class Chat extends Component {
           chat.profiles[user] = {
             id: data._id,
             name: data.name,
-            profilePicture: data.profile[0]
-              ? data.profile[0].profilePictureUrl
-              : "",
+            profilePicture: data.profile[0]?.profilePictureUrl,
           };
           chat.users.push(user);
           const chatStateCopy = [...this.state.chats];
