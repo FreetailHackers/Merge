@@ -137,6 +137,12 @@ class Chat extends Component {
       chat.name = data.newName;
       this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
     });
+
+    if (this.props.location.data) {
+      this.setState({ newChatInput: this.props.location.data }, () => {
+        this.createChat();
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -330,6 +336,7 @@ const mapStateToProps = (state) => ({
 
 Chat.propTypes = {
   userID: PropTypes.object.isRequired,
+  location: PropTypes.object,
 };
 
 export default connect(mapStateToProps, { logoutUser, setCurrentUser })(Chat);
