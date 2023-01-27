@@ -7,6 +7,7 @@ const keys = require("../../config/keys");
 var formidable = require("formidable");
 //var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var fs = require("fs");
+const fetch = require("node-fetch");
 
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
