@@ -51,7 +51,20 @@ class Chat extends Component {
     document.getElementById("newMessageInput").focus();
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    if (this.props.location.data) {
+      const name = "New Chat";
+      await axios
+        .post(process.env.REACT_APP_API_URL + `/api/chats/new`, { name })
+        .then(async (res) => {
+          let user = this.props.location.data;
+          await axios.post(
+            process.env.REACT_APP_API_URL + `/api/chats/${res.data._id}/add`,
+            { user }
+          );
+        });
+    }
+
     axios.get(process.env.REACT_APP_API_URL + "/api/users/list").then((res) => {
       this.setState({
         otherUsers: res.data.filter(
@@ -137,12 +150,6 @@ class Chat extends Component {
       chat.name = data.newName;
       this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
     });
-
-    if (this.props.location.data) {
-      this.setState({ newChatInput: this.props.location.data }, () => {
-        this.createChat();
-      });
-    }
   }
 
   componentWillUnmount() {
