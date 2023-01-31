@@ -190,11 +190,13 @@ class Chat extends Component {
         const users = this.state.newChatInput.map((u) => u.trim());
         chat.users = [...chat.users, ...users];
 
-        for (const user of [...users, this.props.userID.id]) {
-          axios.post(
-            process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`,
-            { user }
-          );
+        for (const user of chat.users) {
+          if (user !== this.props.userID.id) {
+            axios.post(
+              process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`,
+              { user }
+            );
+          }
           const { data } = await axios.get(
             process.env.REACT_APP_API_URL + "/api/users/" + user
           );
