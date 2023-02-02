@@ -1,8 +1,8 @@
 node_modules
 .DS_Store
 .idea/
-.env
-.env.local
+*.env*
+!.env.example
 yarn.lock
 build
 coverage
