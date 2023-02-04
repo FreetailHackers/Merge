@@ -13,7 +13,10 @@ dotenv.config();
 const app = express();
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Origin", [
+    "http://localhost:3000",
+    "https://merge.freetailhackers.com",
+  ]);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, X-ACCESS-TOKEN, Content-Type, *, Accept"
@@ -53,6 +56,10 @@ require("./config/passport")(passport);
 // Routes
 app.use("/api/users", users.router);
 app.use("/api/chats", chats.router);
+
+app.get("/", (req, res) => {
+  res.status(200).send("Hello World");
+});
 
 const port = process.env.PORT || 5000;
 
