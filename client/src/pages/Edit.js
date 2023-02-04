@@ -6,8 +6,8 @@ import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
 
+// FileInput,
 import {
-  FileInput,
   NumberInput,
   TextInput,
   MultiSelect,
@@ -207,18 +207,20 @@ class Edit extends Component {
                 className="question"
                 required
               />
-              <FileInput
-                label="Profile Picture"
-                placeholder="Upload JPG/PNG/GIF, up to 10 MB"
-                accept="image/jpg, image/png, image/gif"
-                error={
-                  this.state.oversizedFile
-                    ? "File must be 10 MB or smaller"
-                    : ""
-                }
-                onChange={this.handleNewProfilePicture}
-                className="question"
-              />
+              {
+                //   <FileInput
+                //   label="Profile Picture"
+                //   placeholder="Upload JPG/PNG/GIF, up to 10 MB"
+                //   accept="image/jpg, image/png, image/gif"
+                //   error={
+                //     this.state.oversizedFile
+                //       ? "File must be 10 MB or smaller"
+                //       : ""
+                //   }
+                //   onChange={this.handleNewProfilePicture}
+                //   className="question"
+                // />
+              }
               <TextInput
                 label="Portfolio"
                 placeholder="https://danielzting.github.io"
