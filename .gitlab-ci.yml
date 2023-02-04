@@ -201,6 +201,7 @@ deploy_prod_chat:
   script:
     - mv ../.elasticbeanstalk .elasticbeanstalk
     - mv ../.ebextensions .ebextensions
+    - mv $PROD_REDIS_CONFIG .ebextensions/options.config
     - mv ../Procfile Procfile
     - mv $PROD_HTTPS_CHAT_ALB .ebextensions/securelistener-alb.config
     - 'echo "web: npm install && CHAT_PORT=8080 npm run chat" > Procfile'
@@ -209,6 +210,7 @@ deploy_prod_chat:
   after_script:
     - cd $FOLDER
     - rm .ebextensions/securelistener-alb.config
+    - rm .ebextensions/options.config
     - rm -r ~/.aws
     - git add .
 
