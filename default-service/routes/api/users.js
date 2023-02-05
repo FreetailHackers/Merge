@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
 var formidable = require("formidable");
-//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var fs = require("fs");
 const fetch = require("node-fetch");
 
@@ -342,7 +341,7 @@ router.get("/:user", (req, res) => {
  * RETURNS the Report Object
  */
 router.post("/:user/report", (req, res) => {
-  User.findById(req.params.users, (err, user) => {
+  User.findById(req.params.user, (err, user) => {
     if (err) {
       return res.sendStatus(400);
     }
