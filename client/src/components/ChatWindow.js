@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import Message from "./Message";
 import "./ChatWindow.css";
 import PropTypes from "prop-types";
@@ -10,7 +11,18 @@ class ChatWindow extends Component {
     this.state = {
       newMessage: "",
       newUserIDs: [],
+      reportPressed: false,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.chat &&
+      this.props.chat &&
+      prevProps.chat._id !== this.props.chat._id
+    ) {
+      this.setState({ newUserIDs: [], reportPressed: false });
+    }
   }
 
   onType = (e) => {
@@ -45,9 +57,20 @@ class ChatWindow extends Component {
     this.props.sendMessage(message);
   };
 
+  showReport = () => {
+    this.setState({ reportPressed: true, newUserIDs: [] });
+  };
+
   report = () => {
-    this.setState({ reportPressed: true });
-    // send to database
+    const contents = document.getElementById("reason").value;
+    for (const user of this.state.newUserIDs) {
+      axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/report",
+        { contents }
+      );
+    }
+    document.getElementById("reason").value = "";
+    this.setState({ reportPressed: false, newUserIDs: [] });
   };
 
   render = () => (
@@ -87,7 +110,9 @@ class ChatWindow extends Component {
           <button
             id="exit"
             className="exitButton"
-            onClick={() => this.setState({ reportPressed: false })}
+            onClick={() =>
+              this.setState({ reportPressed: false, newUserIDs: [] })
+            }
           >
             ✖
           </button>
@@ -102,13 +127,7 @@ class ChatWindow extends Component {
             }))}
           />
           <textarea id="reason" placeholder="Reason for reporting" />
-          <button
-            id="submit"
-            className="submitButton"
-            onClick={() => {
-              this.setState({ reportPressed: false });
-            }}
-          >
+          <button id="submit" className="submitButton" onClick={this.report}>
             ➡️
           </button>
         </div>
@@ -176,14 +195,24 @@ class ChatWindow extends Component {
         >
           Add User
         </button>
-        <button type="button" id="block" onClick={this.block}>
-          Block
-        </button>
-        <button type="button" id="report" onClick={this.report}>
+        {this.props.chat.users.length > 1 && (
+          <button
+            type="button"
+            id="block"
+            onClick={
+              this.props.chat.users.length === 2
+                ? this.block
+                : this.props.leaveChat
+            }
+          >
+            {this.props.chat.users.length === 2 ? "Block" : "Leave"}
+          </button>
+        )}
+        <button type="button" id="report" onClick={this.showReport}>
           Report
         </button>
         {this.props.chat.owner === this.props.selfID && (
-          <button type="button" id="delete" onClick={this.leave}>
+          <button type="button" id="delete" onClick={this.props.deleteChat}>
             Delete Chat
           </button>
         )}
@@ -207,6 +236,8 @@ ChatWindow.propTypes = {
   profile: PropTypes.object.isRequired,
   titleInput: PropTypes.string.isRequired,
   editingTitle: PropTypes.bool.isRequired,
+  leaveChat: PropTypes.func,
+  deleteChat: PropTypes.func,
 };
 
 export default ChatWindow;
