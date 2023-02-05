@@ -85,7 +85,7 @@ deploy_integ:
     - git add .
     - git status
     - ls -al
-    - eb deploy --staged $EB_ENVIRONMENT
+    - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
   after_script:
     - rm default-service/.env
     - rm ./client/.env
@@ -108,7 +108,7 @@ cleanup_integ:
   stage: pre-production
   environment:
     action: stop
-  script: eb terminate --force $EB_ENVIRONMENT
+  script: eb terminate --timeout 30 --force $EB_ENVIRONMENT
   after_script:
     - rm -r ~/.aws
 
@@ -131,11 +131,11 @@ create_prod_api:
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
-    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
+    - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
   after_script:
     - rm -r ~/.aws
-    - sleep 180
+    - sleep 360
 
 deploy_prod_api:
   stage: production
@@ -152,7 +152,7 @@ deploy_prod_api:
     - mv $PROD_HTTPS_API_ALB .ebextensions/securelistener-alb.config
     - 'echo "web: npm install && npm run server" > Procfile'
     - git add .
-    - eb deploy --staged $EB_ENVIRONMENT
+    - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
   after_script:
     - cd $FOLDER
     - rm .env
@@ -169,7 +169,7 @@ stop_prod_api:
     action: stop
   script:
     - mv ../.elasticbeanstalk .elasticbeanstalk
-    - eb terminate --force $EB_ENVIRONMENT
+    - eb terminate --timeout 60 --force $EB_ENVIRONMENT
   after_script:
     - rm -r ~/.aws
 
@@ -192,11 +192,11 @@ create_prod_chat:
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
-    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
+    - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
   after_script:
     - rm -r ~/.aws
-    - sleep 180
+    - sleep 360
 
 deploy_prod_chat:
   stage: production
@@ -212,7 +212,7 @@ deploy_prod_chat:
     - mv $PROD_HTTPS_CHAT_ALB .ebextensions/securelistener-alb.config
     - 'echo "web: npm install && CHAT_PORT=8080 npm run chat" > Procfile'
     - git add .
-    - eb deploy --staged $EB_ENVIRONMENT
+    - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
   after_script:
     - cd $FOLDER
     - rm .ebextensions/securelistener-alb.config
@@ -229,6 +229,6 @@ stop_prod_chat:
     action: stop
   script:
     - mv ../.elasticbeanstalk .elasticbeanstalk
-    - eb terminate --force $EB_ENVIRONMENT
+    - eb terminate --timeout 60 --force $EB_ENVIRONMENT
   after_script:
     - rm -f ~/.aws
