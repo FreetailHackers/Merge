@@ -26,28 +26,12 @@ class Chat extends Component {
   }
 
   getMessages(index) {
-    let chat = this.state.chats[index];
+    const chat = this.state.chats[index];
     this.setState({ editingTitle: false, titleInput: chat.name });
     axios
       .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
-      .then(async (res) => {
+      .then((res) => {
         chat.seen = true;
-        const messages = res.data;
-
-        // fill in missing profiles (needed if someone leaves the chat)
-        const authors = [...new Set(messages.map((message) => message.author))];
-        for (const author of authors) {
-          if (!(author in chat.profiles)) {
-            const { data } = await axios.get(
-              process.env.REACT_APP_API_URL + "/api/users/" + author
-            );
-            chat.profiles[author] = {
-              id: data._id,
-              name: data.name,
-              profilePicture: data.profile[0]?.profilePictureUrl,
-            };
-          }
-        }
         this.setState(
           {
             chats: this.chatStateCopy(chat, false, index),
@@ -165,17 +149,6 @@ class Chat extends Component {
       let chat = this.state.chats[chatIndex];
       chat.name = data.newName;
       this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-    });
-    this.socket.on("chat-deleted", (deletedChat) => {
-      this.removeChatFromClient(deletedChat);
-    });
-    this.socket.on("user-left", (data) => {
-      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
-      if (chatIndex >= 0) {
-        let chat = this.state.chats[chatIndex];
-        chat.users = [...chat.users].filter((user) => user !== data.user);
-        this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-      }
     });
   }
 
@@ -310,51 +283,6 @@ class Chat extends Component {
         ];
   }
 
-  removeChatFromClient(deletedChat) {
-    const newChats = [...this.state.chats].filter(
-      (chat) => chat._id !== deletedChat._id
-    );
-    const chatIndex = this.state.chats
-      .map((chat) => chat._id)
-      .indexOf(deletedChat._id);
-    let newIndex = this.state.activeChatIndex;
-    if (
-      chatIndex < this.state.activeChatIndex ||
-      (newIndex === newChats.length && newChats.length > 0)
-    ) {
-      newIndex--;
-    }
-    this.setState({ activeChatIndex: newIndex, chats: newChats });
-  }
-
-  deleteChat() {
-    const deletedChat = this.state.chats[this.state.activeChatIndex];
-    axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`
-      )
-      .then(() => {
-        this.socket.emit("delete-chat", deletedChat);
-        this.removeChatFromClient(deletedChat);
-      });
-  }
-
-  leaveChat() {
-    const deletedChat = this.state.chats[this.state.activeChatIndex];
-    axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/remove`,
-        { user: this.props.userID.id }
-      )
-      .then(() => {
-        this.socket.emit("leave-chat", {
-          chatID: deletedChat._id,
-          user: this.props.userID.id,
-        });
-        this.removeChatFromClient(deletedChat);
-      });
-  }
-
   render() {
     return (
       <div style={{ display: "flex", width: "100%" }}>
@@ -365,7 +293,9 @@ class Chat extends Component {
           createChat={this.createChat.bind(this)}
           newChatInput={this.state.newChatInput}
           updateNewChatInput={(values) => {
-            this.setState({ newChatInput: values });
+            this.setState({ newChatInput: values }, () =>
+              console.log(this.state.newChatInput)
+            );
           }}
           otherUsers={this.state.otherUsers}
         />
@@ -402,8 +332,6 @@ class Chat extends Component {
               )
             }
             chat={this.state.chats[this.state.activeChatIndex]}
-            deleteChat={this.deleteChat.bind(this)}
-            leaveChat={this.leaveChat.bind(this)}
           />
         )}
       </div>
