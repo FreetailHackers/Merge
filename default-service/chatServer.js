@@ -1,5 +1,14 @@
 require("dotenv").config();
-const io = require("socket.io")(process.env.CHAT_PORT, {
+const express = require("express");
+const http = require("http");
+
+const app = express();
+const server = http.createServer(app);
+app.get("/", (req, res) => {
+  res.send(`Status Ok: ${new Date()}`);
+});
+
+const io = require("socket.io")(server, {
   cors: {
     origin: ["http://localhost:3000", "https://merge.freetailhackers.com"],
     credentials: true,
@@ -106,3 +115,9 @@ function renameChat(data, socket) {
     socket.to(data.chatID).emit("chat-renamed", data);
   }
 }
+
+const port = process.env.CHAT_PORT || 5000;
+
+server.listen(port, () =>
+  console.log(`CHAT server up and running on port ${port} !`)
+);
