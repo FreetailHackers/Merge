@@ -1,7 +1,7 @@
 require("dotenv").config();
 const io = require("socket.io")(process.env.CHAT_PORT, {
   cors: {
-    origin: ["http://localhost:3000", "https://merge.freetailhackers.com"],
+    origin: [process.env.CORS_ORIGIN_URL],
     credentials: true,
   },
 });
