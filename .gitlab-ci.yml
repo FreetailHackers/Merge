@@ -12,6 +12,7 @@ stages:
   - pre-staging
   - staging
   - test
+  - post-test
   - pre-production
   - production
   - post-production
@@ -98,18 +99,35 @@ acceptance_test:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: manual
+      allow_failure: false
   script:
     - echo "Acceptance tests not yet implemented, please add and replace this script!"
-    - echo "For now, this is just a manual acceptance step"
+    - echo "For now, this is just a manual inspection step"
   # TODO: add script here
+
+fail_manual_inspection:
+  extends: cleanup_integ
+  stage: test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+      allow_failure: true
+  script:
+    - echo "Failing manual inspection..."
+    - touch ACCEPTANCE_FAIL.txt
+  artifacts:
+    paths:
+      - FAIL.txt
+    expire_in: 10 mins
 
 cleanup_integ:
   extends: deploy_integ
-  stage: pre-production
+  stage: post-test
   environment:
     action: stop
-  script: eb terminate --timeout 30 --force $EB_ENVIRONMENT
+  script: if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
   after_script:
+    - eb terminate --timeout 30 --force $EB_ENVIRONMENT
     - rm -r ~/.aws
 
 create_prod_api:
