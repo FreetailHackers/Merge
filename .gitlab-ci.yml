@@ -83,6 +83,7 @@ deploy_integ:
     - mv $CI_ENV_FILE_INTEG default-service/.env
     - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
     - echo "REACT_APP_CHAT_URL=$CI_ENVIRONMENT_URL:5003" >> ./client/.env
+    - rm -r .platform
     - git add .
     - git status
     - ls -al
