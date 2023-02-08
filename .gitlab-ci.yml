@@ -252,4 +252,4 @@ stop_prod_chat:
     - mv ../.elasticbeanstalk .elasticbeanstalk
     - eb terminate --timeout 60 --force $EB_ENVIRONMENT
   after_script:
-    - rm -f ~/.aws
+    - rm -r ~/.aws
