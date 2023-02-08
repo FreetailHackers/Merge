@@ -106,7 +106,7 @@ acceptance_test:
   # TODO: add script here
 
 fail_manual_inspection:
-  extends: cleanup_integ
+  image: alpine
   stage: test
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
@@ -114,11 +114,12 @@ fail_manual_inspection:
       allow_failure: true
   script:
     - echo "Failing manual inspection..."
+    - echo "Now trigger the acceptance_test job!"
     - touch ACCEPTANCE_FAIL.txt
   artifacts:
     paths:
-      - FAIL.txt
-    expire_in: 10 mins
+      - ACCEPTANCE_FAIL.txt
+    expire_in: 30 mins
 
 cleanup_integ:
   extends: deploy_integ
@@ -146,6 +147,7 @@ create_prod_api:
     - touch ~/.aws/credentials
     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
     - rm .gitignore
+    - rm .ebextensions/integ-security-group.config
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
@@ -207,6 +209,7 @@ create_prod_chat:
     - touch ~/.aws/credentials
     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
     - rm .gitignore
+    - rm .ebextensions/integ-security-group.config
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
