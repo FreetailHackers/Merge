@@ -88,7 +88,7 @@ class Login extends Component {
           </span>
 
           <button onClick={this.onSubmit} className="action" type="submit">
-            Login
+            Logon
           </button>
           <span className="error">{errors.status}</span>
           <button onClick={this.onRegister} className="action" type="submit">
