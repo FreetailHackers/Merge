@@ -15,7 +15,7 @@ const ChatPreview = ({
   <div
     className={
       "chatPreview" +
-      (chatRequest
+      (chatRequest && !active
         ? " chatrequest"
         : (!seen ? " unread" : "") + (active ? " active" : ""))
     }
