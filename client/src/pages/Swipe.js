@@ -430,7 +430,6 @@ Swipe.propTypes = {
 const mapStateToProps = (state) => ({
   auth: state.auth,
   user: state.auth.user,
-  userID: state.auth.userID,
 });
 
 export default connect(mapStateToProps)(Swipe);

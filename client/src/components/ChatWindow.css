@@ -33,39 +33,28 @@
   resize: none;
   display: block;
   margin: 0 auto;
-  margin-top: 10px;
+  margin-top: 3%;
 }
 
 .exitButton {
+  transform: scale(2);
   float: right;
   margin: -3% 5% 0 0;
-  background: #ddd;
-  border-radius: 15px;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.reportWindowCheckbox {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin-top: 10px;
-}
-.reportWindowCheckbox input {
-  margin-right: 10px;
 }
 
 #submit {
   position: relative;
   margin: 3% 5% 0 0;
   float: right;
-  font-size: 16px;
-  font-weight: bold;
+  transform: scale(2) scaleX(2);
 }
 
+.exitButton,
+#submit {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
 /*
 New message box
@@ -183,69 +172,64 @@ Messages
 
 /*action buttons*/
 .chatWindowHeader {
-  width: 100%;
+  position: fixed;
+  top: 0;
+  width: 55%;
   background-color: white;
   border: 1px #eee solid;
+  text-align: right;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
-  padding-top: 15px;
-  padding-bottom: 15px;
 }
 
-.chatWindowHeader button {
+.chatWindowHeader > button {
+  text-align: center;
   min-width: 85px;
+  padding: 10px;
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: 15px;
   font-size: 1em;
+  cursor: pointer;
 }
 
-.chatWindowHeader button:hover {
+.chatWindowHeader > button:hover {
   background-color: var(--secondary);
 }
 
 .chatWindowHeader input {
-  width: 100%
-}
-
-.chatWindowTitle {
-  min-width: 30%;
-  max-width: 50%;
-  display: flex;
-  justify-content: flex-start;
-  margin-right: auto;
+  width: 20%;
 }
 
 .chatTitle {
   display: inline-block;
   margin-block-end: 0;
   margin-block-start: 0;
+  min-width: 100px;
+  max-width: 400px;
   padding: 5px;
 }
 .chatTitle:hover {
   background-color: #eee;
 }
 
-.chatWindowHeader h3, input, button {
-  margin-left: 8px;
-  margin-right: 8px;
+.chatWindowHeader input,
+.chatWindowHeader h3,
+.chatWindowHeader button {
+  margin: 15px 8px 15px;
+}
+
+.chatWindowHeader div {
+  margin: 0px;
 }
 
 .chatScrollBox {
   width: 100%;
-  margin-top: 0;
-  padding-top: 10px;
-  margin-bottom: auto;
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: scroll;
-}
-
-.userAddition {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#delete {
-  margin-right: 16px;
+  height: calc(100% - 140px);
 }
