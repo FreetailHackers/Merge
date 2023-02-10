@@ -12,10 +12,8 @@ stages:
   - pre-staging
   - staging
   - test
-  - post-test
   - pre-production
   - production
-  - post-production
 
 build_backend:
   image: node:16.16.0-slim
@@ -71,7 +69,7 @@ create_integ:
     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
   after_script:
     - rm -r ~/.aws
-    - sleep 180
+    - sleep 30
 
 
 deploy_integ:
@@ -124,7 +122,7 @@ fail_manual_inspection:
 
 cleanup_integ:
   extends: deploy_integ
-  stage: post-test
+  stage: pre-staging
   environment:
     action: stop
   script: if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
@@ -152,11 +150,12 @@ create_prod_api:
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
+    - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
     - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
   after_script:
     - rm -r ~/.aws
-    - sleep 360
+    - sleep 30
 
 deploy_prod_api:
   stage: production
@@ -183,7 +182,7 @@ deploy_prod_api:
 
 
 stop_prod_api:
-  stage: post-production
+  stage: production
   extends: deploy_prod_api
   when: manual
   environment:
@@ -214,11 +213,12 @@ create_prod_chat:
     - echo $EB_ENVIRONMENT
     - cd $FOLDER
   script:
+    - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
     - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
   after_script:
     - rm -r ~/.aws
-    - sleep 360
+    - sleep 30
 
 deploy_prod_chat:
   stage: production
@@ -244,7 +244,7 @@ deploy_prod_chat:
 
 
 stop_prod_chat:
-  stage: post-production
+  stage: production
   extends: deploy_prod_chat
   when: manual
   environment:
