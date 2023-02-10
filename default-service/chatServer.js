@@ -35,10 +35,6 @@ io.on("connection", (socket) => {
   socket.on("add-user", (data) => addUser(data, socket));
 
   socket.on("rename-chat", (data) => renameChat(data, socket));
-
-  socket.on("leave-chat", (data) => leaveChat(data, socket));
-
-  socket.on("delete-chat", (data) => deleteChat(data, socket));
 });
 
 // error handler function
@@ -93,12 +89,11 @@ async function createRoom(data, socket) {
 async function addUser(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
-    const fetched = await io.fetchSockets();
+    let fetched = await io.fetchSockets();
     let foundSocket = false;
     for (let fetchedSocket of fetched) {
       if (data.userID == fetchedSocket.data.mongoID) {
         foundSocket = true;
-        socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
       } else if (
         data.chat.users.includes(fetchedSocket.data.mongoID) &&
         data.userID != fetchedSocket.data.mongoID &&
@@ -119,21 +114,6 @@ function renameChat(data, socket) {
   if (data && socket) {
     socket.to(data.chatID).emit("chat-renamed", data);
   }
-}
-
-function deleteChat(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data._id).emit("chat-deleted", data);
-  }
-}
-
-function leaveChat(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.chatID).emit("user-left", data);
-  }
-  socket.leave(data.chatID);
 }
 
 const port = process.env.CHAT_PORT || 5000;
