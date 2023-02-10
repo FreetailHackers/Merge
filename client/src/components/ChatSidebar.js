@@ -6,6 +6,8 @@ import { MultiSelect } from "@mantine/core";
 
 const ChatSidebar = ({
   createChat,
+  creatingNewChat,
+  setCreatingNewChat,
   newChatInput,
   updateNewChatInput,
   otherUsers,
@@ -15,27 +17,42 @@ const ChatSidebar = ({
 }) => (
   <div className="chatSidebar">
     <div className="chatSidebarTop">
-      <button className="newChatButton" onClick={createChat}>
-        New Chat
-      </button>
-      <MultiSelect
-        value={newChatInput}
-        onChange={(values) => updateNewChatInput(values)}
-        placeholder="Search for people to add"
-        searchable
-        data={
-          otherUsers &&
-          otherUsers.map((user) => ({
-            value: user._id,
-            label: user.name,
-            image:
-              user.profile &&
-              user.profile[0] &&
-              user.profile[0].profilePictureUrl &&
-              user.profile[0].profilePictureUrl,
-          }))
-        }
-      />
+      <div style={creatingNewChat ? { marginBottom: 10 } : {}}>
+        {creatingNewChat && (
+          <button
+            className="newChatButton themeButton"
+            onClick={() => setCreatingNewChat(false)}
+          >
+            Cancel
+          </button>
+        )}
+        {(!creatingNewChat || newChatInput.length > 0) && (
+          <button
+            className="newChatButton themeButton"
+            onClick={
+              creatingNewChat ? createChat : () => setCreatingNewChat(true)
+            }
+          >
+            New Chat
+          </button>
+        )}
+      </div>
+      {creatingNewChat && (
+        <MultiSelect
+          value={newChatInput}
+          onChange={(values) => updateNewChatInput(values)}
+          placeholder="Search for people to add"
+          searchable
+          data={
+            otherUsers &&
+            otherUsers.map((user) => ({
+              value: user._id,
+              label: user.name,
+              image: user.profile && user.profile[0]?.profilePictureUrl,
+            }))
+          }
+        />
+      )}
     </div>
     {chats.map((chat, i) => (
       <ChatPreview
@@ -45,8 +62,8 @@ const ChatSidebar = ({
         chatRequest={chat.lastMessage === null}
         lastMessage={chat.lastMessage?.contents}
         lastMessageDate={chat.lastMessage?.timestamp}
-        profilePictures={Object.entries(chat.profiles).map(
-          (profile) => profile[1].profilePicture
+        profilePictures={chat.users.map(
+          (user) => chat.profiles[user].profilePicture
         )}
         seen={chat.seen}
         onClick={() => changeChat(i)}
@@ -64,6 +81,8 @@ ChatSidebar.propTypes = {
   newChatInput: PropTypes.array.isRequired,
   updateNewChatInput: PropTypes.func.isRequired,
   otherUsers: PropTypes.arrayOf(PropTypes.object),
+  creatingNewChat: PropTypes.bool,
+  setCreatingNewChat: PropTypes.func,
 };
 
 export default ChatSidebar;

@@ -1,0 +1,9 @@
+.themeButton {
+  text-align: center;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  border: none;
+  cursor: pointer;
+  }
