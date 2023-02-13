@@ -25,7 +25,7 @@ const Navbar = (props) => {
         <NavLink to="/swipe">Find Team Members</NavLink>
         <NavLink to="/chat">Chat</NavLink>
         <NavLink to="/edit">Edit Profile</NavLink>
-        <NavLink to="/database">User List</NavLink>
+        {/*<NavLink to="/database">User List</NavLink>*/}
         {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
         <Link onClick={onLogoutClick} to="/">
           Logout

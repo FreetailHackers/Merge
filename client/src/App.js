@@ -42,7 +42,7 @@ class App extends Component {
               component={Database}
               childProps={{ title: "Admin", admin: true }}
             />
-            <PrivateRoute exact path="/database" component={Database} />
+            {/*<PrivateRoute exact path="/database" component={Database}/>*/}
             <Route exact path="/dashboard" component={Dashboard} />
             <PrivateRoute exact path="/swipe" component={Swipe} />
             <PrivateRoute exact path="/edit" component={Edit} />
