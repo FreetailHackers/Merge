@@ -2,7 +2,7 @@
   height: calc(100vh - 20px);
   width: 300px;
   min-width: 300px;
-  padding: 10px;
+  padding: 15px 10px;
   border-right: 1px #ddd solid;
   overflow-y: auto;
 }
@@ -100,23 +100,16 @@
 }
 
 .newChatButton {
-   text-align: center;
-   padding: 10px;
-   background-color: var(--primary);
-   color: var(--text-on-primary);
-   border: none;
-   border-radius: 15px;
-   font-size: 0.8em;
-   cursor: pointer;
-   margin-right: 10px;
-   width: 100px;
+  font-size: 1em;
+  margin-right: 10px;
+  width: 100px;
 }
 
 .chatSidebarTop {
-   padding: 10px;
-   display: flex;
-   flex-direction: row;
-   align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .chatSidebarTop div {

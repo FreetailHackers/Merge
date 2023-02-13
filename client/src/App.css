@@ -28,11 +28,8 @@ section {
 
 input {
   padding: 10px;
-  width: 300px;
-
   border: 1px #ddd solid;
   border-radius: 0;
-
   font-size: 1em;
 }
 
