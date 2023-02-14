@@ -120,9 +120,9 @@ fail_manual_inspection:
       - ACCEPTANCE_FAIL.txt
     expire_in: 30 mins
 
-cleanup_integ:
+stop_integ:
   extends: deploy_integ
-  stage: pre-staging
+  stage: pre-production
   environment:
     action: stop
   script: if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
