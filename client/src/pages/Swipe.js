@@ -252,7 +252,10 @@ class Swipe extends Component {
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
               })
-              .then((res) => {});
+              .then((res) => {
+                let data = [this.state.userToShow._id];
+                this.props.history.push({ pathname: "/chat", data });
+              });
             setTimeout(() => {
               this.getUserToShow(() => {
                 this.setState({
@@ -316,7 +319,10 @@ class Swipe extends Component {
               otherUser: this.state.userToShow,
               decision: this.state.profileSide,
             })
-            .then((res) => {});
+            .then((res) => {
+              let data = [this.state.userToShow._id];
+              this.props.history.push({ pathname: "/chat", data });
+            });
 
           setTimeout(() => {
             this.getUserToShow(() => {
