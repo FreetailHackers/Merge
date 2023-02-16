@@ -265,6 +265,10 @@ class Edit extends Component {
                 value={this.state.userProfile.skills}
                 onChange={(value) => this.setProfile("skills", value)}
                 className="question"
+                error={
+                  this.state.userProfile.skills?.length === 0 ? "Required" : ""
+                }
+                required
               />
               <NativeSelect
                 label="Years of coding experience"
@@ -277,6 +281,12 @@ class Edit extends Component {
                 value={this.state.userProfile.experience}
                 onChange={(value) => this.setProfile("experience", value)}
                 className="question"
+                error={
+                  this.state.userProfile.experience?.length === 0
+                    ? "Required"
+                    : ""
+                }
+                required
               />
               <Radio.Group
                 label="How competitive are you?"
@@ -285,6 +295,12 @@ class Edit extends Component {
                 spacing="xs"
                 value={this.state.userProfile.competitiveness}
                 onChange={(value) => this.setProfile("competitiveness", value)}
+                required
+                error={
+                  this.state.userProfile.competitiveness?.length === 0
+                    ? "Required"
+                    : ""
+                }
               >
                 <Radio
                   value="learn"
@@ -333,7 +349,10 @@ class Edit extends Component {
               onClick={this.handleSubmit}
               disabled={
                 this.state.userProfile.name?.length === 0 ||
-                this.state.userProfile.intro?.length === 0
+                this.state.userProfile.intro?.length === 0 ||
+                this.state.userProfile.skills?.length === 0 ||
+                this.state.userProfile.experience?.length === 0 ||
+                this.state.userProfile.competitiveness?.length === 0
               }
               className="action"
               id="save"

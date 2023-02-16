@@ -320,8 +320,10 @@ class Swipe extends Component {
               decision: this.state.profileSide,
             })
             .then((res) => {
-              let data = [this.state.userToShow._id];
-              this.props.history.push({ pathname: "/chat", data });
+              if (this.state.profileSide === "accept-committed") {
+                let data = [this.state.userToShow._id];
+                this.props.history.push({ pathname: "/chat", data });
+              }
             });
 
           setTimeout(() => {
