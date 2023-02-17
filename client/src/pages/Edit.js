@@ -22,6 +22,7 @@ import "./Edit.css";
 class Edit extends Component {
   //frontend for updating
   handleSubmit = async (event) => {
+    event.persist();
     event.preventDefault();
     const data = {
       id: this.props.userID.id,

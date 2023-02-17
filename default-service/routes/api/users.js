@@ -244,38 +244,38 @@ async function s3Upload(file_name, files, res) {
   res.json({ url: promise.Location });
 }
 
-async function clear_old_pictures(req) {
-  const id = req.body.id;
-  const profile_pic_link = req.body.update.profile.profilePictureUrl;
-  if (!profile_pic_link) {
-    console.log("No profile pic link");
-    return;
-  }
-  const folder_name = id + "/";
-  var params = {
-    Bucket: BUCKET_NAME,
-    Prefix: folder_name,
-  };
-  await s3
-    .listObjectsV2(params, async function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else {
-        let listOfObjects = data.Contents;
-        let newimg = profile_pic_link.replace(
-          "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
-          ""
-        );
-        for (let i = 1; i < data.KeyCount; i++) {
-          let nameOfFile = listOfObjects[i].Key;
-          if (nameOfFile !== newimg) {
-            var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
-            await s3.deleteObject(params).promise();
-          }
-        }
-      }
-    })
-    .promise();
-}
+// async function clear_old_pictures(req) {
+//   const id = req.body.id;
+//   const profile_pic_link = req.body.update.profile.profilePictureUrl;
+//   if (!profile_pic_link) {
+//     console.log("No profile pic link");
+//     return;
+//   }
+//   const folder_name = id + "/";
+//   var params = {
+//     Bucket: BUCKET_NAME,
+//     Prefix: folder_name,
+//   };
+//   await s3
+//     .listObjectsV2(params, async function (err, data) {
+//       if (err) console.log(err, err.stack); // an error occurred
+//       else {
+//         let listOfObjects = data.Contents;
+//         let newimg = profile_pic_link.replace(
+//           "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
+//           ""
+//         );
+//         for (let i = 1; i < data.KeyCount; i++) {
+//           let nameOfFile = listOfObjects[i].Key;
+//           if (nameOfFile !== newimg) {
+//             var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
+//             await s3.deleteObject(params).promise();
+//           }
+//         }
+//       }
+//     })
+//     .promise();
+// }
 
 async function update(req, res) {
   const id = req.body.id;
@@ -285,7 +285,7 @@ async function update(req, res) {
   };
 
   //Clear all old s3 files
-  await clear_old_pictures(req);
+  //await clear_old_pictures(req);
   if (profile.name?.length > 1000) {
     return res.sendStatus(413);
   }
@@ -294,7 +294,6 @@ async function update(req, res) {
       return res.sendStatus(413);
     }
   }
-
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
   // Look at mongoose docs
