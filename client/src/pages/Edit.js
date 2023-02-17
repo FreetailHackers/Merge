@@ -280,7 +280,9 @@ class Edit extends Component {
                   { value: ">3", label: "Over three years" },
                 ]}
                 value={this.state.userProfile.experience}
-                onChange={(value) => this.setProfile("experience", value)}
+                onChange={(value) =>
+                  this.setProfile("experience", value.target.value)
+                }
                 className="question"
                 error={
                   this.state.userProfile.experience?.length === 0

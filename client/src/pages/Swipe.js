@@ -7,16 +7,23 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
-// import { addListener } from "process";
 
 class Swipe extends Component {
+  containsRequired(data) {
+    let userProfile = data.profile[0];
+    return (
+      data.name?.length !== 0 &&
+      userProfile.intro?.length !== 0 &&
+      userProfile.skills?.length !== 0 &&
+      userProfile.experience?.length !== 0 &&
+      userProfile.competitiveness?.length !== 0
+    );
+  }
   getUserToShow = (callback) => {
     var queryParamters = {
       start: 0,
       limit: 0,
-      filters: {
-        // _id: this.props.userID.id,
-      },
+      filters: {},
     };
     this.setState({ loadingUserToShow: true }, async () => {
       //getting my swipeList
@@ -55,9 +62,11 @@ class Swipe extends Component {
             let i = 0;
             while (i < res.data.length) {
               let temp = res.data[i];
+              console.log(temp);
               if (
                 !myswipeList.includes(temp._id) &&
-                temp._id !== this.props.auth.userID.id
+                temp._id !== this.props.auth.userID.id &&
+                this.containsRequired(temp)
               ) {
                 foundSomeone = true;
                 break;
