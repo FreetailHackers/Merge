@@ -325,7 +325,7 @@ class Edit extends Component {
                   { value: "misc", label: "Miscellaneous MLH Prizes" },
                 ]}
                 label="What categories are you planning to submit to?"
-                placeholder="If you haven't decided yet, you can leave this blank"
+                placeholder="May be left blank if undecided"
                 value={this.state.userProfile.categories}
                 onChange={(value) => this.setProfile("categories", value)}
                 className="question"
