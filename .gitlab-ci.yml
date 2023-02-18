@@ -253,7 +253,7 @@ stop_prod_chat:
   after_script:
     - rm -r ~/.aws
 
-deploy_prod_client:
+pages:
   stage: production
   image: node:16.16.0-slim
   rules:
@@ -270,13 +270,15 @@ deploy_prod_client:
     paths:
       - public
   after_script:
-    - rm .env
+    - rm ./client/.env
 
 stop_prod_client:
   stage: production
-  extends: deploy_prod_client
+  extends: pages
   when: manual
   environment:
     action: stop
   script:
     - rm -r public
+  after_script:
+    - echo "Stopping production client"
