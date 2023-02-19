@@ -85,7 +85,7 @@ class Swipe extends Component {
                     skills: data.skills,
                     experienceLevel: data.experience,
                     intro: data.intro,
-                    profilePictureUrl: data.profilePictureUrl,
+                    // profilePictureUrl: data.profilePictureUrl,
                     github: data.github,
                     linkedin: data.linkedin,
                     portfolio: data.portfolio,
@@ -398,7 +398,7 @@ class Swipe extends Component {
             name={this.state.userToShow.name}
             school={this.state.userToShow.school}
             intro={this.state.userToShow.intro}
-            profilePictureUrl={this.state.userToShow.profilePictureUrl}
+            // profilePictureUrl={this.state.userToShow.profilePictureUrl}
             github={this.state.userToShow.github}
             linkedin={this.state.userToShow.linkedin}
             portfolio={this.state.userToShow.portfolio}

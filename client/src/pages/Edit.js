@@ -37,7 +37,7 @@ class Edit extends Component {
       }
     }
 
-    data.update.profile.profilePictureUrl = this.state.profilePictureUrl;
+    // data.update.profile.profilePictureUrl = this.state.profilePictureUrl;
     axios
       .post(process.env.REACT_APP_API_URL + "/api/users/update", data)
       .then((res) => {
@@ -71,56 +71,56 @@ class Edit extends Component {
         if (!("swipeReady" in data)) data.swipeReady = true;
         this.setState({
           userProfile: data,
-          profilePictureUrl: data.profilePictureUrl,
+          // profilePictureUrl: data.profilePictureUrl,
         });
       });
   }
 
-  handleNewProfilePicture = async (file) => {
-    const fd = new FormData();
-
-    // Setting up S3 upload parameters for folder upload
-    fd.append("file_name", this.props.userID.id + "/" + file.name);
-    fd.append("file", file);
-
-    if (file.size > 10_000_000) {
-      this.setState({ oversizedFile: true });
-      return;
-    } else {
-      this.setState({ oversizedFile: false });
-    }
-
-    await axios
-      .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(async (res) => {
-        this.setState({
-          profilePictureUrl: res.data.url,
-          oversizedFile: false,
-        });
-        this.props.setCurrentUser(this.props.userID, {
-          ...this.props.user,
-          profilePictureUrl: res.data.url,
-        });
-      })
-      .catch(() => {
-        this.setState({ oversizedFile: true });
-      });
-  };
+  // handleNewProfilePicture = async (file) => {
+  //   const fd = new FormData();
+  //
+  //   // Setting up S3 upload parameters for folder upload
+  //   fd.append("file_name", this.props.userID.id + "/" + file.name);
+  //   fd.append("file", file);
+  //
+  //   if (file.size > 10_000_000) {
+  //     this.setState({ oversizedFile: true });
+  //     return;
+  //   } else {
+  //     this.setState({ oversizedFile: false });
+  //   }
+  //
+  //   await axios
+  //     .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     })
+  //     .then(async (res) => {
+  //       this.setState({
+  //         profilePictureUrl: res.data.url,
+  //         oversizedFile: false,
+  //       });
+  //       this.props.setCurrentUser(this.props.userID, {
+  //         ...this.props.user,
+  //         profilePictureUrl: res.data.url,
+  //       });
+  //     })
+  //     .catch(() => {
+  //       this.setState({ oversizedFile: true });
+  //     });
+  // };
 
   constructor(props) {
     super(props);
     this.state = {
       userProfile: { ...this.props.user.profile },
       saved: true,
-      profilePictureUrl: this.props.user.profilePictureUrl,
+      // profilePictureUrl: this.props.user.profilePictureUrl,
     };
     this.baseState = {
       userProfile: { ...this.props.user.profile },
-      profilePictureUrl: this.props.user.profilePictureUrl,
+      // profilePictureUrl: this.props.user.profilePictureUrl,
     };
   }
 
@@ -130,7 +130,7 @@ class Edit extends Component {
     this.props.setCurrentUser(this.props.userID, {
       ...this.props.user,
       profile: this.baseState.userProfile,
-      profilePictureUrl: this.baseState.profilePictureUrl,
+      // profilePictureUrl: this.baseState.profilePictureUrl,
     });
 
     axios
@@ -379,7 +379,7 @@ class Edit extends Component {
             name={this.state.userProfile.name}
             school={this.state.userProfile.school}
             intro={this.state.userProfile.intro}
-            profilePictureUrl={this.state.profilePictureUrl}
+            // profilePictureUrl={this.state.profilePictureUrl}
           />
         </div>
       </div>

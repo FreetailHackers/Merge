@@ -21,7 +21,7 @@ const ChatPreview = ({
     }
     onClick={onClick}
   >
-    <div
+    {/*<div
       style={{
         backgroundImage:
           profilePictures.length === 1 ? `url(${profilePictures[0]})` : "none",
@@ -56,7 +56,7 @@ const ChatPreview = ({
             />
           );
         })}
-    </div>
+    </div>*/}
     <div className="text">
       <h4>{title}</h4>
       {chatRequest ? (
