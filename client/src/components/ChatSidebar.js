@@ -48,7 +48,7 @@ const ChatSidebar = ({
             otherUsers.map((user) => ({
               value: user._id,
               label: user.name,
-              image: user.profile && user.profile[0]?.profilePictureUrl,
+              // image: user.profile && user.profile[0]?.profilePictureUrl,
             }))
           }
         />
@@ -62,9 +62,9 @@ const ChatSidebar = ({
         chatRequest={chat.lastMessage === null}
         lastMessage={chat.lastMessage?.contents}
         lastMessageDate={chat.lastMessage?.timestamp}
-        profilePictures={chat.users.map(
-          (user) => chat.profiles[user].profilePicture
-        )}
+        // profilePictures={chat.users.map(
+        //   (user) => chat.profiles[user].profilePicture
+        // )}
         seen={chat.seen}
         onClick={() => changeChat(i)}
       />
