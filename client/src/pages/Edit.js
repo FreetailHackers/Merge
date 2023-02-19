@@ -230,6 +230,13 @@ class Edit extends Component {
                 className="question"
               />
               <TextInput
+                label="Github Username"
+                placeholder="danielzting"
+                value={this.state.userProfile.github}
+                onChange={(e) => this.setProfile("github", e.target.value)}
+                className="question"
+              />
+              <TextInput
                 label="LinkedIn"
                 placeholder="https://www.linkedin.com/in/danielzting/"
                 id="linkedin"
