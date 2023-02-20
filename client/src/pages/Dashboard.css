@@ -6,6 +6,13 @@
   margin: 200px auto 0 auto;
 }
 
+.forms {
+  position: relative;
+  margin: 0 auto;
+  margin-top: 40rem;
+  display: block;
+}
+
 .team-image {
   position: relative;
   margin: 0 auto;
