@@ -242,7 +242,6 @@ deploy_prod_chat:
 
 
 stop_prod_chat:
-  stage: production
   extends: deploy_prod_chat
   when: manual
   environment:
@@ -272,13 +271,3 @@ pages:
   after_script:
     - rm ./client/.env
 
-stop_prod_client:
-  stage: production
-  extends: pages
-  when: manual
-  environment:
-    action: stop
-  script:
-    - rm -r public
-  after_script:
-    - echo "Stopping production client"
