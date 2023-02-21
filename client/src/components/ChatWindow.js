@@ -60,6 +60,7 @@ class ChatWindow extends Component {
 
   showReport = () => {
     this.setState({ reportPressed: true, newUserIDs: [], addingUsers: false });
+    this.props.setEditingTitle(false);
   };
 
   submitReport = () => {
@@ -74,7 +75,13 @@ class ChatWindow extends Component {
       document.getElementById("reason").value = "";
     }
     if (this.state.blockChecked) {
-      // need to modify the backend heavily
+      for (const user of this.state.newUserIDs) {
+        axios.post(
+          process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
+          { userID: this.props.selfID }
+        );
+      }
+      this.props.blockUsers(this.state.newUserIDs);
     }
     this.setState({
       reportPressed: false,
@@ -99,9 +106,19 @@ class ChatWindow extends Component {
           ) : (
             <h3
               className="chatTitle"
-              onClick={() => this.props.setEditingTitle(true)}
+              onClick={() => {
+                if (!this.state.addingUsers && !this.state.reportPressed) {
+                  this.props.setEditingTitle(true);
+                }
+              }}
             >
-              {this.props.title}
+              {this.props.title
+                ? this.props.title
+                : String(
+                    this.props.chat.users.map(
+                      (id) => `${this.props.chat.profiles[id].name}`
+                    )
+                  ).replaceAll(",", ", ")}
             </h3>
           )}
         </div>
@@ -136,6 +153,7 @@ class ChatWindow extends Component {
                       this.setState({ newUserIDs: [], addingUsers: false });
                     } else {
                       this.setState({ addingUsers: true });
+                      this.props.setEditingTitle(false);
                     }
                   }}
                 >
@@ -168,7 +186,7 @@ class ChatWindow extends Component {
             id="block"
             onClick={this.showReport}
           >
-            {"Block/Report"}
+            Manage Users
           </button>
         )}
         {this.state.leavingDeleting && (
@@ -203,29 +221,31 @@ class ChatWindow extends Component {
         </button>
       </div>
       <div id="chatScrollBox" className="chatScrollBox">
-        {this.props.messages.map((message, index) => {
-          return (
-            <Message
-              key={message._id}
-              fromSelf={message.author === this.props.selfID}
-              content={message.contents}
-              image={this.props.chat.profiles[message.author].profilePicture}
-              name={this.props.chat.profiles[message.author].name}
-              timestamp={new Date(message.timestamp).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-              mergeTop={
-                index > 0 &&
-                message.author === this.props.messages[index - 1].author
-              }
-              mergeBottom={
-                index < this.props.messages.length - 1 &&
-                message.author === this.props.messages[index + 1].author
-              }
-            />
-          );
-        })}
+        {this.props.messages
+          .filter((m) => !this.props.blockedByMe.includes(m.author))
+          .map((message, index) => {
+            return (
+              <Message
+                key={message._id}
+                fromSelf={message.author === this.props.selfID}
+                content={message.contents}
+                image={this.props.chat.profiles[message.author].profilePicture}
+                name={this.props.chat.profiles[message.author].name}
+                timestamp={new Date(message.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+                mergeTop={
+                  index > 0 &&
+                  message.author === this.props.messages[index - 1].author
+                }
+                mergeBottom={
+                  index < this.props.messages.length - 1 &&
+                  message.author === this.props.messages[index + 1].author
+                }
+              />
+            );
+          })}
       </div>
       {
         <div
@@ -238,42 +258,78 @@ class ChatWindow extends Component {
             id="exit"
             className="exitButton"
             onClick={() =>
-              this.setState({ reportPressed: false, newUserIDs: [] })
+              this.setState({
+                reportPressed: false,
+                newUserIDs: [],
+                reportChecked: false,
+                blockChecked: false,
+              })
             }
           >
             Cancel
           </button>
 
-          <MultiSelect
-            value={this.state.newUserIDs}
-            onChange={(values) => this.setState({ newUserIDs: values })}
-            placeholder="Search for people"
-            searchable
-            data={this.props.chat.users
-              .filter((user) => user !== this.props.selfID)
-              .map((userID) => ({
-                value: userID,
-                label: this.props.chat.profiles[userID].name,
-              }))}
-          />
-          <div className="reportWindowCheckbox">
-            <input
-              type="checkbox"
-              onChange={(e) =>
-                this.setState({ blockChecked: e.target.checked })
-              }
-              checked={this.state.blockChecked}
-            />
-            <p style={{ marginRight: "15%" }}>Block users?</p>
-            <input
-              type="checkbox"
-              onChange={(e) =>
-                this.setState({ reportChecked: e.target.checked })
-              }
-              checked={this.state.reportChecked}
-            />
-            <p>Report users?</p>
+          <div className="reportWindowUserSelect">
+            <h3>Select Users</h3>
+            <p style={{ marginTop: 15 }}>
+              {this.props.chat.profiles[this.props.selfID].name} (you)
+            </p>
+            {this.props.chat &&
+              this.props.chat.profiles &&
+              Object.entries(this.props.chat.profiles)
+                .filter((entry) => entry[0] !== this.props.selfID)
+                .map((entry, i) => (
+                  <div key={i}>
+                    <input
+                      type="checkbox"
+                      onChange={(e) => {
+                        if (this.state.newUserIDs.includes(entry[0])) {
+                          this.setState({
+                            newUserIDs: [
+                              ...this.state.newUserIDs.filter(
+                                (id) => id !== entry[0]
+                              ),
+                            ],
+                          });
+                        } else {
+                          this.setState({
+                            newUserIDs: [...this.state.newUserIDs, entry[0]],
+                          });
+                        }
+                      }}
+                      checked={this.state.newUserIDs.includes(entry[0])}
+                    />
+                    <p>
+                      {entry[1].name}{" "}
+                      {!this.props.chat.users.includes(entry[0]) &&
+                        "(not present)"}
+                      {this.props.blockedByMe.includes(entry[0]) && "(blocked)"}
+                    </p>
+                  </div>
+                ))}
           </div>
+
+          {this.state.newUserIDs.length > 0 && (
+            <div className="reportWindowCheckbox">
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  this.setState({ blockChecked: e.target.checked })
+                }
+                checked={this.state.blockChecked}
+              />
+              <p style={{ marginRight: "15%" }}>Block users?</p>
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  this.setState({ reportChecked: e.target.checked })
+                }
+                checked={this.state.reportChecked}
+              />
+              <p>Report users?</p>
+            </div>
+          )}
+
           {this.state.reportChecked && (
             <textarea id="reason" placeholder="Reason for reporting" />
           )}
@@ -297,7 +353,13 @@ class ChatWindow extends Component {
           type="text"
           value={this.state.newMessage}
           placeholder="Aa"
-          onChange={(e) => this.setState({ newMessage: e.target.value })}
+          onChange={(e) => {
+            if (e.target.value.length > 1500) {
+              this.setState({ newMessage: e.target.value.slice(0, 1500) });
+            } else {
+              this.setState({ newMessage: e.target.value });
+            }
+          }}
           onKeyDown={this.onKeyDown}
         />
         <p
@@ -329,6 +391,8 @@ ChatWindow.propTypes = {
   editingTitle: PropTypes.bool.isRequired,
   leaveChat: PropTypes.func,
   deleteChat: PropTypes.func,
+  blockUsers: PropTypes.func,
+  blockedByMe: PropTypes.array,
 };
 
 export default ChatWindow;

@@ -358,6 +358,34 @@ router.post("/:user/report", (req, res) => {
   });
 });
 
+/**
+ * Block a user.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ */
+router.post("/:user/block", (req, res) => {
+  User.findById(req.params.user, (err, user) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    User.updateOne(
+      { _id: req.body.userID },
+      { $push: { blockList: req.params.user } },
+      { upsert: true }
+    )
+      .then(() => {
+        res.json({
+          success: true,
+        });
+      })
+      .catch(() => res.sendStatus(400));
+  });
+});
+
 module.exports = {
   router,
   login,

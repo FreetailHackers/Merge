@@ -29,6 +29,7 @@ class Swipe extends Component {
       //getting my swipeList
       let myswipeList = null;
       let myswipeReady = false;
+      let myBlockList = null;
       await axios
         .get(process.env.REACT_APP_API_URL + "/api/users/list", {
           params: {
@@ -41,6 +42,7 @@ class Swipe extends Component {
         })
         .then((res) => {
           myswipeList = res.data[0].swipeList;
+          myBlockList = res.data[0].blockList;
           if (
             res.data[0].profile[0] !== undefined &&
             "swipeReady" in res.data[0].profile[0]
@@ -62,10 +64,11 @@ class Swipe extends Component {
             let i = 0;
             while (i < res.data.length) {
               let temp = res.data[i];
-              console.log(temp);
               if (
                 !myswipeList.includes(temp._id) &&
+                !myBlockList.includes(temp._id) &&
                 temp._id !== this.props.auth.userID.id &&
+                !temp.blockList.includes(this.props.auth.userID.id) &&
                 this.containsRequired(temp)
               ) {
                 foundSomeone = true;
@@ -124,6 +127,7 @@ class Swipe extends Component {
       profilePosition: [0, 0],
       profileAngle: 0,
       profileSide: "neutral",
+      blockList: [],
     };
   }
 

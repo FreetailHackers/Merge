@@ -34,6 +34,8 @@ io.on("connection", (socket) => {
 
   socket.on("add-user", (data) => addUser(data, socket));
 
+  socket.on("block-users", (data) => blockUsers(data, socket));
+
   socket.on("rename-chat", (data) => renameChat(data, socket));
 
   socket.on("leave-chat", (data) => leaveChat(data, socket));
@@ -76,7 +78,7 @@ async function createRoom(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
     socket.join(data._id);
-    let fetched = await io.fetchSockets();
+    const fetched = await io.fetchSockets();
     let foundSocket = false;
     for (let fetchedSocket of fetched) {
       if (data.otherUsers.includes(fetchedSocket.data.mongoID)) {
@@ -96,7 +98,7 @@ async function addUser(data, socket) {
     const fetched = await io.fetchSockets();
     let foundSocket = false;
     for (let fetchedSocket of fetched) {
-      if (data.userID == fetchedSocket.data.mongoID) {
+      if (data.userID === fetchedSocket.data.mongoID) {
         foundSocket = true;
         socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
       } else if (
@@ -110,6 +112,20 @@ async function addUser(data, socket) {
     }
     if (!foundSocket) {
       console.error("Added users do not have sockets");
+    }
+  }
+}
+
+async function blockUsers(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    const fetched = await io.fetchSockets();
+    for (let fetchedSocket of fetched) {
+      if (data.users.includes(fetchedSocket.data.mongoID)) {
+        socket
+          .to(fetchedSocket.id)
+          .emit("blocked-by", { userID: socket.data.mongoID });
+      }
     }
   }
 }

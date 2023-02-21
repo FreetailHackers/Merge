@@ -40,6 +40,7 @@ const UserSchema = new Schema({
   ],
   //make this a set
   swipeList: [],
+  blockList: [],
 });
 
 module.exports = mongoose.model("users", UserSchema);
