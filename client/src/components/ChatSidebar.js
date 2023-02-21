@@ -58,7 +58,13 @@ const ChatSidebar = ({
       <ChatPreview
         key={i}
         active={i === activeChatIndex}
-        title={chat.name}
+        title={
+          chat.name
+            ? chat.name
+            : String(
+                chat.users.map((id) => `${chat.profiles[id].name}`)
+              ).replaceAll(",", ", ")
+        }
         chatRequest={chat.lastMessage === null}
         lastMessage={chat.lastMessage?.contents}
         lastMessageDate={chat.lastMessage?.timestamp}

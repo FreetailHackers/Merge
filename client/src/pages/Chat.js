@@ -22,6 +22,7 @@ class Chat extends Component {
       titleInput: "",
       userMap: {},
       otherUsers: [],
+      blockedByMe: [],
     };
     this.socket = io(process.env.REACT_APP_CHAT_URL, {
       transports: ["websocket"],
@@ -64,74 +65,67 @@ class Chat extends Component {
   }
 
   async componentDidMount() {
-    axios.get(process.env.REACT_APP_API_URL + "/api/users/list").then((res) => {
-      this.setState({
-        userMap: Object.fromEntries(
-          res.data.map((i) => [
-            i._id,
-            { name: i.name, profilePicture: i.profile[0]?.profilePictureUrl },
-          ])
-        ),
-        otherUsers: res.data.filter(
-          (user) => user._id && user._id !== this.props.userID.id
-        ),
-      });
-    });
-
     this.socket.emit("new-connection", { userID: this.props.userID.id });
-    axios
-      .get(process.env.REACT_APP_API_URL + "/api/chats")
-      .then(async (res) => {
-        for (const chat of res.data) {
-          // join websocket room
-          this.socket.emit("join-room", { id: chat._id });
-          chat.profiles = Object.fromEntries(
-            chat.users.map((id) => [id, this.state.userMap[id]])
-          );
-          chat.seen = chat.readBy.includes(this.props.userID.id);
-        }
-        this.setState({ chats: res.data });
-        if (res.data.length > 0) {
-          this.getMessages(0);
-        }
+    await axios
+      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+        params: {
+          start: 0,
+          limit: 0,
+          filters: {
+            _id: this.props.userID.id,
+          },
+        },
+      })
+      .then((res) => {
+        this.setState({ blockedByMe: res.data[0].blockList });
       });
 
-    this.socket.on("broadcast-message", (data) => {
-      this.setState({ messages: [...this.state.messages, data] });
-      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chat);
-      const chat = this.state.chats[chatIndex];
-      if (chatIndex !== this.state.activeChatIndex) {
-        chat.seen = false;
-      } else {
-        axios.post(
-          process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/read`
-        );
-      }
-      chat.lastMessage = data;
-      let chatStateCopy = [
-        chat,
-        ...this.state.chats.slice(0, chatIndex),
-        ...this.state.chats.slice(chatIndex + 1, this.state.chats.length),
-      ];
-      let newActiveChatIndex = this.state.activeChatIndex;
-      if (chatIndex === this.state.activeChatIndex) {
-        newActiveChatIndex = 0;
-      } else if (chatIndex > this.state.activeChatIndex) {
-        newActiveChatIndex++;
-      }
-      this.setState(
-        { chats: chatStateCopy, activeChatIndex: newActiveChatIndex },
-        () => {
-          newActiveChatIndex === 0 &&
-            document
-              .getElementById("chatScrollBox")
-              .scrollTo(
-                0,
-                document.getElementById("chatScrollBox").scrollHeight
+    axios
+      .get(process.env.REACT_APP_API_URL + "/api/users/list")
+      .then((res) => {
+        this.setState({
+          userMap: Object.fromEntries(
+            res.data.map((i) => [
+              i._id,
+              { name: i.name, profilePicture: i.profile[0]?.profilePictureUrl },
+            ])
+          ),
+          otherUsers: [
+            ...res.data.filter(
+              (user) => user._id && user._id !== this.props.userID.id
+            ),
+          ],
+        });
+      })
+      .then(() => {
+        axios
+          .get(process.env.REACT_APP_API_URL + "/api/chats")
+          .then(async (res) => {
+            for (const chat of res.data) {
+              // join websocket room
+              this.socket.emit("join-room", { id: chat._id });
+              chat.profiles = Object.fromEntries(
+                chat.users.map((id) => [id, this.state.userMap[id]])
               );
-        }
-      );
-    });
+              chat.seen = chat.readBy.includes(this.props.userID.id);
+            }
+            this.setState({ chats: res.data });
+            if (res.data.length > 0) {
+              this.getMessages(0);
+            }
+          })
+          .then(() => {
+            if (this.props.location.data) {
+              this.setState(
+                { newChatInput: this.props.location.data },
+                this.createChat
+              );
+              this.props.location.data = null;
+            }
+          });
+      });
+
+    this.socket.on("broadcast-message", this.broadcastMessageWS);
     this.socket.on("added-to-room", async (chat) => {
       chat.seen = false;
       this.socket.emit("join-room", { id: chat._id });
@@ -150,28 +144,71 @@ class Chat extends Component {
     this.socket.on("chat-deleted", (deletedChat) => {
       this.removeChatFromClient(deletedChat);
     });
-    this.socket.on("user-left", (data) => {
-      if (data.user === this.props.userID.id) {
-        this.removeChatFromClient(
-          this.state.chats.find((chat) => chat._id === data.chatID)
-        );
-      } else {
-        let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
-        if (chatIndex >= 0) {
-          let chat = this.state.chats[chatIndex];
-          chat.users = [...chat.users.filter((user) => user !== data.user)];
-          this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-        }
-      }
-    });
-
-    if (this.props.location.data) {
-      this.setState(
-        { newChatInput: [this.props.location.data] },
-        this.createChat
-      );
-    }
+    this.socket.on("user-left", this.userLeftWS);
+    this.socket.on("blocked-by", this.blockedWS);
   }
+
+  broadcastMessageWS = (data) => {
+    if (this.state.blockedByMe.includes(data.author)) return;
+    this.setState({ messages: [...this.state.messages, data] });
+    let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chat);
+    const chat = this.state.chats[chatIndex];
+    if (chatIndex !== this.state.activeChatIndex) {
+      chat.seen = false;
+    } else {
+      axios.post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/read`);
+    }
+    chat.lastMessage = data;
+    let chatStateCopy = [
+      chat,
+      ...this.state.chats.slice(0, chatIndex),
+      ...this.state.chats.slice(chatIndex + 1, this.state.chats.length),
+    ];
+    let newActiveChatIndex = this.state.activeChatIndex;
+    if (chatIndex === this.state.activeChatIndex) {
+      newActiveChatIndex = 0;
+    } else if (chatIndex > this.state.activeChatIndex) {
+      newActiveChatIndex++;
+    }
+    this.setState(
+      { chats: chatStateCopy, activeChatIndex: newActiveChatIndex },
+      () => {
+        newActiveChatIndex === 0 &&
+          document
+            .getElementById("chatScrollBox")
+            .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
+      }
+    );
+  };
+
+  userLeftWS = (data) => {
+    if (data.user === this.props.userID.id) {
+      this.removeChatFromClient(
+        this.state.chats.find((chat) => chat._id === data.chatID)
+      );
+    } else {
+      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
+      if (chatIndex >= 0) {
+        let chat = this.state.chats[chatIndex];
+        chat.users = [...chat.users.filter((user) => user !== data.user)];
+        this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+      }
+    }
+  };
+
+  blockedWS = (data) => {
+    let index = this.state.otherUsers.findIndex((u) => u._id === data.userID);
+    if (index > -1) {
+      let newUserObj = { ...this.state.otherUsers[index] };
+      newUserObj.blockList.push(this.props.userID.id);
+      let newOthUsers = [
+        ...this.state.otherUsers.slice(0, index),
+        newUserObj,
+        ...this.state.otherUsers.slice(index + 1),
+      ];
+      this.setState({ otherUsers: newOthUsers });
+    }
+  };
 
   componentWillUnmount() {
     this.socket.disconnect({ userID: this.props.userID.id });
@@ -207,7 +244,6 @@ class Chat extends Component {
   };
 
   async createChat() {
-    let name = this.props.userID.name;
     const users = this.state.newChatInput;
     for (const user of users) {
       if (!(user in this.state.userMap)) {
@@ -218,16 +254,13 @@ class Chat extends Component {
           name: data.name,
           profilePicture: data.profile[0]?.profilePictureUrl,
         };
-        name += ", " + profile.name;
         let newUserMap = { ...this.state.userMap };
         newUserMap[user] = profile;
         this.setState({ userMap: newUserMap });
-      } else {
-        name += ", " + this.state.userMap[user].name;
       }
     }
     axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/new`, { name })
+      .post(process.env.REACT_APP_API_URL + `/api/chats/new`)
       .then(async (res) => {
         let chat = res.data;
         chat.seen = true;
@@ -356,6 +389,13 @@ class Chat extends Component {
       });
   }
 
+  blockUsers(users) {
+    this.setState({
+      blockedByMe: [...new Set([...this.state.blockedByMe, ...users])],
+    });
+    this.socket.emit("block-users", { users });
+  }
+
   render() {
     return (
       <div style={{ display: "flex", width: "100%" }}>
@@ -370,7 +410,11 @@ class Chat extends Component {
           updateNewChatInput={(values) => {
             this.setState({ newChatInput: values });
           }}
-          otherUsers={this.state.otherUsers}
+          otherUsers={this.state.otherUsers.filter(
+            (user) =>
+              !this.state.blockedByMe.includes(user._id) &&
+              !user.blockList.includes(this.props.userID.id)
+          )}
         />
         {this.state.chats.length === 0 ? (
           <ChatMissing />
@@ -400,12 +444,16 @@ class Chat extends Component {
                 (user) =>
                   !this.state.chats[this.state.activeChatIndex].users.includes(
                     user._id
-                  )
+                  ) &&
+                  !this.state.blockedByMe.includes(user._id) &&
+                  !user.blockList.includes(this.props.userID.id)
               )
             }
             chat={this.state.chats[this.state.activeChatIndex]}
             deleteChat={this.deleteChat.bind(this)}
             leaveChat={this.leaveChat.bind(this)}
+            blockedByMe={this.state.blockedByMe}
+            blockUsers={this.blockUsers.bind(this)}
           />
         )}
       </div>

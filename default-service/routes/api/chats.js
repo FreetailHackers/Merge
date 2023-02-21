@@ -22,6 +22,7 @@ const router = express.Router();
 
 const Chat = require("../../models/Chat");
 const Message = require("../../models/Message");
+const User = require("../../models/User");
 const authenticateToken = require("../helpers/authentication");
 
 const MAX_CHAT_SIZE = 5;
@@ -167,6 +168,11 @@ async function post_add_function(req, res) {
       console.error("User attempting add not in chat");
       return res.sendStatus(403);
     }
+    const user = await User.findOne({ _id: req.body.user });
+    if (user.blockList.includes(chat.owner)) {
+      console.error("User attempting to add someone who blocked them");
+      res.sendStatus(403);
+    }
     chat.users.push(req.body.user);
     const saved = await chat.save();
     return res.json(saved);
@@ -220,7 +226,7 @@ async function post_remove_function(req, res) {
 async function post_rename_function(req, res) {
   try {
     const chat = await Chat.findOne({ _id: req.params.chat }).exec();
-    if (!req.body.name) {
+    if (!req.body.name && req.body.name !== "") {
       console.error("Name does not exist");
       return res.sendStatus(400);
     }
@@ -248,7 +254,7 @@ async function post_new_function(req, res) {
   try {
     let chat = new Chat({
       users: [req.user],
-      name: req.body.name,
+      name: req.body && req.body.name ? req.body.name : "",
       owner: req.user,
     });
     const saved = await chat.save();
