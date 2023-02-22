@@ -398,45 +398,49 @@ class Swipe extends Component {
             <Loading />
           </center>
         ) : this.state.usersLeft ? (
-          <SwipeProfile
-            name={this.state.userToShow.name}
-            school={this.state.userToShow.school}
-            intro={this.state.userToShow.intro}
-            // profilePictureUrl={this.state.userToShow.profilePictureUrl}
-            github={this.state.userToShow.github}
-            linkedin={this.state.userToShow.linkedin}
-            portfolio={this.state.userToShow.portfolio}
-            onMouseDown={this.mouseDownOnProfile}
-            relativePosition={this.state.profilePosition}
-            relativeAngle={this.state.profileAngle}
-            borderColor={this.state.profileSide}
-          />
+          <>
+            <SwipeProfile
+              name={this.state.userToShow.name}
+              school={this.state.userToShow.school}
+              intro={this.state.userToShow.intro}
+              // profilePictureUrl={this.state.userToShow.profilePictureUrl}
+              github={this.state.userToShow.github}
+              linkedin={this.state.userToShow.linkedin}
+              portfolio={this.state.userToShow.portfolio}
+              onMouseDown={this.mouseDownOnProfile}
+              relativePosition={this.state.profilePosition}
+              relativeAngle={this.state.profileAngle}
+              borderColor={this.state.profileSide}
+            />
+            <div className="arrows">
+              <input
+                type="image"
+                src={arrowLeft}
+                alt="Arrow Left"
+                className="arrow left"
+                id="left"
+                onClick={this.click}
+              />
+              <input
+                type="image"
+                src={arrowRight}
+                alt="Arrow Right"
+                className="arrow right"
+                id="right"
+                onClick={this.click}
+              />
+            </div>
+          </>
         ) : (
           <center>
             <label>
-              <font size="+20"> No Users Left to Swipe</font>{" "}
+              <p style={{ fontSize: "32px", marginTop: "10%" }}>
+                {" "}
+                No Users left to Swipe{" "}
+              </p>{" "}
             </label>
           </center>
         )}
-
-        <div className="arrows">
-          <input
-            type="image"
-            src={arrowLeft}
-            alt="Arrow Left"
-            className="arrow left"
-            id="left"
-            onClick={this.click}
-          />
-          <input
-            type="image"
-            src={arrowRight}
-            alt="Arror Right"
-            className="arrow right"
-            id="right"
-            onClick={this.click}
-          />
-        </div>
       </section>
     );
   }
