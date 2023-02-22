@@ -52,11 +52,46 @@ class Login extends Component {
   onRegister = (e) => {
     this.props.history.push("/register");
   };
+
   render() {
     const { errors } = this.state;
 
     return (
       <section id="login">
+        <div className="about">
+          <h4>
+            Merge is a team-matching and real-time chat app made with ❤️ by
+            Freetail Hackers.
+          </h4>
+          <p>
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href="https://freetailhackers.com/"
+            >
+              <strong>Freetail Hackers</strong>
+            </a>{" "}
+            is an organization centered at the University of Texas at Austin
+            that specializes in hosting hackathons.
+          </p>
+          <p>
+            We host two hackathons every year - our spring hackathon (
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href="https://freetailhackers.com/hack-the-future/"
+            >
+              Hack the Future 2023
+            </a>
+            !) , and our flagship event,{" "}
+            <a rel="noreferrer" target="_blank" href="https://hacktx.com/">
+              <strong>HackTX</strong>
+            </a>{" "}
+            , in the fall.
+          </p>
+          <p>We hope to see you at one of our events!</p>
+        </div>
+
         <form id="fields">
           <div className="logo" />
           <hr />
@@ -88,7 +123,7 @@ class Login extends Component {
           </span>
 
           <button onClick={this.onSubmit} className="action" type="submit">
-            Logon
+            Login
           </button>
           <span className="error">{errors.status}</span>
           <button onClick={this.onRegister} className="action" type="submit">

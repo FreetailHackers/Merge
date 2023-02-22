@@ -52,11 +52,56 @@ class Register extends Component {
     this.props.registerUser(userData);
   };
 
+  termsOfService() {
+    const e = document.getElementById("termsofservice");
+    e.style.display = "block";
+  }
+
+  closeTOS() {
+    const e = document.getElementById("termsofservice");
+    e.style.display = "none";
+  }
+
+  onBack = () => {
+    this.props.history.push("/");
+  };
+
   render() {
     const { errors } = this.state;
 
     return (
-      <section id="login">
+      <section id="register">
+        <div className="terms" id="termsofservice">
+          <strong>Terms of Service</strong>
+          <ol type="1">
+            <li>
+              Follow the{" "}
+              <a
+                rel="noreferrer"
+                target="_blank"
+                href="https://static.mlh.io/docs/mlh-code-of-conduct.pdf"
+              >
+                MLH Code of Conduct.
+              </a>
+            </li>
+            <li>Use your real name in your profile.</li>
+            <li>Avoid using slurs or offensive sentiments.</li>
+            <li>Avoid pretending to be a organizer/mentor/sponsor.</li>
+            <li>
+              Do not provide or request help on projects that may break laws,
+              breach terms of services, be considered malicious /inappropriate
+              or be for graded coursework/exams.
+            </li>
+            <li>
+              Freetail Hackers reserves the right to take action against any
+              harmful behavior not necessarily outlined here.
+            </li>
+          </ol>
+          <button className="closetos" onClick={this.closeTOS}>
+            Confirm
+          </button>
+        </div>
+
         <form noValidate onSubmit={this.onRegister}>
           <div className="logo" />
           <hr />
@@ -112,7 +157,22 @@ class Register extends Component {
             {errors.password2incorrect}
           </span>
           <button type="submit">Register</button>
+          <button type="submit" className="action" onClick={this.onBack}>
+            Go Back
+          </button>
           <span className="error">{errors.status}</span>
+          <br />
+          <br />
+          <p id="ToS">
+            <strong>By using Merge, you agree to our</strong>{" "}
+            <a
+              type="button"
+              href="#termsofservice"
+              onClick={this.termsOfService}
+            >
+              <strong>Terms of Service</strong>
+            </a>
+          </p>
         </form>
       </section>
     );
