@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser, setCurrentUser } from "../actions/authActions";
@@ -150,6 +150,63 @@ class Edit extends Component {
     });
   };
 
+  Demo = () => {
+    const [data, setData] = useState([
+      { value: "python", label: "Python" },
+      { value: "java", label: "Java" },
+      { value: "c", label: "C" },
+      { value: "c++", label: "C++" },
+      { value: "c#", label: "C#" },
+      { value: "rust", label: "Rust" },
+      { value: "javascript", label: "JavaScript" },
+      { value: "typescript", label: "TypeScript" },
+      { value: "html", label: "HTML" },
+      { value: "css", label: "CSS" },
+      { value: "go", label: "Go" },
+      { value: "lua", label: "Lua" },
+      { value: "swift", label: "Swift" },
+      { value: "php", label: "PhP" },
+      { value: "react", label: "React" },
+      { value: "reactnative", label: "React Native" },
+      { value: "express", label: "Express" },
+      { value: "mongodb", label: "MongoDB" },
+      { value: "postgresql", label: "PostGreSQL" },
+      { value: "prisma", label: "Prisma" },
+      { value: "nextjs", label: "NextJS" },
+      { value: "sveltejs", label: "SvelteJS" },
+      { value: "vuejs", label: "VueJS" },
+      { value: "angularjs", label: "AngularJS" },
+      { value: "spring", label: "Spring" },
+      { value: "flutter", label: "Flutter" },
+      { value: "flask", label: "Flask" },
+      { value: "django", label: "Django" },
+      { value: "swiftui", label: "SwiftUI" },
+      { value: "laravel", label: "Laravel" },
+    ]);
+
+    return (
+      <MultiSelect
+        label="Skills"
+        data={data}
+        searchable
+        creatable
+        clearable
+        getCreateLabel={(query) => `+ Create ${query}`}
+        onCreate={(query) => {
+          const item = { value: query, label: query };
+          setData((current) => [...current, item]);
+          return item;
+        }}
+        placeholder="Python, Java, C, etc."
+        nothingFound="Nothing found"
+        value={this.state.userProfile.skills}
+        onChange={(value) => this.setProfile("skills", value)}
+        className="question"
+        error={this.state.userProfile.skills?.length === 0 ? "Required" : ""}
+        required
+      />
+    );
+  };
   render() {
     return (
       <div className="profile-container">
@@ -257,28 +314,7 @@ class Edit extends Component {
                 onChange={(value) => this.setProfile("hours", value)}
                 className="question"
               />
-              <MultiSelect
-                data={[
-                  { value: "python", label: "Python" },
-                  { value: "java", label: "Java" },
-                  { value: "c", label: "C" },
-                  { value: "react", label: "React" },
-                  { value: "express", label: "Express" },
-                  { value: "mongodb", label: "MongoDB" },
-                ]}
-                label="Skills"
-                searchable
-                creatable
-                placeholder="Python, Java, C, etc."
-                nothingFound="Nothing found"
-                value={this.state.userProfile.skills}
-                onChange={(value) => this.setProfile("skills", value)}
-                className="question"
-                error={
-                  this.state.userProfile.skills?.length === 0 ? "Required" : ""
-                }
-                required
-              />
+              <this.Demo />
               <NativeSelect
                 label="Years of coding experience"
                 placeholder="Pick one"
