@@ -379,6 +379,8 @@ class Edit extends Component {
             name={this.state.userProfile.name}
             school={this.state.userProfile.school}
             intro={this.state.userProfile.intro}
+            linkedin={this.state.userProfile.linkedin}
+            github={this.state.userProfile.github}
             // profilePictureUrl={this.state.profilePictureUrl}
           />
         </div>
