@@ -129,8 +129,6 @@ class Login extends Component {
           <button onClick={this.onRegister} className="action" type="submit">
             Register
           </button>
-          <br />
-          <br />
         </form>
       </section>
     );

@@ -1,0 +1,27 @@
+.about-page {
+  width: 100vw;
+}
+
+.about-page p,
+.about-page h3 {
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width:80%;
+  text-align: left;
+  padding:0 100px 0 0;
+  font-size: 18px;
+  line-height: 1.5rem;
+}
+
+.about-page p {
+  text-indent: 2rem;
+}
+
+.about-page h1 {
+  padding: 10px 0px 20px 0px;
+  display: block;
+  text-align: center;
+  width: 100%;
+  font-size: 32px;
+}

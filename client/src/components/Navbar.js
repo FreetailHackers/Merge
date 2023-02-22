@@ -30,6 +30,7 @@ const Navbar = (props) => {
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
+        <NavLink to="/about">About</NavLink>
       </nav>
     </div>
   );
