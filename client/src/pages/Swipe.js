@@ -7,7 +7,7 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
-
+import "./Dashboard.css";
 class Swipe extends Component {
   containsRequired(data) {
     let userProfile = data.profile[0];
@@ -48,11 +48,13 @@ class Swipe extends Component {
             "swipeReady" in res.data[0].profile[0]
           )
             myswipeReady = res.data[0].profile[0].swipeReady;
+          this.state.swipeReady = myswipeReady;
         });
       if (!myswipeReady) {
         this.setState({
           usersLeft: false,
           loadingUserToShow: false,
+          swipeReady: false,
         });
       } else {
         axios
@@ -121,6 +123,7 @@ class Swipe extends Component {
     this.state = {
       loadingUserToShow: true,
       usersLeft: true,
+      swipeReady: true,
       userToShow: {},
       cursorDown: false,
       mouseDownPosition: [0, 0],
@@ -431,14 +434,35 @@ class Swipe extends Component {
               />
             </div>
           </>
+        ) : !this.state.swipeReady ? (
+          <center>
+            <label>
+              <p style={{ fontSize: "20px", marginTop: "15%" }}>
+                {" "}
+                Please Make Sure Your Profile is Completed
+              </p>{" "}
+            </label>
+            <div className="team-image">
+              <div className="background" />
+              <div className="main" />
+              <div className="primary" />
+              <div className="secondary" />
+            </div>
+          </center>
         ) : (
           <center>
             <label>
-              <p style={{ fontSize: "32px", marginTop: "10%" }}>
+              <p style={{ fontSize: "20px", marginTop: "15%" }}>
                 {" "}
                 No Users left to Swipe{" "}
               </p>{" "}
             </label>
+            <div className="team-image">
+              <div className="background" />
+              <div className="main" />
+              <div className="primary" />
+              <div className="secondary" />
+            </div>
           </center>
         )}
       </section>
