@@ -15,16 +15,6 @@ class Login extends Component {
     };
   }
 
-  termsOfService() {
-    const e = document.getElementById("termsofservice");
-    e.style.display = "block";
-  }
-
-  closeTOS() {
-    const e = document.getElementById("termsofservice");
-    e.style.display = "none";
-  }
-
   componentDidMount() {
     // If logged in and user navigates to Login page, should redirect them to dashboard
     if (this.props.auth.isAuthenticated) {
@@ -139,6 +129,8 @@ class Login extends Component {
           <button onClick={this.onRegister} className="action" type="submit">
             Register
           </button>
+          <br />
+          <br />
         </form>
       </section>
     );
