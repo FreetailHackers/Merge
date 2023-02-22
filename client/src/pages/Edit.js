@@ -126,12 +126,13 @@ class Edit extends Component {
 
   cancelEdit = async (e) => {
     e.preventDefault();
-    this.setState(this.baseState);
     this.props.setCurrentUser(this.props.userID, {
       ...this.props.user,
       profile: this.baseState.userProfile,
       // profilePictureUrl: this.baseState.profilePictureUrl,
     });
+
+    this.setState(this.baseState);
 
     axios
       .post(process.env.REACT_APP_API_URL + "user/", {
