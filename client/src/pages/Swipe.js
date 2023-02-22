@@ -455,7 +455,7 @@ class Swipe extends Component {
               <p style={{ fontSize: "20px", marginTop: "15%" }}>
                 {" "}
                 No Users left to Swipe{" "}
-              </p>{" "}
+              </p>
             </label>
             <div className="team-image">
               <div className="background" />

@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
+import About from "./pages/About";
 
 import "./Theme.css";
 import "./App.css";
@@ -47,6 +48,7 @@ class App extends Component {
             <PrivateRoute exact path="/swipe" component={Swipe} />
             <PrivateRoute exact path="/edit" component={Edit} />
             <PrivateRoute exact path="/chat" component={Chat} />
+            <Route exact path="/about" component={About} />
           </div>
         </Router>
       </Provider>

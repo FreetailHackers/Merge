@@ -268,6 +268,7 @@ class Edit extends Component {
                 ]}
                 label="Skills"
                 searchable
+                creatable
                 placeholder="Python, Java, C, etc."
                 nothingFound="Nothing found"
                 value={this.state.userProfile.skills}
