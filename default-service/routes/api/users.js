@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
 var formidable = require("formidable");
 var fs = require("fs");
 const fetch = require("node-fetch");
@@ -132,7 +131,7 @@ function login(req, res) {
           // Sign token
           jwt.sign(
             payload,
-            keys.secretOrKey,
+            process.env.SECRETORKEY,
             {
               expiresIn: 31556926, // 1 year in seconds
             },
@@ -189,7 +188,7 @@ function register_func(req, res) {
               // Sign token
               jwt.sign(
                 payload,
-                keys.secretOrKey,
+                process.env.SECRETORKEY,
                 {
                   expiresIn: 31556926, // 1 year in seconds
                 },

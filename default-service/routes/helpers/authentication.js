@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
 
 module.exports = function authenticateToken(req, res, next) {
   const authHeader = req.headers["x-access-token"];
@@ -7,7 +6,7 @@ module.exports = function authenticateToken(req, res, next) {
   if (!token) {
     return res.sendStatus(401);
   }
-  jwt.verify(token, keys.secretOrKey, (err, decoded) => {
+  jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
     if (err) {
       return res.sendStatus(403);
     }
