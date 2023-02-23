@@ -145,11 +145,11 @@ class Chat extends Component {
       this.removeChatFromClient(deletedChat);
     });
     this.socket.on("user-left", this.userLeftWS);
-    this.socket.on("blocked-by", this.blockedWS);
+    this.socket.on("blocked-by", (data) => this.blockedWS(data, true));
+    this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
   }
 
   broadcastMessageWS = (data) => {
-    if (this.state.blockedByMe.includes(data.author)) return;
     this.setState({ messages: [...this.state.messages, data] });
     let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chat);
     const chat = this.state.chats[chatIndex];
@@ -158,7 +158,9 @@ class Chat extends Component {
     } else {
       axios.post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/read`);
     }
-    chat.lastMessage = data;
+    if (!this.state.blockedByMe.includes(data.author)) {
+      chat.lastMessage = data;
+    }
     let chatStateCopy = [
       chat,
       ...this.state.chats.slice(0, chatIndex),
@@ -196,11 +198,17 @@ class Chat extends Component {
     }
   };
 
-  blockedWS = (data) => {
+  blockedWS = (data, blocked) => {
     let index = this.state.otherUsers.findIndex((u) => u._id === data.userID);
     if (index > -1) {
       let newUserObj = { ...this.state.otherUsers[index] };
-      newUserObj.blockList.push(this.props.userID.id);
+      if (blocked) {
+        newUserObj.blockList.push(this.props.userID.id);
+      } else {
+        newUserObj.blockList = [
+          ...newUserObj.blockList.filter((e) => e !== this.props.userID.id),
+        ];
+      }
       let newOthUsers = [
         ...this.state.otherUsers.slice(0, index),
         newUserObj,
@@ -396,6 +404,15 @@ class Chat extends Component {
     this.socket.emit("block-users", { users });
   }
 
+  unblockUsers(users) {
+    this.setState({
+      blockedByMe: [
+        ...this.state.blockedByMe.filter((u) => !users.includes(u)),
+      ],
+    });
+    this.socket.emit("unblock-users", { users });
+  }
+
   render() {
     return (
       <div style={{ display: "flex", width: "100%" }}>
@@ -454,6 +471,7 @@ class Chat extends Component {
             leaveChat={this.leaveChat.bind(this)}
             blockedByMe={this.state.blockedByMe}
             blockUsers={this.blockUsers.bind(this)}
+            unblockUsers={this.unblockUsers.bind(this)}
           />
         )}
       </div>

@@ -350,6 +350,8 @@ router.post("/:user/report", (req, res) => {
     var newReport = new Report({
       contents: req.body.contents,
       reported: req.params.user,
+      reporter: req.body.reporter,
+      chatOrigin: req.body.chatID,
     });
     newReport
       .save()
@@ -376,6 +378,33 @@ router.post("/:user/block", (req, res) => {
       { _id: req.body.userID },
       { $push: { blockList: req.params.user } },
       { upsert: true }
+    )
+      .then(() => {
+        res.json({
+          success: true,
+        });
+      })
+      .catch(() => res.sendStatus(400));
+  });
+});
+
+/**
+ * Unblock a user.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ */
+router.post("/:user/unblock", (req, res) => {
+  User.findById(req.params.user, (err, user) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    User.updateOne(
+      { _id: req.body.userID },
+      { $pull: { blockList: req.params.user } }
     )
       .then(() => {
         res.json({

@@ -36,6 +36,8 @@ io.on("connection", (socket) => {
 
   socket.on("block-users", (data) => blockUsers(data, socket));
 
+  socket.on("unblock-users", (data) => unblockUsers(data, socket));
+
   socket.on("rename-chat", (data) => renameChat(data, socket));
 
   socket.on("leave-chat", (data) => leaveChat(data, socket));
@@ -125,6 +127,20 @@ async function blockUsers(data, socket) {
         socket
           .to(fetchedSocket.id)
           .emit("blocked-by", { userID: socket.data.mongoID });
+      }
+    }
+  }
+}
+
+async function unblockUsers(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    const fetched = await io.fetchSockets();
+    for (let fetchedSocket of fetched) {
+      if (data.users.includes(fetchedSocket.data.mongoID)) {
+        socket
+          .to(fetchedSocket.id)
+          .emit("unblocked-by", { userID: socket.data.mongoID });
       }
     }
   }
