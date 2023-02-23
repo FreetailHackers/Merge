@@ -243,6 +243,8 @@ class ChatWindow extends Component {
         {this.props.messages
           .filter((m) => !this.props.blockedByMe.includes(m.author))
           .map((message, index) => {
+            const msgDate = new Date(message.timestamp);
+            const nowDate = new Date();
             return (
               <Message
                 key={message._id}
@@ -250,15 +252,17 @@ class ChatWindow extends Component {
                 content={message.contents}
                 image={this.props.chat.profiles[message.author].profilePicture}
                 name={this.props.chat.profiles[message.author].name}
-                timestamp={`${
-                  message.timestamp.substring(0, 10) !==
-                  new Date().toISOString().substring(0, 10)
-                    ? new Date(message.timestamp).toDateString().slice(4) + " "
-                    : ""
-                }${new Date(message.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}`}
+                timestamp={
+                  (msgDate.getDate() !== nowDate.getDate() ||
+                  msgDate.getMonth() !== nowDate.getMonth() ||
+                  msgDate.getFullYear() !== nowDate.getFullYear()
+                    ? msgDate.toDateString().slice(4) + " "
+                    : "") +
+                  msgDate.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                }
                 mergeTop={
                   index > 0 &&
                   message.author === this.props.messages[index - 1].author
