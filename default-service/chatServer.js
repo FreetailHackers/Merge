@@ -21,6 +21,28 @@ const pubClient = createClient({ url: process.env.REDIS_URL });
 const subClient = pubClient.duplicate();
 io.adapter(redisAdapter(pubClient, subClient));
 
+const jwt = require("jsonwebtoken");
+
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    const authHeader = socket.handshake.query.token;
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) {
+      next(new Error("Token not in correct format"));
+    }
+    next(
+      jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
+        if (err) {
+          return new Error(err.mesage);
+        }
+        socket.request.user = decoded.id;
+      })
+    );
+  } else {
+    next(new Error("invalid"));
+  }
+});
+
 io.on("connection", (socket) => {
   // handles new connection
   socket.on("new-connection", (data) => newConnection(data, socket));
