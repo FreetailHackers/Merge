@@ -24,7 +24,8 @@
 }
 
 .chatPreview div.text {
-  flex-grow: 2;
+  width: calc(100% - 70px);
+  overflow: hidden;
 }
 
 .chatPreview h4,
@@ -49,8 +50,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
   vertical-align: top;
+}
+
+.chatPreview h4 {
+  width: 100%;
 }
 
 .chatPreview.unread p,
@@ -81,14 +85,13 @@
 }
 
 .chatPicture {
-  width: 45px;
-  height: 45px;
   margin-right: 10px;
   margin-left: 5px;
   background-size: cover;
   background-position: center;
-  border-radius: 50%;
-  position: relative
+  position: relative;
+  width: 45px;
+  height: 45px;
 }
 
 .chatPreview .unreadBubble {

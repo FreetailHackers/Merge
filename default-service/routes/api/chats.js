@@ -69,10 +69,15 @@ async function get_default_function(req, res) {
       result.push(chat);
       // Sort chats in reverse chronological order; i.e., most recent on top
       result.sort((a, b) => {
-        if (!a.lastMessage && !b.lastMessage) return 0;
-        // Put chat requests on top
-        if (!a.lastMessage) return -1;
-        if (!b.lastMessage) return 1;
+        if (!a.lastMessage && !b.lastMessage) {
+          return b.created - a.created;
+        }
+        if (!a.lastMessage) {
+          return b.lastMessage.timestamp - a.created;
+        }
+        if (!b.lastMessage) {
+          return b.created - a.lastMessage.timestamp;
+        }
         return b.lastMessage.timestamp - a.lastMessage.timestamp;
       });
     }

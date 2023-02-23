@@ -250,10 +250,15 @@ class ChatWindow extends Component {
                 content={message.contents}
                 image={this.props.chat.profiles[message.author].profilePicture}
                 name={this.props.chat.profiles[message.author].name}
-                timestamp={new Date(message.timestamp).toLocaleTimeString([], {
+                timestamp={`${
+                  message.timestamp.substring(0, 10) !==
+                  new Date().toISOString().substring(0, 10)
+                    ? new Date(message.timestamp).toDateString().slice(4) + " "
+                    : ""
+                }${new Date(message.timestamp).toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",
-                })}
+                })}`}
                 mergeTop={
                   index > 0 &&
                   message.author === this.props.messages[index - 1].author
