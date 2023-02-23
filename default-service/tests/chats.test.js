@@ -147,7 +147,7 @@ describe("create new chat", () => {
   test("should create new chat", async () => {
     const req = {
       user: fakeId,
-      body: { name: "fakename" },
+      body: { name: "fakename", id: "fakeid" },
     };
     mockingoose(Chat).toReturn(mockChatData, "save");
     await chats.post_new_function(req, res);

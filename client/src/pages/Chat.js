@@ -26,6 +26,7 @@ class Chat extends Component {
     };
     this.socket = io(process.env.REACT_APP_CHAT_URL, {
       transports: ["websocket"],
+      query: { token: localStorage.jwtToken },
     });
   }
 

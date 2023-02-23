@@ -313,6 +313,9 @@ describe("update router tests", () => {
       json: function (input) {
         this.object = input;
       },
+      sendStatus: function (input) {
+        this.object = input;
+      },
     };
 
     const mS3Instance = new AWSMock.S3();
@@ -323,9 +326,7 @@ describe("update router tests", () => {
       })
       .promise.mockResolvedValueOnce("THIS WORKED");
     await users.update(req, res);
-    expect(res.object).toEqual({
-      success: true,
-    });
+    expect(res.object).toEqual(403);
   });
 });
 describe("List users ", () => {

@@ -8,7 +8,7 @@ module.exports = function authenticateToken(req, res, next) {
   }
   jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     }
     req.user = decoded.id;
     next();

@@ -19,6 +19,7 @@ const Report = require("../../models/Report");
 //AWS credentials
 require("dotenv").config();
 const AWS = require("aws-sdk");
+// const { authenticate } = require("passport");
 const ID = process.env.AWS_ID;
 const SECRET = process.env.AWS_SECRET;
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
@@ -38,19 +39,23 @@ router.post("/login", async (req, res) => login(req, res));
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.post("/update", async (req, res) => update(req, res));
+router.post("/update", authenticateToken, async (req, res) => update(req, res));
 
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.get("/list", async (req, res) => list_func(req, res));
+router.get("/list", authenticateToken, async (req, res) => list_func(req, res));
 
-router.post("/swipe", async (req, res) => swipe(req, res));
+router.post("/swipe", authenticateToken, async (req, res) => swipe(req, res));
 
 // @route POST api/users/list
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.post("/profile-picture", async (req, res) => {
+router.post("/profile-picture", authenticateToken, async (req, res) => {
+  const id = req.body.id;
+  if (req.id !== id) {
+    return res.sendStatus(403);
+  }
   const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) return res.json({ err: err.message });
@@ -68,6 +73,11 @@ router.get("/github/user", async (req, res) => {
 });
 
 async function list_func(req, res) {
+  const id = req.body?.id;
+  if (req.id !== id) {
+    return res.sendStatus(403);
+  }
+
   // Parse query parameters
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
@@ -213,6 +223,10 @@ function register_func(req, res) {
 }
 
 async function swipe(req, res) {
+  const id = req.body?.id;
+  if (req.id !== id) {
+    return res.sendStatus(403);
+  }
   const options = {
     upsert: true,
   };
@@ -278,6 +292,9 @@ async function s3Upload(file_name, files, res) {
 
 async function update(req, res) {
   const id = req.body.id;
+  if (req.id !== id) {
+    return res.sendStatus(403);
+  }
   const profile = req.body.update;
   const options = {
     upsert: true,
