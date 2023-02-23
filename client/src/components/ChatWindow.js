@@ -69,19 +69,38 @@ class ChatWindow extends Component {
       for (const user of this.state.newUserIDs) {
         axios.post(
           process.env.REACT_APP_API_URL + "/api/users/" + user + "/report",
-          { contents }
+          {
+            contents: contents,
+            reporter: this.props.selfID,
+            chatID: this.props.chat._id,
+          }
         );
       }
       document.getElementById("reason").value = "";
     }
     if (this.state.blockChecked) {
-      for (const user of this.state.newUserIDs) {
-        axios.post(
-          process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
-          { userID: this.props.selfID }
-        );
+      const allBlocked = this.state.newUserIDs.every((e) =>
+        this.props.blockedByMe.includes(e)
+      );
+      const allNotBlocked = this.state.newUserIDs.every(
+        (e) => !this.props.blockedByMe.includes(e)
+      );
+      if (allBlocked || allNotBlocked) {
+        for (const user of this.state.newUserIDs) {
+          axios.post(
+            process.env.REACT_APP_API_URL +
+              "/api/users/" +
+              user +
+              `/${allBlocked ? "un" : ""}block`,
+            { userID: this.props.selfID }
+          );
+        }
+        if (allBlocked) {
+          this.props.unblockUsers(this.state.newUserIDs);
+        } else {
+          this.props.blockUsers(this.state.newUserIDs);
+        }
       }
-      this.props.blockUsers(this.state.newUserIDs);
     }
     this.setState({
       reportPressed: false,
@@ -311,14 +330,36 @@ class ChatWindow extends Component {
 
           {this.state.newUserIDs.length > 0 && (
             <div className="reportWindowCheckbox">
-              <input
-                type="checkbox"
-                onChange={(e) =>
-                  this.setState({ blockChecked: e.target.checked })
-                }
-                checked={this.state.blockChecked}
-              />
-              <p style={{ marginRight: "15%" }}>Block users?</p>
+              {(this.state.newUserIDs.every((e) =>
+                this.props.blockedByMe.includes(e)
+              ) ||
+                this.state.newUserIDs.every(
+                  (e) => !this.props.blockedByMe.includes(e)
+                )) && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginRight: "15%",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    onChange={(e) =>
+                      this.setState({ blockChecked: e.target.checked })
+                    }
+                    checked={this.state.blockChecked}
+                  />
+                  <p>
+                    {this.state.newUserIDs.every((e) =>
+                      this.props.blockedByMe.includes(e)
+                    )
+                      ? "Unblock"
+                      : "Block"}{" "}
+                    users?
+                  </p>
+                </div>
+              )}
               <input
                 type="checkbox"
                 onChange={(e) =>
@@ -392,6 +433,7 @@ ChatWindow.propTypes = {
   leaveChat: PropTypes.func,
   deleteChat: PropTypes.func,
   blockUsers: PropTypes.func,
+  unblockUsers: PropTypes.func,
   blockedByMe: PropTypes.array,
 };
 

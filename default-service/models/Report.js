@@ -10,6 +10,14 @@ const ReportSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  reporter: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  chatOrigin: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("reports", ReportSchema);
