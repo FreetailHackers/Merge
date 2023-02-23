@@ -6,35 +6,38 @@ const ChatPreview = ({
   title,
   lastMessage,
   lastMessageDate,
-  profilePictures,
+  profiles,
   seen,
   onClick,
   active,
   chatRequest,
+  createdByYou,
 }) => (
   <div
     className={
       "chatPreview" +
-      (chatRequest && !active
+      (chatRequest && !active && !createdByYou
         ? " chatrequest"
         : (!seen ? " unread" : "") + (active ? " active" : ""))
     }
     onClick={onClick}
   >
-    {/*<div
-      style={{
-        backgroundImage:
-          profilePictures.length === 1 ? `url(${profilePictures[0]})` : "none",
-      }}
+    <div
+      style={
+        profiles.length === 1 && profiles[0].profilePicture
+          ? {
+              backgroundImage: `url(${profiles[0].profilePicture})`,
+            }
+          : {}
+      }
       className="chatPicture"
     >
-      {profilePictures?.length > 1 &&
-        profilePictures.map((pic, i) => {
+      {profiles?.length > 1 &&
+        profiles.map((prof, i) => {
           const mu = Math.sqrt(
-            (1 - Math.cos((2 * Math.PI) / profilePictures.length)) / 2
+            (1 - Math.cos((2 * Math.PI) / profiles.length)) / 2
           );
-          const theta =
-            Math.PI / 2 + (2 * Math.PI * i) / profilePictures.length;
+          const theta = Math.PI / 2 + (2 * Math.PI * i) / profiles.length;
           const size = (45 * mu) / (1 + mu);
           const r = 45 / 2 / (1 + mu);
           const top = 45 / 2 - r * Math.sin(theta) - size / 2;
@@ -43,7 +46,7 @@ const ChatPreview = ({
             <div
               key={i}
               style={{
-                backgroundImage: `url("${pic}")`,
+                backgroundImage: `url("${prof.profilePicture}")`,
                 position: "absolute",
                 top: top,
                 left: left,
@@ -53,15 +56,46 @@ const ChatPreview = ({
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
-            />
+            >
+              {!prof.profilePicture && (
+                <svg height="100%" width="100%" viewBox="0 0 45 45 ">
+                  <circle
+                    r={22.5}
+                    cx={22.5}
+                    cy={22.5}
+                    fill="#ddd"
+                    border="none"
+                  />
+                  {prof.name && (
+                    <text
+                      fontSize="22"
+                      x="50%"
+                      y="50%"
+                      dominantBaseline="middle"
+                      textAnchor="middle"
+                      fill="black"
+                    >
+                      {prof.name
+                        .split(" ")
+                        .map((s) => s[0])
+                        .join("")
+                        .toUpperCase()}
+                    </text>
+                  )}
+                </svg>
+              )}
+            </div>
           );
         })}
-    </div>*/}
+    </div>
     <div className="text">
       <h4>{title}</h4>
       {chatRequest ? (
         <p>
-          <span className="messagePreview"> incoming chat request! </span>
+          <span className="messagePreview">
+            {" "}
+            {createdByYou ? "No messages yet" : "incoming chat request!"}{" "}
+          </span>
         </p>
       ) : (
         <p>
@@ -82,8 +116,9 @@ ChatPreview.propTypes = {
   onClick: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
   chatRequest: PropTypes.bool.isRequired,
+  createdByYou: PropTypes.bool.isRequired,
   title: PropTypes.string.isRequired,
-  profilePictures: PropTypes.arrayOf(PropTypes.string),
+  profiles: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ChatPreview;

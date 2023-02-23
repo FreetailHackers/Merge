@@ -432,6 +432,7 @@ class Chat extends Component {
               !this.state.blockedByMe.includes(user._id) &&
               !user.blockList.includes(this.props.userID.id)
           )}
+          selfID={this.props.userID.id}
         />
         {this.state.chats.length === 0 ? (
           <ChatMissing />

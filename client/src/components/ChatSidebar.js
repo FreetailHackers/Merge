@@ -14,6 +14,7 @@ const ChatSidebar = ({
   chats,
   changeChat,
   activeChatIndex,
+  selfID,
 }) => (
   <div className="chatSidebar">
     <div className="chatSidebarTop">
@@ -65,12 +66,11 @@ const ChatSidebar = ({
                 chat.users.map((id) => `${chat.profiles[id].name}`)
               ).replaceAll(",", ", ")
         }
+        createdByYou={chat.owner === selfID}
         chatRequest={chat.lastMessage === null}
         lastMessage={chat.lastMessage?.contents}
         lastMessageDate={chat.lastMessage?.timestamp}
-        // profilePictures={chat.users.map(
-        //   (user) => chat.profiles[user].profilePicture
-        // )}
+        profiles={chat.users.map((user) => chat.profiles[user])}
         seen={chat.seen}
         onClick={() => changeChat(i)}
       />
@@ -89,6 +89,7 @@ ChatSidebar.propTypes = {
   otherUsers: PropTypes.arrayOf(PropTypes.object),
   creatingNewChat: PropTypes.bool,
   setCreatingNewChat: PropTypes.func,
+  selfID: PropTypes.string.isRequired,
 };
 
 export default ChatSidebar;

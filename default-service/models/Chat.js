@@ -22,6 +22,10 @@ const ChatSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("chats", ChatSchema);
