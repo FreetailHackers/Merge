@@ -254,6 +254,7 @@ class Chat extends Component {
 
   async createChat() {
     const users = this.state.newChatInput;
+    if (users.length > 5) return;
     for (const user of users) {
       if (!(user in this.state.userMap)) {
         const { data } = await axios.get(
@@ -300,6 +301,7 @@ class Chat extends Component {
 
   addUsers(newUserIDs) {
     const chat = this.state.chats[this.state.activeChatIndex];
+    if (chat.users.length + newUserIDs.length > 5) return;
     for (const user of newUserIDs) {
       axios
         .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`, {

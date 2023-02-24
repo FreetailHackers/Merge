@@ -163,6 +163,7 @@ class ChatWindow extends Component {
               </button>
             )}
             {!this.state.reportPressed &&
+              this.props.chat.users.length < 5 &&
               (!this.state.addingUsers || this.state.newUserIDs.length > 0) && (
                 <button
                   className="themeButton"
@@ -176,7 +177,7 @@ class ChatWindow extends Component {
                     }
                   }}
                 >
-                  Add User
+                  Add Users
                 </button>
               )}
           </div>
@@ -184,7 +185,17 @@ class ChatWindow extends Component {
             <MultiSelect
               style={{ width: "100%" }}
               value={this.state.newUserIDs}
-              onChange={(values) => this.setState({ newUserIDs: values })}
+              onChange={(values) =>
+                this.setState({
+                  newUserIDs:
+                    values.length + this.props.chat.users.length > 5
+                      ? values.slice(
+                          0,
+                          5 - values.length - this.props.chat.users.length
+                        )
+                      : values,
+                })
+              }
               placeholder="Search for people"
               searchable
               data={

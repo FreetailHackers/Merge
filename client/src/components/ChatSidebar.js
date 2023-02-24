@@ -41,7 +41,11 @@ const ChatSidebar = ({
       {creatingNewChat && (
         <MultiSelect
           value={newChatInput}
-          onChange={(values) => updateNewChatInput(values)}
+          onChange={(values) =>
+            updateNewChatInput(
+              values.length > 4 ? values.slice(0, 4 - values.length) : values
+            )
+          }
           placeholder="Search for people to add"
           searchable
           data={
