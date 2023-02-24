@@ -51,11 +51,7 @@ router.post("/swipe", authenticateToken, async (req, res) => swipe(req, res));
 // @route POST api/users/list
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.post("/profile-picture", authenticateToken, async (req, res) => {
-  const id = req.body.id;
-  if (req.id !== id) {
-    return res.sendStatus(403);
-  }
+router.post("/profile-picture", async (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) return res.json({ err: err.message });
@@ -73,14 +69,15 @@ router.get("/github/user", async (req, res) => {
 });
 
 async function list_func(req, res) {
-  const id = req.body?.id;
-  if (req.id !== id) {
+  const id = req.query.id;
+  if (req.user !== id) {
     return res.sendStatus(403);
   }
 
   // Parse query parameters
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
+
   if (filters._id) {
     filters._id = mongoose.Types.ObjectId(filters._id);
   }
@@ -223,8 +220,8 @@ function register_func(req, res) {
 }
 
 async function swipe(req, res) {
-  const id = req.body?.id;
-  if (req.id !== id) {
+  const id = req.body.id;
+  if (req.user !== id) {
     return res.sendStatus(403);
   }
   const options = {
@@ -291,15 +288,15 @@ async function s3Upload(file_name, files, res) {
 // }
 
 async function update(req, res) {
-  const id = req.body.id;
-  if (req.id !== id) {
-    return res.sendStatus(403);
-  }
   const profile = req.body.update;
   const options = {
     upsert: true,
   };
 
+  const id = req.body?.id;
+  if (req.user !== id) {
+    return res.sendStatus(403);
+  }
   //Clear all old s3 files
   //await clear_old_pictures(req);
   if (profile.name?.length > 1000) {

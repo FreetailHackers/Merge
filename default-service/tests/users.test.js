@@ -331,12 +331,13 @@ describe("update router tests", () => {
 });
 describe("List users ", () => {
   test("Basic list users route test", async () => {
-    "{_id: 123456}";
     const dataSent = new Date(2020, 1, 1);
     const req = {
+      user: 123456,
       query: {
         start: 0,
         limit: 0,
+        id: 123456,
         filters: '{"_id": 123456}',
         dateSent: dataSent,
       },

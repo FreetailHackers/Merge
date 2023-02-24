@@ -51,6 +51,7 @@ class Edit extends Component {
     var queryParamters = {
       start: 0,
       limit: 0,
+      id: this.props.userID.id,
       filters: {
         _id: this.props.userID.id,
       },
@@ -148,6 +149,7 @@ class Edit extends Component {
         ...this.state.userProfile,
         [key]: value,
       },
+      saved: false,
     });
   };
 
@@ -411,6 +413,7 @@ class Edit extends Component {
               <Link to="/dashboard">Cancel</Link>
             </button>
           </section>
+          {this.state.saved && <p> Save Successful </p>}
         </div>
         <div className="profile-child">
           <SwipeProfile

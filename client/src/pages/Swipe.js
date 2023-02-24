@@ -23,6 +23,7 @@ class Swipe extends Component {
     var queryParamters = {
       start: 0,
       limit: 0,
+      id: this.props.userID.id,
       filters: {},
     };
     this.setState({ loadingUserToShow: true }, async () => {
@@ -35,12 +36,14 @@ class Swipe extends Component {
           params: {
             start: 0,
             limit: 0,
+            id: this.props.auth.userID.id,
             filters: {
               _id: this.props.auth.userID.id,
             },
           },
         })
         .then((res) => {
+          console.log(res);
           myswipeList = res.data[0].swipeList;
           myBlockList = res.data[0].blockList;
           if (
@@ -171,6 +174,7 @@ class Swipe extends Component {
             axios
               .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
+                id: this.props.userID.id,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
               })
@@ -197,6 +201,7 @@ class Swipe extends Component {
             axios
               .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
+                id: this.props.userID.id,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
               })
@@ -237,6 +242,7 @@ class Swipe extends Component {
             axios
               .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
+                id: this.props.userID.id,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
               })
@@ -265,6 +271,7 @@ class Swipe extends Component {
             axios
               .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
                 auth: this.props.auth,
+                id: this.props.userID.id,
                 otherUser: this.state.userToShow,
                 decision: this.state.profileSide,
               })
@@ -332,6 +339,7 @@ class Swipe extends Component {
           axios
             .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
               auth: this.props.auth,
+              id: this.props.userID.id,
               otherUser: this.state.userToShow,
               decision: this.state.profileSide,
             })
