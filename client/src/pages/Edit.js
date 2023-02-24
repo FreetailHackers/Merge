@@ -147,6 +147,7 @@ class Edit extends Component {
       userProfile: {
         ...this.state.userProfile,
         [key]: value,
+        saved: false,
       },
     });
   };
@@ -411,6 +412,7 @@ class Edit extends Component {
               <Link to="/dashboard">Cancel</Link>
             </button>
           </section>
+          {this.state.saved ?? <p style="color:green;">Save Successful</p>}
         </div>
         <div className="profile-child">
           <SwipeProfile
