@@ -152,6 +152,7 @@ class Register extends Component {
             type="password"
             placeholder="Reenter your password"
           />
+
           <span className="error">
             {errors.password2}
             {errors.password2incorrect}

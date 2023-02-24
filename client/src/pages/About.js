@@ -45,8 +45,8 @@ class About extends Component {
           release for Spring 2023. In early February, we were proud to bring on
           a brand new Freetail member, Dinesh, onto the team. Special thanks to
           Orion (previous Logistics Director) for being a fantastic resource
-          while we (mostly Adi) worked with full-scale professional development
-          -&gt; production pipelines and cloud hosting on AWS.
+          while we (mostly Adi) worked with full-scale and industry level
+          development -&gt; production pipelines and cloud hosting on AWS.
         </p>
         <br />
         <h3>Future Steps</h3>

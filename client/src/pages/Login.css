@@ -54,12 +54,21 @@ section#register form,
   line-height:30px;
 }
 
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+}
+
 .about {
   font-size: 22px;
-  position: relative;
   padding: 10px 30px 30px 30px;
-  margin-bottom: 20vh;
-  margin-left: 22vw;
+  margin-right: 20vw;
+  margin-left: auto;
+  margin-bottom: auto;
+  margin-top: 15vh;
 }
 
 p#ToS {
@@ -71,9 +80,11 @@ p#ToS {
 }
 
 section#login form {
-  padding: 50px 30px 20px 30px;
-  margin-left: 6vw;
-  margin-top: 18vh;
+  padding: 50px 30px 30px 30px;
+  margin-left: 20%;
+  margin-right: auto;
+  margin-bottom: 15vh;
+  margin-top: auto;
 }
 
 section#register form {
