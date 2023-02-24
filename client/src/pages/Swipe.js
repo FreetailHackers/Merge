@@ -406,6 +406,7 @@ class Swipe extends Component {
               name={this.state.userToShow.name}
               school={this.state.userToShow.school}
               intro={this.state.userToShow.intro}
+              skills={this.state.userToShow.skills}
               // profilePictureUrl={this.state.userToShow.profilePictureUrl}
               github={this.state.userToShow.github}
               linkedin={this.state.userToShow.linkedin}
