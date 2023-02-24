@@ -72,6 +72,7 @@ class Chat extends Component {
         params: {
           start: 0,
           limit: 0,
+          id: this.props.userID.id,
           filters: {
             _id: this.props.userID.id,
           },
@@ -82,7 +83,11 @@ class Chat extends Component {
       });
 
     axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/list")
+      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+        params: {
+          id: this.props.userID.id,
+        },
+      })
       .then((res) => {
         this.setState({
           userMap: Object.fromEntries(
