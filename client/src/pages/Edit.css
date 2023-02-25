@@ -48,8 +48,7 @@
   display: block;
 }
 
-#settings .action:hover,
-#settings .action:focus {
+#settings .action:hover {
   transform: scale(1.1);
   opacity: 0.8;
 }
