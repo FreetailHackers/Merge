@@ -3,6 +3,8 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
       when: never
+    - if: "$CI_COMMIT_BRANCH == 'amplify-prod'"
+      when: never
     - if: "$CI_COMMIT_BRANCH"
 
 stages:
@@ -180,7 +182,6 @@ deploy_prod_api:
 
 
 stop_prod_api:
-  stage: production
   extends: deploy_prod_api
   when: manual
   environment:
@@ -251,23 +252,3 @@ stop_prod_chat:
     - eb terminate --timeout 60 --force $EB_ENVIRONMENT
   after_script:
     - rm -r ~/.aws
-
-pages:
-  stage: production
-  image: node:16.16.0-slim
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  environment:
-    name: prod-client
-    url: https://merge.freetailhackers.com/
-  script:
-    - cd client
-    - mv $CI_ENV_FILE_PROD_CLIENT .env
-    - npm i
-    - BUILD_PATH='../public' npm run build
-  artifacts:
-    paths:
-      - public
-  after_script:
-    - rm ./client/.env
-
