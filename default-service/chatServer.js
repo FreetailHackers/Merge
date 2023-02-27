@@ -64,6 +64,8 @@ io.on("connection", (socket) => {
 
   socket.on("leave-chat", (data) => leaveChat(data, socket));
 
+  socket.on("remove-users", (data) => removeUsers(data, socket));
+
   socket.on("delete-chat", (data) => deleteChat(data, socket));
 });
 
@@ -188,6 +190,26 @@ function leaveChat(data, socket) {
     socket.to(data.chatID).emit("user-left", data);
   }
   socket.leave(data.chatID);
+}
+
+async function removeUsers(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    const fetched = await io.in(data.chatID).fetchSockets();
+    for (const fetchedSocket of fetched) {
+      if (data.users.includes(fetchedSocket.data.mongoID)) {
+        socket
+          .to(fetchedSocket.id)
+          .emit("removed-from", { chatID: data.chatID });
+      } else {
+        for (const user of data.users) {
+          socket
+            .to(fetchedSocket.id)
+            .emit("user-left", { chatID: data.chatID, user: user });
+        }
+      }
+    }
+  }
 }
 
 const port = process.env.CHAT_PORT || 5000;
