@@ -30,14 +30,15 @@ io.use((socket, next) => {
     if (!token) {
       next(new Error("Token not in correct format"));
     }
-    next(
-      jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
-        if (err) {
-          return new Error(err.mesage);
-        }
+
+    jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
+      if (err) {
+        next(err);
+      } else {
         socket.request.user = decoded.id;
-      })
-    );
+        next();
+      }
+    });
   } else {
     next(new Error("invalid"));
   }
