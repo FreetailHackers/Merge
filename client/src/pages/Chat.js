@@ -152,7 +152,7 @@ class Chat extends Component {
     });
     this.socket.on("user-left", this.userLeftWS);
     this.socket.on("removed-from", (data) => {
-      const index = this.state.chats.findIndex((e) => e._id, data.chatID);
+      const index = this.state.chats.findIndex((e) => e._id === data.chatID);
       if (index >= 0) {
         this.removeChatFromClient(this.state.chats[index]);
       }
@@ -196,8 +196,6 @@ class Chat extends Component {
   };
 
   userLeftWS = (data) => {
-    console.log("user left ws");
-    console.log(data);
     if (data.user === this.props.userID.id) {
       this.removeChatFromClient(
         this.state.chats.find((chat) => chat._id === data.chatID)
@@ -419,8 +417,7 @@ class Chat extends Component {
     const deletedChat = this.state.chats[chatIndex];
     axios
       .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/remove`,
-        { user: this.props.userID.id }
+        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/leave`
       )
       .then(() => this.leaveChatWS(deletedChat));
   }

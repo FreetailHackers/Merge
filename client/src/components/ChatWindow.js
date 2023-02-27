@@ -108,13 +108,11 @@ class ChatWindow extends Component {
       this.state.kickChecked &&
       this.state.newUserIDs.every((e) => this.props.chat.users.includes(e))
     ) {
-      for (const user of this.state.newUserIDs) {
-        await axios.post(
-          process.env.REACT_APP_API_URL +
-            `/api/chats/${this.props.chat._id}/remove`,
-          { user: user }
-        );
-      }
+      await axios.post(
+        process.env.REACT_APP_API_URL +
+          `/api/chats/${this.props.chat._id}/remove`,
+        { users: this.state.newUserIDs }
+      );
       this.props.kickUsers(this.state.newUserIDs, this.props.chat._id);
     }
 
@@ -398,26 +396,27 @@ class ChatWindow extends Component {
                   </p>
                 </div>
               )}
-              {this.state.newUserIDs.every((e) =>
-                this.props.chat.users.includes(e)
-              ) && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginRight: "15%",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    onChange={(e) =>
-                      this.setState({ kickChecked: e.target.checked })
-                    }
-                    checked={this.state.kickChecked}
-                  />
-                  <p>Remove users?</p>
-                </div>
-              )}
+              {this.props.chat.owner === this.props.selfID &&
+                this.state.newUserIDs.every((e) =>
+                  this.props.chat.users.includes(e)
+                ) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginRight: "15%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      onChange={(e) =>
+                        this.setState({ kickChecked: e.target.checked })
+                      }
+                      checked={this.state.kickChecked}
+                    />
+                    <p>Remove users?</p>
+                  </div>
+                )}
               <input
                 type="checkbox"
                 onChange={(e) =>
