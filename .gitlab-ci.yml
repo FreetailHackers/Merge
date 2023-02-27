@@ -123,11 +123,12 @@ fail_manual_inspection:
 stop_integ:
   extends: deploy_integ
   stage: pre-production
+  when: manual
   environment:
     action: stop
-  script: if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
-  after_script:
+  script:
     - eb terminate --timeout 30 --force $EB_ENVIRONMENT
+  after_script:
     - rm -r ~/.aws
 
 create_prod_api:
