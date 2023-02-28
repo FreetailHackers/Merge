@@ -15,7 +15,6 @@ class GithubCard extends Component {
   }
 
   componentDidMount() {
-    console.log("this is called");
     axios
       .get(process.env.REACT_APP_API_URL + "/api/users/github/user", {
         params: {
@@ -32,9 +31,6 @@ class GithubCard extends Component {
   }
 
   componentDidUpdate() {
-    console.log(this.props.change);
-    console.log(this.state.oldUser);
-    console.log(this.props.username);
     if (this.props.change && this.state.oldUser !== this.props.username) {
       this.componentDidMount();
     }
