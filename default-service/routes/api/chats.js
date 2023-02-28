@@ -40,6 +40,7 @@ router.post("/:chat/add", async (req, res) => post_add_function(req, res));
 router.post("/:chat/remove", async (req, res) =>
   post_remove_function(req, res)
 );
+router.post("/:chat/leave", async (req, res) => post_leave_function(req, res));
 router.post("/:chat/rename", async (req, res) =>
   post_rename_function(req, res)
 );
@@ -188,10 +189,11 @@ async function post_add_function(req, res) {
 }
 
 /**
- * Remove a user from a chat.
+ * Remove user from a chat.
+ * Can only be called by the owner of a chat.
  *
  * PATH PARAMETER chat: ObjectId of Chat
- * BODY PARAMETER user: ObjectId of User
+ * BODY PARAMETER users: ObjectIds of Users
  *
  * RETURNS the modified Chat Object
  * RETURNS 400 if the User was not a member of the Chat
@@ -199,19 +201,54 @@ async function post_add_function(req, res) {
 async function post_remove_function(req, res) {
   try {
     const chat = await Chat.findOne({ _id: req.params.chat }).exec();
-    if (!req.body.user) {
+    if (!req.body.users) {
+      console.error("No users provided");
+      return res.sendStatus(400);
+    }
+    if (
+      !chat.users.includes(req.user) ||
+      chat.owner.toString() !== req.user.toString()
+    ) {
+      console.error(
+        "User attempting to remove not in chat or not owner of chat"
+      );
+      return res.sendStatus(403);
+    }
+    if (!req.body.users.every((user) => chat.users.includes(user))) {
+      console.error("At least one user not in chat");
+      return res.sendStatus(400);
+    }
+    chat.users = chat.users.filter(
+      (user) => !req.body.users.includes(user.toString())
+    );
+    const saved = await chat.save();
+    return res.json(saved);
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+}
+
+/**
+ * Leave a chat.
+ *
+ * PATH PARAMETER chat: ObjectId of Chat
+ *
+ * RETURNS the modified Chat Object
+ * RETURNS 400 if the User was not a member of the Chat
+ */
+async function post_leave_function(req, res) {
+  try {
+    const chat = await Chat.findOne({ _id: req.params.chat }).exec();
+    if (!req.user) {
       console.error("User does not exist");
       return res.sendStatus(400);
     }
-    if (!chat.users.includes(req.body.user)) {
-      console.error("User not in chat or undefined");
-      return res.sendStatus(400);
-    }
     if (!chat.users.includes(req.user)) {
-      console.error("User attempting to remove not in chat");
+      console.error("User not in chat or undefined");
       return res.sendStatus(403);
     }
-    chat.users = chat.users.filter((user) => user.toString() !== req.body.user);
+    chat.users = chat.users.filter((user) => user.toString() !== req.user);
     const saved = await chat.save();
     return res.json(saved);
   } catch (err) {
