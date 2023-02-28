@@ -29,7 +29,7 @@ const SwipeProfile = (props) => {
       <p draggable={false} style={{ marginBottom: 60 }}>
         {props.intro}
       </p>
-      {props.github ? (
+      {props.github && props.githubFinished ? (
         <GithubCard username={props.github} change={props.githubFinished} />
       ) : null}
       {props.linkedin ? <LinkedInCard link={props.linkedin} /> : null}

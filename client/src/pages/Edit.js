@@ -91,6 +91,7 @@ class Edit extends Component {
           }
         }
         if (!("swipeReady" in data)) data.swipeReady = true;
+        data.githubFinished = data.github;
         this.setState({
           userProfile: data,
           // profilePictureUrl: data.profilePictureUrl,
