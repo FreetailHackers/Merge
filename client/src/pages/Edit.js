@@ -24,6 +24,16 @@ class Edit extends Component {
   handleSubmit = async (event) => {
     event.persist();
     event.preventDefault();
+    if (this.state.userProfile?.portfolio) {
+      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const inputValue = this.state.userProfile.portfolio;
+      if (!regex.test(inputValue)) {
+        this.setState({
+          portfolioRegex: false,
+        });
+        return;
+      }
+    }
     const data = {
       id: this.props.userID.id,
       update: {
@@ -43,6 +53,7 @@ class Edit extends Component {
       .then((res) => {
         this.setState({
           saved: true,
+          portfolioRegex: true,
         });
       });
   };
@@ -117,6 +128,7 @@ class Edit extends Component {
     this.state = {
       userProfile: { ...this.props.user.profile },
       saved: false,
+      portfolioRegex: true,
       // profilePictureUrl: this.props.user.profilePictureUrl,
     };
     this.baseState = {
@@ -284,11 +296,18 @@ class Edit extends Component {
               }
               <TextInput
                 label="Portfolio"
+                id="portfolio"
                 placeholder="https://danielzting.github.io"
                 value={this.state.userProfile.portfolio}
                 onChange={(e) => this.setProfile("portfolio", e.target.value)}
                 className="question"
               />
+              {!this.state.portfolioRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  Portfolio must start with &quot;https://&quot;
+                </p>
+              )}
               <TextInput
                 label="Github Username"
                 id="github"
@@ -396,7 +415,10 @@ class Edit extends Component {
                 className="question"
               />
               {this.state.saved && (
-                <h3 style={{ color: "green" }}> Save Successful</h3>
+                <p style={{ fontSize: "15.4px", color: "green" }}>
+                  {" "}
+                  Save Successful
+                </p>
               )}
             </form>
             <button

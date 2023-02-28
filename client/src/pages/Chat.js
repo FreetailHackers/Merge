@@ -151,6 +151,12 @@ class Chat extends Component {
       this.removeChatFromClient(deletedChat);
     });
     this.socket.on("user-left", this.userLeftWS);
+    this.socket.on("removed-from", (data) => {
+      const index = this.state.chats.findIndex((e) => e._id === data.chatID);
+      if (index >= 0) {
+        this.removeChatFromClient(this.state.chats[index]);
+      }
+    });
     this.socket.on("blocked-by", (data) => this.blockedWS(data, true));
     this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
   }
@@ -389,20 +395,31 @@ class Chat extends Component {
       });
   }
 
-  leaveChat() {
-    const deletedChat = this.state.chats[this.state.activeChatIndex];
+  leaveChatWS(leftChat) {
+    this.socket.emit("leave-chat", {
+      chatID: leftChat._id,
+      user: this.props.userID.id,
+    });
+    this.removeChatFromClient(leftChat);
+  }
+
+  kickUsersWS(users, chatID) {
+    this.socket.emit("remove-users", {
+      chatID: chatID,
+      users: users,
+    });
+    for (const user of users) {
+      this.userLeftWS({ user: user, chatID: chatID });
+    }
+  }
+
+  leaveChat(chatIndex) {
+    const deletedChat = this.state.chats[chatIndex];
     axios
       .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/remove`,
-        { user: this.props.userID.id }
+        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/leave`
       )
-      .then(() => {
-        this.socket.emit("leave-chat", {
-          chatID: deletedChat._id,
-          user: this.props.userID.id,
-        });
-        this.removeChatFromClient(deletedChat);
-      });
+      .then(() => this.leaveChatWS(deletedChat));
   }
 
   blockUsers(users) {
@@ -477,9 +494,10 @@ class Chat extends Component {
             }
             chat={this.state.chats[this.state.activeChatIndex]}
             deleteChat={this.deleteChat.bind(this)}
-            leaveChat={this.leaveChat.bind(this)}
+            leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
             blockedByMe={this.state.blockedByMe}
             blockUsers={this.blockUsers.bind(this)}
+            kickUsers={this.kickUsersWS.bind(this)}
             unblockUsers={this.unblockUsers.bind(this)}
           />
         )}

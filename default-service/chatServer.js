@@ -30,14 +30,15 @@ io.use((socket, next) => {
     if (!token) {
       next(new Error("Token not in correct format"));
     }
-    next(
-      jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
-        if (err) {
-          return new Error(err.mesage);
-        }
+
+    jwt.verify(token, process.env.SECRETORKEY, (err, decoded) => {
+      if (err) {
+        next(err);
+      } else {
         socket.request.user = decoded.id;
-      })
-    );
+        next();
+      }
+    });
   } else {
     next(new Error("invalid"));
   }
@@ -63,6 +64,8 @@ io.on("connection", (socket) => {
   socket.on("rename-chat", (data) => renameChat(data, socket));
 
   socket.on("leave-chat", (data) => leaveChat(data, socket));
+
+  socket.on("remove-users", (data) => removeUsers(data, socket));
 
   socket.on("delete-chat", (data) => deleteChat(data, socket));
 });
@@ -188,6 +191,26 @@ function leaveChat(data, socket) {
     socket.to(data.chatID).emit("user-left", data);
   }
   socket.leave(data.chatID);
+}
+
+async function removeUsers(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    const fetched = await io.in(data.chatID).fetchSockets();
+    for (const fetchedSocket of fetched) {
+      if (data.users.includes(fetchedSocket.data.mongoID)) {
+        socket
+          .to(fetchedSocket.id)
+          .emit("removed-from", { chatID: data.chatID });
+      } else {
+        for (const user of data.users) {
+          socket
+            .to(fetchedSocket.id)
+            .emit("user-left", { chatID: data.chatID, user: user });
+        }
+      }
+    }
+  }
 }
 
 const port = process.env.CHAT_PORT || 5000;
