@@ -33,7 +33,7 @@ section#register form,
   display: none;
   background-color: #fff;
   width: 35vw;
-  box-shadow: 20px 10px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 50vw 15vw rgba(0, 0, 0, 0.7);
   border-radius:10px;
   align-items: center;
 }
@@ -66,7 +66,7 @@ section#register form,
   font-size: 22px;
   padding: 10px 30px 30px 30px;
   margin-right: 20vw;
-  margin-left: auto;
+  margin-left: 5%;
   margin-bottom: auto;
   margin-top: 15vh;
 }
@@ -82,7 +82,7 @@ p#ToS {
 section#login form {
   padding: 50px 30px 30px 30px;
   margin-left: 20%;
-  margin-right: auto;
+  margin-right: 5%;
   margin-bottom: 15vh;
   margin-top: auto;
 }
