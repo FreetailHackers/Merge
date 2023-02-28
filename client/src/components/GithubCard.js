@@ -30,25 +30,11 @@ class GithubCard extends Component {
       });
   }
 
-  // componentDidUpdate() {
-  //   if(this.props.username !== this.state.oldUser) {
-  //     axios
-  //     .get(process.env.REACT_APP_API_URL + "/api/users/github/user", {
-  //       params: {
-  //         username: this.props.username,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       this.setState({
-  //         profileData: response.data,
-  //         isLoadingProfile: false,
-  //         oldUser: this.props.username
-  //       });
-  //     });
-  //     console.log(this.state.profileData)
-  //   }
-
-  // }
+  componentDidUpdate() {
+    if (this.props.change && this.state.oldUser !== this.props.username) {
+      this.componentDidMount();
+    }
+  }
 
   render = () => (
     <div className="github-card">
@@ -83,6 +69,7 @@ class GithubCard extends Component {
 
 GithubCard.propTypes = {
   username: PropTypes.string.isRequired,
+  change: PropTypes.bool.isRequired,
 };
 
 export default GithubCard;

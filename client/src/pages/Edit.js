@@ -33,6 +33,15 @@ class Edit extends Component {
         });
         return;
       }
+    } else if (this.state.userProfile?.linkedin) {
+      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const inputValue = this.state.userProfile.linkedin;
+      if (!regex.test(inputValue)) {
+        this.setState({
+          linkedinRegex: false,
+        });
+        return;
+      }
     }
     const data = {
       id: this.props.userID.id,
@@ -54,6 +63,7 @@ class Edit extends Component {
         this.setState({
           saved: true,
           portfolioRegex: true,
+          linkedinRegex: true,
         });
       });
   };
@@ -129,6 +139,7 @@ class Edit extends Component {
       userProfile: { ...this.props.user.profile },
       saved: false,
       portfolioRegex: true,
+      linkedinRegex: true,
       // profilePictureUrl: this.props.user.profilePictureUrl,
     };
     this.baseState = {
@@ -314,6 +325,8 @@ class Edit extends Component {
                 placeholder="danielzting"
                 value={this.state.userProfile.github}
                 onChange={(e) => this.setProfile("github", e.target.value)}
+                onFocus={() => this.setProfile("githubFinished", false)}
+                onBlur={() => this.setProfile("githubFinished", true)}
                 className="question"
               />
               <TextInput
@@ -324,6 +337,13 @@ class Edit extends Component {
                 onChange={(e) => this.setProfile("linkedin", e.target.value)}
                 className="question"
               />
+
+              {!this.state.linkedinRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  LinkedIn must start with &quot;https://&quot;
+                </p>
+              )}
               <NumberInput
                 defaultValue={12}
                 placeholder="Any integer between 1-24 inclusive"
@@ -447,6 +467,7 @@ class Edit extends Component {
             intro={this.state.userProfile.intro}
             linkedin={this.state.userProfile.linkedin}
             github={this.state.userProfile.github}
+            githubFinished={this.state.userProfile.githubFinished}
             // profilePictureUrl={this.state.profilePictureUrl}
           />
         </div>
