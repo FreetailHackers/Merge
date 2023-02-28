@@ -33,6 +33,15 @@ class Edit extends Component {
         });
         return;
       }
+    } else if (this.state.userProfile?.linkedin) {
+      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const inputValue = this.state.userProfile.linkedin;
+      if (!regex.test(inputValue)) {
+        this.setState({
+          linkedinRegex: false,
+        });
+        return;
+      }
     }
     const data = {
       id: this.props.userID.id,
@@ -54,6 +63,7 @@ class Edit extends Component {
         this.setState({
           saved: true,
           portfolioRegex: true,
+          linkedinRegex: true,
         });
       });
   };
@@ -81,6 +91,7 @@ class Edit extends Component {
           }
         }
         if (!("swipeReady" in data)) data.swipeReady = true;
+        data.githubFinished = data.github;
         this.setState({
           userProfile: data,
           // profilePictureUrl: data.profilePictureUrl,
@@ -129,6 +140,7 @@ class Edit extends Component {
       userProfile: { ...this.props.user.profile },
       saved: false,
       portfolioRegex: true,
+      linkedinRegex: true,
       // profilePictureUrl: this.props.user.profilePictureUrl,
     };
     this.baseState = {
@@ -294,12 +306,6 @@ class Edit extends Component {
                 //   className="question"
                 // />
               }
-              {!this.state.portfolioRegex && (
-                <h5 style={{ color: "red" }}>
-                  {" "}
-                  Portfolio must start with &quot;https://&quot;
-                </h5>
-              )}
               <TextInput
                 label="Portfolio"
                 id="portfolio"
@@ -308,12 +314,20 @@ class Edit extends Component {
                 onChange={(e) => this.setProfile("portfolio", e.target.value)}
                 className="question"
               />
+              {!this.state.portfolioRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  Portfolio must start with &quot;https://&quot;
+                </p>
+              )}
               <TextInput
                 label="Github Username"
                 id="github"
                 placeholder="danielzting"
                 value={this.state.userProfile.github}
                 onChange={(e) => this.setProfile("github", e.target.value)}
+                onFocus={() => this.setProfile("githubFinished", false)}
+                onBlur={() => this.setProfile("githubFinished", true)}
                 className="question"
               />
               <TextInput
@@ -324,6 +338,13 @@ class Edit extends Component {
                 onChange={(e) => this.setProfile("linkedin", e.target.value)}
                 className="question"
               />
+
+              {!this.state.linkedinRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  LinkedIn must start with &quot;https://&quot;
+                </p>
+              )}
               <NumberInput
                 defaultValue={12}
                 placeholder="Any integer between 1-24 inclusive"
@@ -415,7 +436,10 @@ class Edit extends Component {
                 className="question"
               />
               {this.state.saved && (
-                <h3 style={{ color: "green" }}> Save Successful</h3>
+                <p style={{ fontSize: "15.4px", color: "green" }}>
+                  {" "}
+                  Save Successful
+                </p>
               )}
             </form>
             <button
@@ -444,6 +468,7 @@ class Edit extends Component {
             intro={this.state.userProfile.intro}
             linkedin={this.state.userProfile.linkedin}
             github={this.state.userProfile.github}
+            githubFinished={this.state.userProfile.githubFinished}
             // profilePictureUrl={this.state.profilePictureUrl}
           />
         </div>
