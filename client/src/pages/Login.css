@@ -36,6 +36,7 @@ section#register form,
   box-shadow: 0px 0px 50vw 15vw rgba(0, 0, 0, 0.7);
   border-radius:10px;
   align-items: center;
+  justify-content: center;
 }
 
 .terms strong {
@@ -65,10 +66,10 @@ section#register form,
 .about {
   font-size: 22px;
   padding: 10px 30px 30px 30px;
-  margin-right: 20vw;
-  margin-left: 5%;
-  margin-bottom: 20%;
-  margin-top: 15vh;
+  margin-right: auto;
+  margin-left: 5vw;
+  margin-top: 0;
+  margin-bottom: 200px;
 }
 
 p#ToS {
@@ -81,10 +82,10 @@ p#ToS {
 
 section#login form {
   padding: 50px 30px 30px 30px;
-  margin-left: 20%;
-  margin-right: 5%;
-  margin-bottom: 15vh;
-  margin-top: 20%;
+  margin-left: auto;
+  margin-right: 5vw;
+  margin-bottom: 0;
+  margin-top: 200px;
 }
 
 section#register form {
@@ -117,7 +118,6 @@ section#login form input,
 section#register form input {
   width: calc(100% - 22px);
   padding: 10px;
-
   border: 1px #ddd solid;
   border-radius: 0;
 }
@@ -126,7 +126,6 @@ section#login form button,
 section#register form button {
   width: 100%;
   margin: 15px 0 0 0;
-
 }
 
 section#login form button,
@@ -147,7 +146,6 @@ section#login form button:hover,
 section#register form button:hover,
 .closetos:hover {
   background-color: var(--secondary);
-
   color: var(--text-on-secondary);
 }
 
