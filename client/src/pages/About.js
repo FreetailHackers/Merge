@@ -69,7 +69,7 @@ class About extends Component {
         <img
           src={groupPhoto}
           className="group-photo"
-          alt="group photo"
+          alt="group pic"
           width="80%"
         />
       </div>
