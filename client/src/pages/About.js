@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import "./About.css";
+import groupPhoto from "../assets/images/group-photo.jpg";
 
 class About extends Component {
   render() {
@@ -42,11 +43,10 @@ class About extends Component {
           In total, the current team has devoted hundreds of hours to the
           development of Merge over the course of 7 total months of consistent
           effort to finally complete the first <strong>early access</strong>{" "}
-          release for Spring 2023. In early February, we were proud to bring on
-          a brand new Freetail member, Dinesh, onto the team. Special thanks to
-          Orion (previous Logistics Director) for being a fantastic resource
-          while we (mostly Adi) worked with full-scale and industry level
-          development -&gt; production pipelines and cloud hosting on AWS.
+          release for Spring 2023. Special thanks to Orion (previous Logistics
+          Director) for being a fantastic resource while we (mostly Adi) worked
+          with full-scale and industry level development -&gt; production
+          pipelines and cloud hosting on AWS.
         </p>
         <br />
         <h3>Future Steps</h3>
@@ -62,6 +62,16 @@ class About extends Component {
           Merge and implement new features to make the user experience even
           better.
         </p>
+        <i>
+          From left to right: Maansi (honorary teammate), Orion, Ayush P, Ayush
+          B, Pranay, Ben G, Adi, Daniel
+        </i>
+        <img
+          src={groupPhoto}
+          className="group-photo"
+          alt="group photo"
+          width="80%"
+        />
       </div>
     );
   }
