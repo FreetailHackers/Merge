@@ -197,7 +197,7 @@ class Edit extends Component {
       { value: "reactnative", label: "React Native" },
       { value: "express", label: "Express" },
       { value: "mongodb", label: "MongoDB" },
-      { value: "postgresql", label: "PostGreSQL" },
+      { value: "postgresql", label: "PostgreSQL" },
       { value: "prisma", label: "Prisma" },
       { value: "nextjs", label: "NextJS" },
       { value: "sveltejs", label: "SvelteJS" },

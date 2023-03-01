@@ -43,7 +43,6 @@ class Swipe extends Component {
           },
         })
         .then((res) => {
-          console.log(res);
           myswipeList = res.data[0].swipeList;
           myBlockList = res.data[0].blockList;
           if (

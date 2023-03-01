@@ -33,9 +33,10 @@ section#register form,
   display: none;
   background-color: #fff;
   width: 35vw;
-  box-shadow: 20px 10px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 50vw 15vw rgba(0, 0, 0, 0.7);
   border-radius:10px;
   align-items: center;
+  justify-content: center;
 }
 
 .terms strong {
@@ -54,12 +55,21 @@ section#register form,
   line-height:30px;
 }
 
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  align-items: center;
+}
+
 .about {
   font-size: 22px;
-  position: relative;
   padding: 10px 30px 30px 30px;
-  margin-bottom: 20vh;
-  margin-left: 22vw;
+  margin-right: auto;
+  margin-left: 5vw;
+  margin-top: 0;
+  margin-bottom: 200px;
 }
 
 p#ToS {
@@ -71,9 +81,11 @@ p#ToS {
 }
 
 section#login form {
-  padding: 50px 30px 20px 30px;
-  margin-left: 6vw;
-  margin-top: 18vh;
+  padding: 50px 30px 30px 30px;
+  margin-left: auto;
+  margin-right: 5vw;
+  margin-bottom: 0;
+  margin-top: 200px;
 }
 
 section#register form {
@@ -106,7 +118,6 @@ section#login form input,
 section#register form input {
   width: calc(100% - 22px);
   padding: 10px;
-
   border: 1px #ddd solid;
   border-radius: 0;
 }
@@ -115,7 +126,6 @@ section#login form button,
 section#register form button {
   width: 100%;
   margin: 15px 0 0 0;
-
 }
 
 section#login form button,
@@ -136,7 +146,6 @@ section#login form button:hover,
 section#register form button:hover,
 .closetos:hover {
   background-color: var(--secondary);
-
   color: var(--text-on-secondary);
 }
 
