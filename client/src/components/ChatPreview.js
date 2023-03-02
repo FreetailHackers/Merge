@@ -22,6 +22,8 @@ const ChatPreview = ({
     }
     onClick={onClick}
   >
+    {!seen ? <span className="unreadBubble" /> : null}
+
     <div
       style={
         profiles.length === 1 && profiles[0].profilePicture
@@ -104,7 +106,6 @@ const ChatPreview = ({
         </p>
       )}
     </div>
-    {!seen ? <span className="unreadBubble" /> : null}
   </div>
 );
 

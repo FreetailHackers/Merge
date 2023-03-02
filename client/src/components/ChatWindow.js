@@ -12,6 +12,7 @@ const defaultState = {
   reportPressed: false,
   reportChecked: false,
   blockChecked: false,
+  kickChecked: false,
   leavingDeleting: false,
 };
 
@@ -63,7 +64,7 @@ class ChatWindow extends Component {
     this.props.setEditingTitle(false);
   };
 
-  submitReport = () => {
+  submitReport = async () => {
     if (this.state.reportChecked) {
       const contents = document.getElementById("reason").value;
       for (const user of this.state.newUserIDs) {
@@ -102,11 +103,25 @@ class ChatWindow extends Component {
         }
       }
     }
+
+    if (
+      this.state.kickChecked &&
+      this.state.newUserIDs.every((e) => this.props.chat.users.includes(e))
+    ) {
+      await axios.post(
+        process.env.REACT_APP_API_URL +
+          `/api/chats/${this.props.chat._id}/remove`,
+        { users: this.state.newUserIDs }
+      );
+      this.props.kickUsers(this.state.newUserIDs, this.props.chat._id);
+    }
+
     this.setState({
       reportPressed: false,
       newUserIDs: [],
       reportChecked: false,
       blockChecked: false,
+      kickChecked: false,
     });
   };
 
@@ -302,6 +317,7 @@ class ChatWindow extends Component {
                 newUserIDs: [],
                 reportChecked: false,
                 blockChecked: false,
+                kickChecked: false,
               })
             }
           >
@@ -380,6 +396,27 @@ class ChatWindow extends Component {
                   </p>
                 </div>
               )}
+              {this.props.chat.owner === this.props.selfID &&
+                this.state.newUserIDs.every((e) =>
+                  this.props.chat.users.includes(e)
+                ) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginRight: "15%",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      onChange={(e) =>
+                        this.setState({ kickChecked: e.target.checked })
+                      }
+                      checked={this.state.kickChecked}
+                    />
+                    <p>Remove users?</p>
+                  </div>
+                )}
               <input
                 type="checkbox"
                 onChange={(e) =>
@@ -395,7 +432,12 @@ class ChatWindow extends Component {
             <textarea id="reason" placeholder="Reason for reporting" />
           )}
           {this.state.newUserIDs.length > 0 &&
-            (this.state.blockChecked || this.state.reportChecked) && (
+            (this.state.blockChecked ||
+              this.state.reportChecked ||
+              (this.state.kickChecked &&
+                this.state.newUserIDs.every((e) =>
+                  this.props.chat.users.includes(e)
+                ))) && (
               <button
                 id="submit"
                 className="submitButton themeButton"
@@ -455,6 +497,7 @@ ChatWindow.propTypes = {
   blockUsers: PropTypes.func,
   unblockUsers: PropTypes.func,
   blockedByMe: PropTypes.array,
+  kickUsers: PropTypes.func,
 };
 
 export default ChatWindow;

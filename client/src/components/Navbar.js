@@ -27,10 +27,10 @@ const Navbar = (props) => {
         <NavLink to="/edit">Edit Profile</NavLink>
         {/*<NavLink to="/database">User List</NavLink>*/}
         {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
+        <NavLink to="/about">About</NavLink>
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
-        <NavLink to="/about">About</NavLink>
       </nav>
     </div>
   );
