@@ -114,7 +114,7 @@ describe("remove user from chat", () => {
     const req = {
       user: fakeId,
       params: { chat: fakeId },
-      body: { user: fakeId },
+      body: { users: [fakeId] },
     };
     mockingoose(Chat).toReturn(mockChatData, "findOne");
     const copy = Object.assign({}, mockChatData);

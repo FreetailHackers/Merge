@@ -9,7 +9,6 @@ const SwipeProfile = (props) => {
   const relativePosition = props.relativePosition || [0, 0];
   const angle = props.relativeAngle || 0;
   const isBeingDragged = relativePosition.some((v) => v !== 0);
-
   return (
     <div
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
@@ -30,7 +29,9 @@ const SwipeProfile = (props) => {
       <p draggable={false} style={{ marginBottom: 60 }}>
         {props.intro}
       </p>
-      {props.github ? <GithubCard username={props.github} /> : null}
+      {props.github && props.githubFinished ? (
+        <GithubCard username={props.github} change={props.githubFinished} />
+      ) : null}
       {props.linkedin ? <LinkedInCard link={props.linkedin} /> : null}
       {props.portfolio ? <PortfolioCard link={props.portfolio} /> : null}
     </div>
@@ -51,6 +52,7 @@ SwipeProfile.propTypes = {
   github: PropTypes.object,
   linkedin: PropTypes.object,
   portfolio: PropTypes.object,
+  githubFinished: PropTypes.bool,
 };
 
 export default SwipeProfile;

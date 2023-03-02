@@ -10,6 +10,7 @@ class GithubCard extends Component {
     this.state = {
       isLoadingProfile: true,
       profileData: {},
+      oldUser: null,
     };
   }
 
@@ -24,8 +25,15 @@ class GithubCard extends Component {
         this.setState({
           profileData: response.data,
           isLoadingProfile: false,
+          oldUser: this.props.username,
         });
       });
+  }
+
+  componentDidUpdate() {
+    if (this.props.change && this.state.oldUser !== this.props.username) {
+      this.componentDidMount();
+    }
   }
 
   render = () => (
@@ -61,6 +69,7 @@ class GithubCard extends Component {
 
 GithubCard.propTypes = {
   username: PropTypes.string.isRequired,
+  change: PropTypes.bool.isRequired,
 };
 
 export default GithubCard;

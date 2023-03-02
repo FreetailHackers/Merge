@@ -24,6 +24,25 @@ class Edit extends Component {
   handleSubmit = async (event) => {
     event.persist();
     event.preventDefault();
+    if (this.state.userProfile?.portfolio) {
+      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const inputValue = this.state.userProfile.portfolio;
+      if (!regex.test(inputValue)) {
+        this.setState({
+          portfolioRegex: false,
+        });
+        return;
+      }
+    } else if (this.state.userProfile?.linkedin) {
+      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const inputValue = this.state.userProfile.linkedin;
+      if (!regex.test(inputValue)) {
+        this.setState({
+          linkedinRegex: false,
+        });
+        return;
+      }
+    }
     const data = {
       id: this.props.userID.id,
       update: {
@@ -43,6 +62,8 @@ class Edit extends Component {
       .then((res) => {
         this.setState({
           saved: true,
+          portfolioRegex: true,
+          linkedinRegex: true,
         });
       });
   };
@@ -70,6 +91,7 @@ class Edit extends Component {
           }
         }
         if (!("swipeReady" in data)) data.swipeReady = true;
+        data.githubFinished = data.github;
         this.setState({
           userProfile: data,
           // profilePictureUrl: data.profilePictureUrl,
@@ -116,7 +138,9 @@ class Edit extends Component {
     super(props);
     this.state = {
       userProfile: { ...this.props.user.profile },
-      saved: true,
+      saved: false,
+      portfolioRegex: true,
+      linkedinRegex: true,
       // profilePictureUrl: this.props.user.profilePictureUrl,
     };
     this.baseState = {
@@ -173,7 +197,7 @@ class Edit extends Component {
       { value: "reactnative", label: "React Native" },
       { value: "express", label: "Express" },
       { value: "mongodb", label: "MongoDB" },
-      { value: "postgresql", label: "PostGreSQL" },
+      { value: "postgresql", label: "PostgreSQL" },
       { value: "prisma", label: "Prisma" },
       { value: "nextjs", label: "NextJS" },
       { value: "sveltejs", label: "SvelteJS" },
@@ -284,16 +308,26 @@ class Edit extends Component {
               }
               <TextInput
                 label="Portfolio"
+                id="portfolio"
                 placeholder="https://danielzting.github.io"
                 value={this.state.userProfile.portfolio}
                 onChange={(e) => this.setProfile("portfolio", e.target.value)}
                 className="question"
               />
+              {!this.state.portfolioRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  Portfolio must start with &quot;https://&quot;
+                </p>
+              )}
               <TextInput
                 label="Github Username"
+                id="github"
                 placeholder="danielzting"
                 value={this.state.userProfile.github}
                 onChange={(e) => this.setProfile("github", e.target.value)}
+                onFocus={() => this.setProfile("githubFinished", false)}
+                onBlur={() => this.setProfile("githubFinished", true)}
                 className="question"
               />
               <TextInput
@@ -304,6 +338,13 @@ class Edit extends Component {
                 onChange={(e) => this.setProfile("linkedin", e.target.value)}
                 className="question"
               />
+
+              {!this.state.linkedinRegex && (
+                <p style={{ fontSize: "15.4px", color: "red" }}>
+                  {" "}
+                  LinkedIn must start with &quot;https://&quot;
+                </p>
+              )}
               <NumberInput
                 defaultValue={12}
                 placeholder="Any integer between 1-24 inclusive"
@@ -394,6 +435,12 @@ class Edit extends Component {
                 onChange={(value) => this.setProfile("roles", value)}
                 className="question"
               />
+              {this.state.saved && (
+                <p style={{ fontSize: "15.4px", color: "green" }}>
+                  {" "}
+                  Save Successful
+                </p>
+              )}
             </form>
             <button
               onClick={this.handleSubmit}
@@ -413,7 +460,6 @@ class Edit extends Component {
               <Link to="/dashboard">Cancel</Link>
             </button>
           </section>
-          {this.state.saved && <p> Save Successful </p>}
         </div>
         <div className="profile-child">
           <SwipeProfile
@@ -422,6 +468,7 @@ class Edit extends Component {
             intro={this.state.userProfile.intro}
             linkedin={this.state.userProfile.linkedin}
             github={this.state.userProfile.github}
+            githubFinished={this.state.userProfile.githubFinished}
             // profilePictureUrl={this.state.profilePictureUrl}
           />
         </div>
