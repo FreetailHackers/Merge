@@ -1,6 +1,8 @@
 # Merge
 
-Hackathon team formation webapp
+Hackathon team formation webapp. Features a real-time chat and swipe feature to find potential teammates.
+
+Contributions welcome!
 
 ## Technologies
 
@@ -19,11 +21,14 @@ Hackathon team formation webapp
 
 ## Configuration
 
-Utilize the .env.example file, and create two .env's one in your client director, the other in your
-default-service directory.
-Ask Adi for the AWS credentials.
+Utilize the .env.example file, and create two .env's one in your client directory, the other in your
+default-service directory. Remember that the client version must be called .env.local.
+Ask Adi/Pranay for the AWS credentials.
 
 ## Quick Start
+
+You need to also install redis and mongo and start them as a service. On MacOS this is done with brew services
+and on Linux it is done with systemctl.
 
 ```bash
 # Install dependencies for server & client
@@ -31,6 +36,7 @@ npm install && npm run client-install
 
 
 # Run client & api server & chat server with concurrently
+cd default-service
 npm run dev
 
 ```

@@ -44,6 +44,15 @@ class Dashboard extends Component {
                 using this{" "}
                 <a href="freetailhackers.com/htf-report">Misconduct Form</a>.
               </span>
+              <br /> <br />
+              <span>
+                Merge is hosted on{" "}
+                <a href="https://gitlab.com/freetail-hackers/Merge">Gitlab</a>,
+                with a read-only mirror on{" "}
+                <a href="https://github.com/FreetailHackers/Merge">GitHub</a>
+              </span>
+              <br /> <br /> <br /> <br />
+              <span>Made with ❤️ by Freetail Hackers</span>
             </div>
           </div>
         </div>
