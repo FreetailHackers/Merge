@@ -14,7 +14,7 @@ function Login(props) {
     if (props.auth.isAuthenticated) {
       navigate("/dashboard");
     }
-  }, [props]);
+  }, [props, navigate]);
 
   const onSubmit = (e) => {
     e.preventDefault();

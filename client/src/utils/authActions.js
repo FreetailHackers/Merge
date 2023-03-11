@@ -1,6 +1,15 @@
 import axios from "axios";
-import setAxiosHeaderAuthToken from "../utils/setAxiosHeaderAuthToken";
 import jwt_decode from "jwt-decode-non-json";
+
+const setAxiosHeaderAuthToken = (token) => {
+  if (token) {
+    // Apply authorization token to every request if logged in
+    axios.defaults.headers.common["x-access-token"] = token;
+  } else {
+    // Delete auth header
+    delete axios.defaults.headers.common["x-access-token"];
+  }
+};
 
 // Register - create user in database and get token
 export const registerUser = (userData, auth, setAuth, setErrors) => {
@@ -94,3 +103,33 @@ export const logoutUser = (auth, setAuth) => {
   setCurrentUser(null, auth, setAuth);
   // window.location.href = '/login';
 };
+
+function isTokenExpired(token) {
+  const { exp } = jwt_decode(token);
+  const timeInSeconds = Date.now() / 1000;
+  return exp < timeInSeconds;
+}
+
+export function initializeAuthIfLoggedIn(auth, setAuth) {
+  if (localStorage.jwtToken && localStorage.jwtToken !== "undefined") {
+    const token = localStorage.jwtToken;
+    setAxiosHeaderAuthToken(token);
+
+    axios
+      .get(process.env.REACT_APP_API_URL + "/api/users/validate")
+      .then((res) => {
+        setCurrentUser(jwt_decode(token), auth, setAuth);
+      })
+      .catch((err) => {
+        logoutUser(auth, setAuth);
+        window.location.href = "./login";
+      });
+
+    if (isTokenExpired(token)) {
+      logoutUser(auth, setAuth);
+      window.location.href = "./login";
+    }
+  } else {
+    setAuth({ ...auth, loading: false });
+  }
+}

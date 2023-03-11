@@ -17,7 +17,7 @@ function Register(props) {
     if (props.auth.isAuthenticated) {
       navigate("/edit");
     }
-  }, [props]);
+  }, [props, navigate]);
 
   const onRegister = (e) => {
     e.preventDefault();

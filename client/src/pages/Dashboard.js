@@ -1,18 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 
 import "./Dashboard.css";
 
 function Dashboard(props) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!props.auth.userID) {
-      navigate("/login");
-    }
-  }, [props.auth]);
-
   /*const onLogoutClick = (e) => {
     e.preventDefault();
     props.logoutUser();

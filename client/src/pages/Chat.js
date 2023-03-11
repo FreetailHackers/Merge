@@ -113,10 +113,11 @@ class Chat extends Component {
               );
               chat.seen = chat.readBy.includes(this.props.userID.id);
             }
-            this.setState({ chats: res.data });
-            if (res.data.length > 0) {
-              this.getMessages(0);
-            }
+            this.setState({ chats: res.data }, () => {
+              if (res.data.length > 0) {
+                this.getMessages(0);
+              }
+            });
           })
           .then(() => {
             if (this.props.swipedUser) {
@@ -124,7 +125,6 @@ class Chat extends Component {
                 { newChatInput: [this.props.swipedUser] },
                 this.createChat
               );
-              this.props.setSwipedUser(null);
             }
           });
       });
@@ -305,6 +305,9 @@ class Chat extends Component {
           creatingNewChat: false,
           activeChatIndex: this.state.chats.length,
         });
+        if (this.props.swipedUser) {
+          this.props.setSwipedUser(null);
+        }
       });
   }
 

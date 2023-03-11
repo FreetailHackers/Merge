@@ -55,94 +55,90 @@ function Swipe(props) {
     );
   }
 
-  async function loadUserToShow() {
-    //getting my swipeList
-    let myswipeList = null;
-    let myswipeReady = false;
-    let myBlockList = null;
-    let queryParamters = {
-      start: 0,
-      limit: 0,
-      id: props.userID.id,
-      filters: {},
-    };
-    await axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-        params: {
-          start: 0,
-          limit: 0,
-          id: props.auth.userID.id,
-          filters: {
-            _id: props.auth.userID.id,
-          },
-        },
-      })
-      .then((res) => {
-        myswipeList = res.data[0].swipeList;
-        myBlockList = res.data[0].blockList;
-        if (
-          res.data[0].profile[0] !== undefined &&
-          "swipeReady" in res.data[0].profile[0]
-        )
-          myswipeReady = res.data[0].profile[0].swipeReady;
-        setSwipeReady(myswipeReady);
-      });
-    if (!myswipeReady) {
-      setUsersLeft(false);
-      setLoadingUserToShow(false);
-      setSwipeReady(false);
-    } else {
-      axios
+  useEffect(() => {
+    async function loadUserToShow() {
+      //getting my swipeList
+      let myswipeList = null;
+      let myswipeReady = false;
+      let myBlockList = null;
+      let queryParamters = {
+        start: 0,
+        limit: 0,
+        id: props.auth.userID.id,
+        filters: {},
+      };
+      await axios
         .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-          params: queryParamters,
+          params: {
+            start: 0,
+            limit: 0,
+            id: props.auth.userID.id,
+            filters: {
+              _id: props.auth.userID.id,
+            },
+          },
         })
         .then((res) => {
-          let foundSomeone = false;
-          let i = 0;
-          while (i < res.data.length) {
-            let temp = res.data[i];
-            if (
-              !myswipeList.includes(temp._id) &&
-              !myBlockList.includes(temp._id) &&
-              temp._id !== props.auth.userID.id &&
-              !temp.blockList.includes(props.auth.userID.id) &&
-              containsRequired(temp)
-            ) {
-              foundSomeone = true;
-              break;
-            }
-            i++;
-          }
-          if (foundSomeone) {
-            var data = res.data[i].profile[0];
-            setUserToShow({
-              name: res.data[i].name,
-              school: data.school,
-              major: data.major,
-              classStanding: data.class,
-              skills: data.skills,
-              experienceLevel: data.experience,
-              intro: data.intro,
-              // profilePictureUrl: data.profilePictureUrl,
-              github: data.github,
-              linkedin: data.linkedin,
-              portfolio: data.portfolio,
-              _id: res.data[i]._id,
-            });
-          } else {
-            setUsersLeft(false);
-          }
-          setLoadingUserToShow(false);
+          myswipeList = res.data[0].swipeList;
+          myBlockList = res.data[0].blockList;
+          if (
+            res.data[0].profile[0] !== undefined &&
+            "swipeReady" in res.data[0].profile[0]
+          )
+            myswipeReady = res.data[0].profile[0].swipeReady;
+          setSwipeReady(myswipeReady);
         });
-    }
-  }
-
-  useEffect(() => {
-    async function loadFunc() {
-      await loadUserToShow();
+      if (!myswipeReady) {
+        setUsersLeft(false);
+        setLoadingUserToShow(false);
+        setSwipeReady(false);
+      } else {
+        axios
+          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+            params: queryParamters,
+          })
+          .then((res) => {
+            let foundSomeone = false;
+            let i = 0;
+            while (i < res.data.length) {
+              let temp = res.data[i];
+              if (
+                !myswipeList.includes(temp._id) &&
+                !myBlockList.includes(temp._id) &&
+                temp._id !== props.auth.userID.id &&
+                !temp.blockList.includes(props.auth.userID.id) &&
+                containsRequired(temp)
+              ) {
+                foundSomeone = true;
+                break;
+              }
+              i++;
+            }
+            if (foundSomeone) {
+              var data = res.data[i].profile[0];
+              setUserToShow({
+                name: res.data[i].name,
+                school: data.school,
+                major: data.major,
+                classStanding: data.class,
+                skills: data.skills,
+                experienceLevel: data.experience,
+                intro: data.intro,
+                // profilePictureUrl: data.profilePictureUrl,
+                github: data.github,
+                linkedin: data.linkedin,
+                portfolio: data.portfolio,
+                _id: res.data[i]._id,
+              });
+            } else {
+              setUsersLeft(false);
+            }
+            setLoadingUserToShow(false);
+          });
+      }
     }
     if (loadingUserToShow) {
-      loadFunc();
+      loadUserToShow();
     }
   }, [loadingUserToShow]);
 
@@ -159,7 +155,7 @@ function Swipe(props) {
     axios
       .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
         auth: props.auth,
-        id: props.userID.id,
+        id: props.auth.userID.id,
         otherUser: userToShow,
         decision: profileSide,
       })
@@ -369,7 +365,6 @@ function Swipe(props) {
 Swipe.propTypes = {
   auth: PropTypes.object.isRequired,
   user: PropTypes.object,
-  userID: PropTypes.object.isRequired,
   setSwipedUser: PropTypes.func,
 };
 

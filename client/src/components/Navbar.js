@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 
@@ -6,6 +6,11 @@ import "./Navbar.css";
 
 const Navbar = (props) => {
   const navigate = useNavigate();
+  useEffect(() => {
+    if (!props.auth.userID) {
+      navigate("/login");
+    }
+  }, [props.auth, navigate]);
 
   if (!props.user) return null;
 

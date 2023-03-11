@@ -5,10 +5,9 @@ import {
   registerUser,
   logoutUser,
   setCurrentUser,
-} from "./actions/authActions";
+  initializeAuthIfLoggedIn,
+} from "./utils/authActions";
 import PropTypes from "prop-types";
-
-import initializeAuthIfLoggedIn from "./utils/initializeAuthIfLoggedIn";
 
 import Navbar from "./components/Navbar";
 //import PrivateRoute from "./components/PrivateRoute";
@@ -56,8 +55,10 @@ export default function App() {
   const [swipedUser, setSwipedUser] = useState(null);
 
   useEffect(() => {
-    initializeAuthIfLoggedIn(auth, setAuth);
-  }, []);
+    if (!auth.user.admitted) {
+      initializeAuthIfLoggedIn(auth, setAuth);
+    }
+  }, [auth]);
 
   const login = (
     <Login
@@ -114,7 +115,6 @@ export default function App() {
               <Swipe
                 auth={auth}
                 user={auth.user}
-                userID={auth.userID}
                 setSwipedUser={setSwipedUser}
               />
             }
