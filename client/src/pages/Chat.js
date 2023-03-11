@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import axios from "axios";
-import { logoutUser, setCurrentUser } from "../actions/authActions";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWindow from "../components/ChatWindow";
 import ChatMissing from "../components/ChatsMissing";
@@ -121,12 +119,12 @@ class Chat extends Component {
             }
           })
           .then(() => {
-            if (this.props.location.data) {
+            if (this.props.swipedUser) {
               this.setState(
-                { newChatInput: this.props.location.data },
+                { newChatInput: [this.props.swipedUser] },
                 this.createChat
               );
-              this.props.location.data = null;
+              this.props.setSwipedUser(null);
             }
           });
       });
@@ -506,13 +504,10 @@ class Chat extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-  userID: state.auth.userID,
-});
-
 Chat.propTypes = {
   userID: PropTypes.object.isRequired,
-  location: PropTypes.object,
+  swipedUser: PropTypes.string,
+  setSwipedUser: PropTypes.func,
 };
 
-export default connect(mapStateToProps, { logoutUser, setCurrentUser })(Chat);
+export default Chat;

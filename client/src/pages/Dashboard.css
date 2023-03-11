@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  text-align: center
+  text-align: center;
 }
 
 .dash {
@@ -16,6 +16,7 @@
   justify-content: "center";
   margin-top: "auto";
   margin-bottom: "auto";
+  width: 100%;
 }
 
 #dashboard h1 {

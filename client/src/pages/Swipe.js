@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import Loading from "../components/Loading";
@@ -8,8 +8,43 @@ import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
 import "./Dashboard.css";
-class Swipe extends Component {
-  containsRequired(data) {
+
+function Swipe(props) {
+  const [loadingUserToShow, setLoadingUserToShow] = useState(true);
+  const [usersLeft, setUsersLeft] = useState(true);
+  const [swipeReady, setSwipeReady] = useState(true);
+  const [cursorDown, setCursorDown] = useState(false);
+  const [userToShow, setUserToShow] = useState({});
+  const [mouseDownPosition, setMouseDownPosition] = useState([0, 0]);
+  const [profilePosition, setProfilePosition] = useState([0, 0]);
+  const [profileAngle, setProfileAngle] = useState(0);
+  const [profileSide, setProfileSide] = useState("neutral");
+  //const [blockList, setBlockList] = useState([])
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.addEventListener("mouseup", mouseUpOnProfile);
+    document.body.addEventListener("mouseleave", mouseUpOnProfile);
+    document.body.addEventListener("mousemove", mouseMoveOnProfile);
+    document.body.addEventListener("keydown", keyDown);
+    document
+      .getElementById("swipe-profile")
+      .addEventListener("click", mouseDown);
+
+    return () => {
+      document.body.removeEventListener("mouseup", mouseUpOnProfile);
+      document.body.removeEventListener(
+        "mouseleave",
+        mouseUpOnProfile.bind(this)
+      );
+      document.body.removeEventListener("mousemove", mouseMoveOnProfile);
+      document.body.removeEventListener("keydown", keyDown);
+      document.body.removeEventListener("click", mouseDown);
+    };
+  }, []);
+
+  function containsRequired(data) {
     let userProfile = data.profile[0];
     return (
       data.name?.length !== 0 &&
@@ -19,356 +54,216 @@ class Swipe extends Component {
       userProfile.competitiveness?.length !== 0
     );
   }
-  getUserToShow = (callback) => {
-    var queryParamters = {
+
+  async function loadUserToShow() {
+    //getting my swipeList
+    let myswipeList = null;
+    let myswipeReady = false;
+    let myBlockList = null;
+    let queryParamters = {
       start: 0,
       limit: 0,
-      id: this.props.userID.id,
+      id: props.userID.id,
       filters: {},
     };
-    this.setState({ loadingUserToShow: true }, async () => {
-      //getting my swipeList
-      let myswipeList = null;
-      let myswipeReady = false;
-      let myBlockList = null;
-      await axios
-        .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-          params: {
-            start: 0,
-            limit: 0,
-            id: this.props.auth.userID.id,
-            filters: {
-              _id: this.props.auth.userID.id,
-            },
+    await axios
+      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+        params: {
+          start: 0,
+          limit: 0,
+          id: props.auth.userID.id,
+          filters: {
+            _id: props.auth.userID.id,
           },
+        },
+      })
+      .then((res) => {
+        myswipeList = res.data[0].swipeList;
+        myBlockList = res.data[0].blockList;
+        if (
+          res.data[0].profile[0] !== undefined &&
+          "swipeReady" in res.data[0].profile[0]
+        )
+          myswipeReady = res.data[0].profile[0].swipeReady;
+        setSwipeReady(myswipeReady);
+      });
+    if (!myswipeReady) {
+      setUsersLeft(false);
+      setLoadingUserToShow(false);
+      setSwipeReady(false);
+    } else {
+      axios
+        .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+          params: queryParamters,
         })
         .then((res) => {
-          myswipeList = res.data[0].swipeList;
-          myBlockList = res.data[0].blockList;
-          if (
-            res.data[0].profile[0] !== undefined &&
-            "swipeReady" in res.data[0].profile[0]
-          )
-            myswipeReady = res.data[0].profile[0].swipeReady;
-          this.state.swipeReady = myswipeReady;
-        });
-      if (!myswipeReady) {
-        this.setState({
-          usersLeft: false,
-          loadingUserToShow: false,
-          swipeReady: false,
-        });
-      } else {
-        axios
-          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-            params: queryParamters,
-          })
-          .then((res) => {
-            let foundSomeone = false;
-            let i = 0;
-            while (i < res.data.length) {
-              let temp = res.data[i];
-              if (
-                !myswipeList.includes(temp._id) &&
-                !myBlockList.includes(temp._id) &&
-                temp._id !== this.props.auth.userID.id &&
-                !temp.blockList.includes(this.props.auth.userID.id) &&
-                this.containsRequired(temp)
-              ) {
-                foundSomeone = true;
-                break;
-              }
-              i++;
+          let foundSomeone = false;
+          let i = 0;
+          while (i < res.data.length) {
+            let temp = res.data[i];
+            if (
+              !myswipeList.includes(temp._id) &&
+              !myBlockList.includes(temp._id) &&
+              temp._id !== props.auth.userID.id &&
+              !temp.blockList.includes(props.auth.userID.id) &&
+              containsRequired(temp)
+            ) {
+              foundSomeone = true;
+              break;
             }
-            if (foundSomeone) {
-              var data = res.data[i].profile[0];
-              this.setState(
-                {
-                  userToShow: {
-                    name: res.data[i].name,
-                    school: data.school,
-                    major: data.major,
-                    classStanding: data.class,
-                    skills: data.skills,
-                    experienceLevel: data.experience,
-                    intro: data.intro,
-                    // profilePictureUrl: data.profilePictureUrl,
-                    github: data.github,
-                    linkedin: data.linkedin,
-                    portfolio: data.portfolio,
-                    _id: res.data[i]._id,
-                  },
-                  loadingUserToShow: false,
-                },
-                () => {
-                  if (callback) callback();
-                }
-              );
-            } else {
-              this.setState(
-                {
-                  usersLeft: false,
-                  loadingUserToShow: false,
-                },
-                () => {
-                  if (callback) callback();
-                }
-              );
-            }
-          });
+            i++;
+          }
+          if (foundSomeone) {
+            var data = res.data[i].profile[0];
+            setUserToShow({
+              name: res.data[i].name,
+              school: data.school,
+              major: data.major,
+              classStanding: data.class,
+              skills: data.skills,
+              experienceLevel: data.experience,
+              intro: data.intro,
+              // profilePictureUrl: data.profilePictureUrl,
+              github: data.github,
+              linkedin: data.linkedin,
+              portfolio: data.portfolio,
+              _id: res.data[i]._id,
+            });
+          } else {
+            setUsersLeft(false);
+          }
+          setLoadingUserToShow(false);
+        });
+    }
+  }
+
+  useEffect(() => {
+    async function loadFunc() {
+      await loadUserToShow();
+    }
+    if (loadingUserToShow) {
+      loadFunc();
+    }
+  }, [loadingUserToShow]);
+
+  useEffect(() => {
+    if (profileSide.endsWith("committed")) {
+      swipeCallback();
+    } else if (profileSide === "neutral") {
+      setLoadingUserToShow(true);
+    }
+  }, [profileSide]);
+
+  function swipeCallback() {
+    const timeout = profileAngle === 0 ? 700 : 350;
+    axios
+      .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
+        auth: props.auth,
+        id: props.userID.id,
+        otherUser: userToShow,
+        decision: profileSide,
+      })
+      .then((res) => {
+        if (profileSide === "accept-committed") {
+          props.setSwipedUser(userToShow._id);
+          // set an App.js state variable to data
+          navigate("/chat");
+        }
+      });
+    setTimeout(() => {
+      if (profileAngle !== 0) {
+        setProfileAngle(0);
       }
-    });
-  };
-
-  constructor() {
-    super();
-    this.state = {
-      loadingUserToShow: true,
-      usersLeft: true,
-      swipeReady: true,
-      userToShow: {},
-      cursorDown: false,
-      mouseDownPosition: [0, 0],
-      profilePosition: [0, 0],
-      profileAngle: 0,
-      profileSide: "neutral",
-      blockList: [],
-    };
+      setProfileSide("neutral");
+    }, timeout);
   }
 
-  componentDidMount() {
-    this.getUserToShow();
-    document.body.addEventListener("mouseup", this.mouseUpOnProfile);
-    document.body.addEventListener("mouseleave", this.mouseUpOnProfile);
-    document.body.addEventListener("mousemove", this.mouseMoveOnProfile);
-    document.body.addEventListener("keydown", this.keyDown);
-    document
-      .getElementById("swipe-profile")
-      .addEventListener("click", this.mouseDown);
-  }
-
-  componentWillUnmount() {
-    document.body.removeEventListener("mouseup", this.mouseUpOnProfile);
-    document.body.removeEventListener(
-      "mouseleave",
-      this.mouseUpOnProfile.bind(this)
-    );
-    document.body.removeEventListener("mousemove", this.mouseMoveOnProfile);
-    document.body.removeEventListener("keydown", this.keyDown);
-    document.body.removeEventListener("click", this.mouseDown);
-  }
-
-  mouseDown = (e) => {
+  const mouseDown = (e) => {
     e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
+    if (profileSide.indexOf("committed") !== -1) return;
     switch (e.target.id) {
       case "left":
-        this.setState(
-          {
-            profileSide: "reject-committed",
-            profilePosition: [0, 0],
-            profileAngle: -20,
-          },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {});
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
-        );
+        setProfileAngle(-20);
+        setProfilePosition([0, 0]);
+        setProfileSide("reject-committed");
+        // swipeCallback("mouseDown")
         break;
       case "right":
-        this.setState(
-          {
-            profileSide: "accept-committed",
-            profilePosition: [0, 0],
-            profileAngle: 20,
-          },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              });
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
-        );
+        setProfileAngle(20);
+        setProfilePosition([0, 0]);
+        setProfileSide("accept-committed");
+        // swipeCallback("mouseDown")
         break;
       default:
         break;
     }
   };
 
-  keyDown = (e) => {
+  const keyDown = (e) => {
     e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
+    if (profileSide.indexOf("committed") !== -1) return;
 
     switch (e.code) {
       case "ArrowLeft":
-        this.setState(
-          {
-            profileSide: "reject-committed",
-            cursorDown: false,
-            profilePosition: [0, 0],
-            profileAngle: -20,
-          },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {});
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  cursorDown: false,
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
-        );
+        setProfileAngle(-20);
+        setProfilePosition([0, 0]);
+        setCursorDown(false);
+        setProfileSide("reject-committed");
+        // swipeCallback("keyDown")
         break;
       case "ArrowRight":
-        this.setState(
-          {
-            profileSide: "accept-committed",
-            cursorDown: false,
-            profilePosition: [0, 0],
-            profileAngle: 20,
-          },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              });
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  cursorDown: false,
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
-        );
+        setProfileAngle(20);
+        setProfilePosition([0, 0]);
+        setCursorDown(false);
+        setProfileSide("accept-committed");
+        // swipeCallback("keyDown")
         break;
       default:
         break;
     }
   };
 
-  buttonClick = (e) => {
+  /*const buttonClick = (e) => {
     e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
+    if (profileSide.indexOf("committed") !== -1) return;
+  };*/
+
+  const mouseDownOnProfile = (e) => {
+    e.preventDefault();
+    if (profileSide.indexOf("committed") !== -1) return;
+
+    setCursorDown(true);
+    setMouseDownPosition([e.clientX, e.clientY]);
+    setProfilePosition([0, 0]);
+    setProfileAngle(0);
+    setProfileSide("neutral");
   };
 
-  mouseDownOnProfile = (e) => {
+  const mouseUpOnProfile = (e) => {
     e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
+    if (profileSide.indexOf("committed") !== -1) return;
 
-    this.setState({
-      cursorDown: true,
-      mouseDownPosition: [e.clientX, e.clientY],
-      profilePosition: [0, 0],
-      profileAngle: 0,
-      profileSide: "neutral",
-    });
-  };
+    setProfileAngle(0);
+    setMouseDownPosition([0, 0]);
+    setProfilePosition([0, 0]);
+    setCursorDown(false);
 
-  mouseUpOnProfile = (e) => {
-    e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
-
-    if (this.state.profileSide === "neutral" || e.type !== "mouseup") {
-      this.setState({
-        cursorDown: false,
-        mouseDownPosition: [0, 0],
-        profilePosition: [0, 0],
-        profileAngle: 0,
-        profileSide: "neutral",
-      });
+    if (profileSide === "neutral" || e.type !== "mouseup") {
+      setProfileSide("neutral");
     } else {
-      this.setState(
-        {
-          profileSide: this.state.profileSide + "-committed",
-          cursorDown: false,
-          mouseDownPosition: [0, 0],
-          profilePosition: [0, 0],
-          profileAngle: 0,
-        },
-        () => {
-          axios
-            .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-              auth: this.props.auth,
-              id: this.props.userID.id,
-              otherUser: this.state.userToShow,
-              decision: this.state.profileSide,
-            })
-            .then((res) => {
-              if (this.state.profileSide === "accept-committed") {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              }
-            });
-
-          setTimeout(() => {
-            this.getUserToShow(() => {
-              this.setState({
-                profileSide: "neutral",
-              });
-            });
-          }, 700);
-        }
-      );
+      setProfileSide(profileSide + "-committed");
+      // swipeCallback("mouseUp", 700)
     }
   };
 
-  mouseMoveOnProfile = (e) => {
+  const mouseMoveOnProfile = (e) => {
     e.preventDefault();
-    if (this.state.profileSide.indexOf("committed") !== -1) return;
+    if (profileSide.indexOf("committed") !== -1) return;
 
-    if (this.state.cursorDown) {
+    if (cursorDown) {
       const position = [
-        e.clientX - this.state.mouseDownPosition[0],
-        e.clientY - this.state.mouseDownPosition[1],
+        e.clientX - mouseDownPosition[0],
+        e.clientY - mouseDownPosition[1],
       ];
 
       const rotateAmount = 4;
@@ -386,107 +281,96 @@ class Swipe extends Component {
           ? "accept"
           : "neutral";
 
-      this.setState({
-        profilePosition: position,
-        profileAngle: angle,
-        profileSide: side,
-      });
+      setProfilePosition(position);
+      setProfileAngle(angle);
+      setProfileSide(side);
     } else {
-      this.setState({
-        profilePosition: [0, 0],
-        profileAngle: 0,
-        profileSide: "neutral",
-      });
+      setProfilePosition([0, 0]);
+      setProfileAngle(0);
+      setProfileSide("neutral");
     }
   };
 
-  render() {
-    return (
-      <section id={"swipe-profile"}>
-        {this.state.loadingUserToShow ? (
-          <center>
-            <Loading />
-          </center>
-        ) : this.state.usersLeft ? (
-          <>
-            <SwipeProfile
-              name={this.state.userToShow.name}
-              school={this.state.userToShow.school}
-              intro={this.state.userToShow.intro}
-              // profilePictureUrl={this.state.userToShow.profilePictureUrl}
-              github={this.state.userToShow.github}
-              linkedin={this.state.userToShow.linkedin}
-              portfolio={this.state.userToShow.portfolio}
-              onMouseDown={this.mouseDownOnProfile}
-              relativePosition={this.state.profilePosition}
-              relativeAngle={this.state.profileAngle}
-              borderColor={this.state.profileSide}
+  return (
+    <section id={"swipe-profile"}>
+      {loadingUserToShow ? (
+        <center>
+          <Loading />
+        </center>
+      ) : usersLeft ? (
+        <>
+          <SwipeProfile
+            name={userToShow.name}
+            school={userToShow.school}
+            intro={userToShow.intro}
+            // profilePictureUrl={userToShow.profilePictureUrl}
+            github={userToShow.github}
+            linkedin={userToShow.linkedin}
+            portfolio={userToShow.portfolio}
+            onMouseDown={mouseDownOnProfile}
+            relativePosition={profilePosition}
+            relativeAngle={profileAngle}
+            borderColor={profileSide}
+          />
+          <div className="arrows">
+            <input
+              type="image"
+              src={arrowLeft}
+              alt="Arrow Left"
+              className="arrow left"
+              id="left"
+              /*onClick={click}*/
             />
-            <div className="arrows">
-              <input
-                type="image"
-                src={arrowLeft}
-                alt="Arrow Left"
-                className="arrow left"
-                id="left"
-                onClick={this.click}
-              />
-              <input
-                type="image"
-                src={arrowRight}
-                alt="Arrow Right"
-                className="arrow right"
-                id="right"
-                onClick={this.click}
-              />
-            </div>
-          </>
-        ) : !this.state.swipeReady ? (
-          <center>
-            <label>
-              <p style={{ fontSize: "20px", marginTop: "15%" }}>
-                {" "}
-                Please Make Sure Your Profile is Completed
-              </p>{" "}
-            </label>
-            <div className="team-image">
-              <div className="background" />
-              <div className="main" />
-              <div className="primary" />
-              <div className="secondary" />
-            </div>
-          </center>
-        ) : (
-          <center>
-            <label>
-              <p style={{ fontSize: "20px", marginTop: "15%" }}>
-                {" "}
-                No Users Left To Swipe
-              </p>
-            </label>
-            <div className="team-image">
-              <div className="background" />
-              <div className="main" />
-              <div className="primary" />
-              <div className="secondary" />
-            </div>
-          </center>
-        )}
-      </section>
-    );
-  }
+            <input
+              type="image"
+              src={arrowRight}
+              alt="Arrow Right"
+              className="arrow right"
+              id="right"
+              /*onClick={click}*/
+            />
+          </div>
+        </>
+      ) : !swipeReady ? (
+        <center>
+          <label>
+            <p style={{ fontSize: "20px", marginTop: "15%" }}>
+              {" "}
+              Please Make Sure Your Profile is Completed
+            </p>{" "}
+          </label>
+          <div className="team-image">
+            <div className="background" />
+            <div className="main" />
+            <div className="primary" />
+            <div className="secondary" />
+          </div>
+        </center>
+      ) : (
+        <center>
+          <label>
+            <p style={{ fontSize: "20px", marginTop: "15%" }}>
+              {" "}
+              No Users Left To Swipe
+            </p>
+          </label>
+          <div className="team-image">
+            <div className="background" />
+            <div className="main" />
+            <div className="primary" />
+            <div className="secondary" />
+          </div>
+        </center>
+      )}
+    </section>
+  );
 }
 
 Swipe.propTypes = {
   auth: PropTypes.object.isRequired,
+  user: PropTypes.object,
   userID: PropTypes.object.isRequired,
-  history: PropTypes.object,
+  setSwipedUser: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
-  auth: state.auth,
-  user: state.auth.user,
-  userID: state.auth.userID,
-});
-
-export default connect(mapStateToProps)(Swipe);
+export default Swipe;

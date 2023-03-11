@@ -1,7 +1,5 @@
 import React, { Component, useState } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { logoutUser, setCurrentUser } from "../actions/authActions";
 import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
@@ -482,13 +480,6 @@ Edit.propTypes = {
   user: PropTypes.object.isRequired,
   userID: PropTypes.object.isRequired,
   setCurrentUser: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  auth: state.auth,
-  user: state.auth.user,
-  userID: state.auth.userID,
-});
-
-export default connect(mapStateToProps, { logoutUser, setCurrentUser })(Edit);
+export default Edit;

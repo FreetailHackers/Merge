@@ -1,13 +1,7 @@
 import jwt_decode from "jwt-decode-non-json";
-
 import setAxiosHeaderAuthToken from "./setAxiosHeaderAuthToken";
-import store from "../store";
-import {
-  setCurrentUser,
-  logoutUser,
-  setUserLoading,
-  setUserNotLoading,
-} from "../actions/authActions";
+
+import { setCurrentUser, logoutUser } from "../actions/authActions";
 import axios from "axios";
 
 function isLoginTokenInLocalStorage() {
@@ -18,17 +12,17 @@ function redirectToLogin() {
   window.location.href = "./login";
 }
 
-function authenticateUserInStore(token) {
+function authenticateUserInState(token, auth, setAuth) {
   axios
     .get(process.env.REACT_APP_API_URL + "/api/users/validate")
     .then((res) => {
-      store.dispatch(setCurrentUser(jwt_decode(token)));
+      setCurrentUser(jwt_decode(token), auth, setAuth);
     })
-    .catch((err) => logoutUserInStore());
+    .catch((err) => logoutUserInState(auth, setAuth));
 }
 
-function logoutUserInStore() {
-  store.dispatch(logoutUser());
+function logoutUserInState(auth, setAuth) {
+  logoutUser(auth, setAuth);
   redirectToLogin();
 }
 
@@ -38,17 +32,17 @@ function isTokenExpired(token) {
   return exp < timeInSeconds;
 }
 
-function initializeAuthIfLoggedIn() {
-  store.dispatch(setUserLoading());
+function initializeAuthIfLoggedIn(auth, setAuth) {
+  setAuth({ ...auth, loading: true });
   if (isLoginTokenInLocalStorage()) {
     const token = localStorage.jwtToken;
     setAxiosHeaderAuthToken(token);
-    authenticateUserInStore(token);
+    authenticateUserInState(token, auth, setAuth);
     if (isTokenExpired(token)) {
-      logoutUserInStore();
+      logoutUserInState(auth, setAuth);
     }
   } else {
-    store.dispatch(setUserNotLoading());
+    setAuth({ ...auth, loading: false });
   }
 }
 
