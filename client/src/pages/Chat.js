@@ -28,8 +28,8 @@ class Chat extends Component {
     });
   }
 
-  getMessages(index) {
-    let chat = this.state.chats[index];
+  getMessages(index, newChats = null) {
+    let chat = newChats ? newChats[index] : this.state.chats[index];
     this.setState({ editingTitle: false, titleInput: chat.name });
     axios
       .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
@@ -44,23 +44,14 @@ class Chat extends Component {
             chat.profiles[author] = this.state.userMap[author];
           }
         }
-        this.setState(
-          {
-            chats: this.chatStateCopy(chat, false, index),
-            activeChatIndex: index,
-            messages: res.data,
-          },
-          () => {
-            document
-              .getElementById("chatScrollBox")
-              .scrollTo(
-                0,
-                document.getElementById("chatScrollBox").scrollHeight
-              );
-          }
-        );
+        this.setState({
+          chats: this.chatStateCopy(chat, false, index),
+          activeChatIndex: index,
+          messages: res.data,
+        });
       });
-    document.getElementById("newMessageInput").focus();
+    document.getElementById("newMessageInput") &&
+      document.getElementById("newMessageInput").focus();
   }
 
   async componentDidMount() {
@@ -113,18 +104,14 @@ class Chat extends Component {
               );
               chat.seen = chat.readBy.includes(this.props.userID.id);
             }
-            this.setState({ chats: res.data }, () => {
-              if (res.data.length > 0) {
-                this.getMessages(0);
-              }
-            });
+            this.setState({ chats: res.data });
+            if (res.data.length > 0) {
+              this.getMessages(0, res.data);
+            }
           })
           .then(() => {
-            if (this.props.swipedUser) {
-              this.setState(
-                { newChatInput: [this.props.swipedUser] },
-                this.createChat
-              );
+            if (this.props.swipedUser !== null) {
+              this.createChat([this.props.swipedUser]);
             }
           });
       });
@@ -182,15 +169,10 @@ class Chat extends Component {
     } else if (chatIndex > this.state.activeChatIndex) {
       newActiveChatIndex++;
     }
-    this.setState(
-      { chats: chatStateCopy, activeChatIndex: newActiveChatIndex },
-      () => {
-        newActiveChatIndex === 0 &&
-          document
-            .getElementById("chatScrollBox")
-            .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
-      }
-    );
+    this.setState({
+      chats: chatStateCopy,
+      activeChatIndex: newActiveChatIndex,
+    });
   };
 
   userLeftWS = (data) => {
@@ -242,11 +224,7 @@ class Chat extends Component {
       recipients: chat.users,
       timestamp: new Date().toISOString(),
     };
-    this.setState({ messages: [...this.state.messages, message] }, () => {
-      document
-        .getElementById("chatScrollBox")
-        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
-    });
+    this.setState({ messages: [...this.state.messages, message] });
     axios
       .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`, {
         contents,
@@ -261,8 +239,7 @@ class Chat extends Component {
       });
   };
 
-  async createChat() {
-    const users = this.state.newChatInput;
+  async createChat(users) {
     if (users.length > 5) return;
     for (const user of users) {
       if (!(user in this.state.userMap)) {
@@ -380,7 +357,7 @@ class Chat extends Component {
     }
     this.setState({ activeChatIndex: newIndex, chats: newChats });
     if (newChats.length > 0) {
-      this.getMessages(newIndex);
+      this.getMessages(newIndex, newChats);
     }
   }
 
@@ -446,7 +423,7 @@ class Chat extends Component {
           chats={this.state.chats}
           changeChat={this.getMessages.bind(this)}
           activeChatIndex={this.state.activeChatIndex}
-          createChat={this.createChat.bind(this)}
+          createChat={() => this.createChat(this.state.newChatInput)}
           creatingNewChat={this.state.creatingNewChat}
           setCreatingNewChat={(val) => this.setState({ creatingNewChat: val })}
           newChatInput={this.state.newChatInput}

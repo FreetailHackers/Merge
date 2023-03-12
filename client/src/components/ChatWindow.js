@@ -30,6 +30,17 @@ class ChatWindow extends Component {
     ) {
       this.setState({ ...defaultState });
     }
+    if (
+      (!prevProps.messages && this.props.messages) ||
+      (prevProps.messages &&
+        this.props.messages &&
+        prevProps.messages[prevProps.messages.length - 1] !==
+          this.props.messages[this.props.messages.length - 1])
+    ) {
+      document
+        .getElementById("chatScrollBox")
+        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
+    }
   }
 
   onKeyDown = (e) => {
