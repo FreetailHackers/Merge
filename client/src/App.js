@@ -90,60 +90,62 @@ export default function App() {
             />
           }
         />
-        <Route
-          path="/"
-          element={
-            <NavLayout
-              auth={auth}
-              logoutUser={() => logoutUser(auth, setAuth)}
-            />
-          }
-        >
+        {auth.userID && (
           <Route
-            path="dashboard"
+            path="/"
             element={
-              <Dashboard
+              <NavLayout
                 auth={auth}
-                user={auth.user}
                 logoutUser={() => logoutUser(auth, setAuth)}
               />
             }
-          />
-          <Route
-            path="swipe"
-            element={
-              <Swipe
-                auth={auth}
-                user={auth.user}
-                setSwipedUser={setSwipedUser}
-              />
-            }
-          />
-          <Route
-            path="edit"
-            element={
-              <Edit
-                auth={auth}
-                user={auth.user}
-                userID={auth.userID}
-                setCurrentUser={(userID, newUser) =>
-                  setCurrentUser(userID, auth, setAuth, newUser)
-                }
-              />
-            }
-          />
-          <Route
-            path="chat"
-            element={
-              <Chat
-                userID={auth.userID}
-                swipedUser={swipedUser}
-                setSwipedUser={setSwipedUser}
-              />
-            }
-          />
-          <Route path="about" element={<About />} />
-        </Route>
+          >
+            <Route
+              path="dashboard"
+              element={
+                <Dashboard
+                  auth={auth}
+                  user={auth.user}
+                  logoutUser={() => logoutUser(auth, setAuth)}
+                />
+              }
+            />
+            <Route
+              path="swipe"
+              element={
+                <Swipe
+                  auth={auth}
+                  user={auth.user}
+                  setSwipedUser={setSwipedUser}
+                />
+              }
+            />
+            <Route
+              path="edit"
+              element={
+                <Edit
+                  auth={auth}
+                  user={auth.user}
+                  userID={auth.userID}
+                  setCurrentUser={(userID, newUser) =>
+                    setCurrentUser(userID, auth, setAuth, newUser)
+                  }
+                />
+              }
+            />
+            <Route
+              path="chat"
+              element={
+                <Chat
+                  userID={auth.userID}
+                  swipedUser={swipedUser}
+                  setSwipedUser={setSwipedUser}
+                />
+              }
+            />
+            <Route path="about" element={<About />} />
+          </Route>
+        )}
       </Routes>
     </BrowserRouter>
   );
