@@ -49,7 +49,7 @@ SwipeProfile.propTypes = {
   onMouseUp: PropTypes.func,
   onMouseMove: PropTypes.func,
   profilePictureUrl: PropTypes.string,
-  github: PropTypes.object,
+  github: PropTypes.string,
   linkedin: PropTypes.object,
   portfolio: PropTypes.object,
   githubFinished: PropTypes.bool,
