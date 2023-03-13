@@ -1,18 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { logoutUser } from "../actions/authActions";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 
 import "./Navbar.css";
 
 const Navbar = (props) => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!props.auth.userID) {
+      navigate("/login");
+    }
+  }, [props.auth, navigate]);
+
   if (!props.user) return null;
 
   const onLogoutClick = (e) => {
     e.preventDefault();
     props.logoutUser();
-    props.history.push("/login");
+    navigate("/login");
   };
 
   return (
@@ -40,13 +45,6 @@ Navbar.propTypes = {
   auth: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
   logoutUser: PropTypes.func.isRequired,
-  history: PropTypes.object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  logoutUser: PropTypes.func.isRequired,
-  auth: state.auth,
-  user: state.auth.user,
-});
-
-export default connect(mapStateToProps, { logoutUser })(Navbar);
+export default Navbar;

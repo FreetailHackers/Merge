@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 import "./ChatsMissing.css";
 import "../pages/Dashboard.css";
 
-class ChatMissing extends Component {
-  render = () => (
+export default function ChatMissing() {
+  return (
     <div className="chatsMissingWindow">
       <h1>No conversations to display!</h1>
       <p>Match with more people to start conversations!</p>
@@ -16,5 +16,3 @@ class ChatMissing extends Component {
     </div>
   );
 }
-
-export default ChatMissing;

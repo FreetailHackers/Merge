@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { connect } from "react-redux";
 import axios from "axios";
 
 import Loading from "../components/Loading";
@@ -8,6 +7,17 @@ import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
 import "./Dashboard.css";
+
+import { useNavigate } from "react-router-dom";
+
+const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const navigate = useNavigate();
+    return <Component navigate={navigate} {...props} />;
+  };
+  return Wrapper;
+};
+
 class Swipe extends Component {
   containsRequired(data) {
     let userProfile = data.profile[0];
@@ -23,7 +33,7 @@ class Swipe extends Component {
     var queryParamters = {
       start: 0,
       limit: 0,
-      id: this.props.userID.id,
+      id: this.props.auth.userID.id,
       filters: {},
     };
     this.setState({ loadingUserToShow: true }, async () => {
@@ -158,6 +168,27 @@ class Swipe extends Component {
     document.body.removeEventListener("click", this.mouseDown);
   }
 
+  swipeCallback = (delay, callbackState) => {
+    axios
+      .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
+        auth: this.props.auth,
+        id: this.props.auth.userID.id,
+        otherUser: this.state.userToShow,
+        decision: this.state.profileSide,
+      })
+      .then((res) => {
+        if (this.state.profileSide === "accept-committed") {
+          this.props.setSwipedUser(this.state.userToShow._id);
+          this.props.navigate("/chat");
+        }
+      });
+    setTimeout(() => {
+      this.getUserToShow(() => {
+        this.setState(callbackState);
+      });
+    }, delay);
+  };
+
   mouseDown = (e) => {
     e.preventDefault();
     if (this.state.profileSide.indexOf("committed") !== -1) return;
@@ -169,24 +200,11 @@ class Swipe extends Component {
             profilePosition: [0, 0],
             profileAngle: -20,
           },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {});
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
+          () =>
+            this.swipeCallback(350, {
+              profileAngle: 0,
+              profileSide: "neutral",
+            })
         );
         break;
       case "right":
@@ -196,27 +214,11 @@ class Swipe extends Component {
             profilePosition: [0, 0],
             profileAngle: 20,
           },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              });
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
+          () =>
+            this.swipeCallback(350, {
+              profileAngle: 0,
+              profileSide: "neutral",
+            })
         );
         break;
       default:
@@ -237,25 +239,11 @@ class Swipe extends Component {
             profilePosition: [0, 0],
             profileAngle: -20,
           },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {});
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  cursorDown: false,
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
+          () =>
+            this.swipeCallback(350, {
+              profileAngle: 0,
+              profileSide: "neutral",
+            })
         );
         break;
       case "ArrowRight":
@@ -266,28 +254,11 @@ class Swipe extends Component {
             profilePosition: [0, 0],
             profileAngle: 20,
           },
-          () => {
-            axios
-              .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-                auth: this.props.auth,
-                id: this.props.userID.id,
-                otherUser: this.state.userToShow,
-                decision: this.state.profileSide,
-              })
-              .then((res) => {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              });
-            setTimeout(() => {
-              this.getUserToShow(() => {
-                this.setState({
-                  cursorDown: false,
-                  profileAngle: 0,
-                  profileSide: "neutral",
-                });
-              });
-            }, 350);
-          }
+          () =>
+            this.swipeCallback(350, {
+              profileAngle: 0,
+              profileSide: "neutral",
+            })
         );
         break;
       default:
@@ -334,29 +305,10 @@ class Swipe extends Component {
           profilePosition: [0, 0],
           profileAngle: 0,
         },
-        () => {
-          axios
-            .post(process.env.REACT_APP_API_URL + "/api/users/swipe", {
-              auth: this.props.auth,
-              id: this.props.userID.id,
-              otherUser: this.state.userToShow,
-              decision: this.state.profileSide,
-            })
-            .then((res) => {
-              if (this.state.profileSide === "accept-committed") {
-                let data = [this.state.userToShow._id];
-                this.props.history.push({ pathname: "/chat", data });
-              }
-            });
-
-          setTimeout(() => {
-            this.getUserToShow(() => {
-              this.setState({
-                profileSide: "neutral",
-              });
-            });
-          }, 700);
-        }
+        () =>
+          this.swipeCallback(700, {
+            profileSide: "neutral",
+          })
       );
     }
   };
@@ -479,14 +431,9 @@ class Swipe extends Component {
 
 Swipe.propTypes = {
   auth: PropTypes.object.isRequired,
-  userID: PropTypes.object.isRequired,
-  history: PropTypes.object,
+  user: PropTypes.object.isRequired,
+  setSwipedUser: PropTypes.func,
+  navigate: PropTypes.func,
 };
 
-const mapStateToProps = (state) => ({
-  auth: state.auth,
-  user: state.auth.user,
-  userID: state.auth.userID,
-});
-
-export default connect(mapStateToProps)(Swipe);
+export default withRouter(Swipe);
