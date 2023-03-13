@@ -415,7 +415,7 @@ class Chat extends Component {
       <div style={{ display: "flex", width: "100%" }}>
         <ChatSidebar
           chats={this.state.chats}
-          changeChat={(i) => this.setState({activeChatIndex: i})}
+          changeChat={(i) => this.setState({ activeChatIndex: i })}
           activeChatIndex={this.state.activeChatIndex}
           createChat={() => this.createChat(this.state.newChatInput)}
           creatingNewChat={this.state.creatingNewChat}

@@ -4,12 +4,6 @@ import PropTypes from "prop-types";
 import "./Dashboard.css";
 
 function Dashboard(props) {
-  /*const onLogoutClick = (e) => {
-    e.preventDefault();
-    props.logoutUser();
-    navigate("/login");
-  };*/
-
   const name = props.user.name;
 
   return (

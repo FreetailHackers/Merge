@@ -23,17 +23,18 @@ class ChatWindow extends Component {
   }
 
   componentDidMount() {
-    this.props.getMessages()
+    this.props.getMessages();
   }
 
   componentDidUpdate(prevProps) {
-    if ((!prevProps.chat && this.props.chat) || (
-      prevProps.chat &&
-      this.props.chat &&
-      prevProps.chat._id !== this.props.chat._id
-    )) {
+    if (
+      (!prevProps.chat && this.props.chat) ||
+      (prevProps.chat &&
+        this.props.chat &&
+        prevProps.chat._id !== this.props.chat._id)
+    ) {
       this.setState({ ...defaultState });
-      this.props.getMessages()
+      this.props.getMessages();
     }
     if (
       (!prevProps.messages && this.props.messages) ||
