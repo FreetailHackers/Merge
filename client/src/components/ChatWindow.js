@@ -22,13 +22,18 @@ class ChatWindow extends Component {
     this.state = { ...defaultState };
   }
 
+  componentDidMount() {
+    this.props.getMessages()
+  }
+
   componentDidUpdate(prevProps) {
-    if (
+    if ((!prevProps.chat && this.props.chat) || (
       prevProps.chat &&
       this.props.chat &&
       prevProps.chat._id !== this.props.chat._id
-    ) {
+    )) {
       this.setState({ ...defaultState });
+      this.props.getMessages()
     }
     if (
       (!prevProps.messages && this.props.messages) ||
@@ -495,6 +500,7 @@ ChatWindow.propTypes = {
   profiles: PropTypes.array,
   title: PropTypes.string.isRequired,
   messages: PropTypes.arrayOf(PropTypes.object),
+  getMessages: PropTypes.func,
   otherUsers: PropTypes.arrayOf(PropTypes.object),
   addUsers: PropTypes.func.isRequired,
   setEditingTitle: PropTypes.func.isRequired,

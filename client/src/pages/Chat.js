@@ -55,15 +55,15 @@ class Chat extends Component {
   }
 
   async componentDidMount() {
-    this.socket.emit("new-connection", { userID: this.props.userID.id });
+    this.socket.emit("new-connection", { userID: this.props.userID });
     await axios
       .get(process.env.REACT_APP_API_URL + "/api/users/list", {
         params: {
           start: 0,
           limit: 0,
-          id: this.props.userID.id,
+          id: this.props.userID,
           filters: {
-            _id: this.props.userID.id,
+            _id: this.props.userID,
           },
         },
       })
@@ -74,7 +74,7 @@ class Chat extends Component {
     axios
       .get(process.env.REACT_APP_API_URL + "/api/users/list", {
         params: {
-          id: this.props.userID.id,
+          id: this.props.userID,
         },
       })
       .then((res) => {
@@ -87,7 +87,7 @@ class Chat extends Component {
           ),
           otherUsers: [
             ...res.data.filter(
-              (user) => user._id && user._id !== this.props.userID.id
+              (user) => user._id && user._id !== this.props.userID
             ),
           ],
         });
@@ -102,12 +102,9 @@ class Chat extends Component {
               chat.profiles = Object.fromEntries(
                 chat.users.map((id) => [id, this.state.userMap[id]])
               );
-              chat.seen = chat.readBy.includes(this.props.userID.id);
+              chat.seen = chat.readBy.includes(this.props.userID);
             }
             this.setState({ chats: res.data });
-            if (res.data.length > 0) {
-              this.getMessages(0, res.data);
-            }
           })
           .then(() => {
             if (this.props.swipedUser !== null) {
@@ -176,7 +173,7 @@ class Chat extends Component {
   };
 
   userLeftWS = (data) => {
-    if (data.user === this.props.userID.id) {
+    if (data.user === this.props.userID) {
       this.removeChatFromClient(
         this.state.chats.find((chat) => chat._id === data.chatID)
       );
@@ -195,10 +192,10 @@ class Chat extends Component {
     if (index > -1) {
       let newUserObj = { ...this.state.otherUsers[index] };
       if (blocked) {
-        newUserObj.blockList.push(this.props.userID.id);
+        newUserObj.blockList.push(this.props.userID);
       } else {
         newUserObj.blockList = [
-          ...newUserObj.blockList.filter((e) => e !== this.props.userID.id),
+          ...newUserObj.blockList.filter((e) => e !== this.props.userID),
         ];
       }
       let newOthUsers = [
@@ -211,14 +208,14 @@ class Chat extends Component {
   };
 
   componentWillUnmount() {
-    this.socket.disconnect({ userID: this.props.userID.id });
+    this.socket.disconnect({ userID: this.props.userID });
   }
 
   sendMessage = (contents) => {
     if (contents === "") return;
     const chat = this.state.chats[this.state.activeChatIndex];
     const message = {
-      author: this.props.userID.id,
+      author: this.props.userID,
       contents: contents,
       chat: chat._id,
       recipients: chat.users,
@@ -356,9 +353,6 @@ class Chat extends Component {
       newIndex--;
     }
     this.setState({ activeChatIndex: newIndex, chats: newChats });
-    if (newChats.length > 0) {
-      this.getMessages(newIndex, newChats);
-    }
   }
 
   deleteChat() {
@@ -376,7 +370,7 @@ class Chat extends Component {
   leaveChatWS(leftChat) {
     this.socket.emit("leave-chat", {
       chatID: leftChat._id,
-      user: this.props.userID.id,
+      user: this.props.userID,
     });
     this.removeChatFromClient(leftChat);
   }
@@ -421,7 +415,7 @@ class Chat extends Component {
       <div style={{ display: "flex", width: "100%" }}>
         <ChatSidebar
           chats={this.state.chats}
-          changeChat={this.getMessages.bind(this)}
+          changeChat={(i) => this.setState({activeChatIndex: i})}
           activeChatIndex={this.state.activeChatIndex}
           createChat={() => this.createChat(this.state.newChatInput)}
           creatingNewChat={this.state.creatingNewChat}
@@ -433,9 +427,9 @@ class Chat extends Component {
           otherUsers={this.state.otherUsers.filter(
             (user) =>
               !this.state.blockedByMe.includes(user._id) &&
-              !user.blockList.includes(this.props.userID.id)
+              !user.blockList.includes(this.props.userID)
           )}
-          selfID={this.props.userID.id}
+          selfID={this.props.userID}
         />
         {this.state.chats.length === 0 ? (
           <ChatMissing />
@@ -446,8 +440,9 @@ class Chat extends Component {
                 message.chat ===
                 this.state.chats[this.state.activeChatIndex]._id
             )}
+            getMessages={() => this.getMessages(this.state.activeChatIndex)}
             sendMessage={this.sendMessage}
-            selfID={this.props.userID.id}
+            selfID={this.props.userID}
             addUsers={this.addUsers.bind(this)}
             title={this.state.chats[this.state.activeChatIndex].name}
             titleInput={this.state.titleInput}
@@ -467,7 +462,7 @@ class Chat extends Component {
                     user._id
                   ) &&
                   !this.state.blockedByMe.includes(user._id) &&
-                  !user.blockList.includes(this.props.userID.id)
+                  !user.blockList.includes(this.props.userID)
               )
             }
             chat={this.state.chats[this.state.activeChatIndex]}
@@ -485,7 +480,7 @@ class Chat extends Component {
 }
 
 Chat.propTypes = {
-  userID: PropTypes.object.isRequired,
+  userID: PropTypes.string.isRequired,
   swipedUser: PropTypes.string,
   setSwipedUser: PropTypes.func,
 };

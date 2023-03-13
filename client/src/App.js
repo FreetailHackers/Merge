@@ -7,14 +7,13 @@ import {
   setCurrentUser,
   initializeAuthIfLoggedIn,
 } from "./utils/authActions";
+
 import PropTypes from "prop-types";
 
 import Navbar from "./components/Navbar";
-//import PrivateRoute from "./components/PrivateRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-//import Database from "./pages/Database";
 import Dashboard from "./pages/Dashboard";
 import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
@@ -55,7 +54,7 @@ export default function App() {
   const [swipedUser, setSwipedUser] = useState(null);
 
   useEffect(() => {
-    if (!auth.user.admitted) {
+    if (!auth.user.admitted && auth.loading) {
       initializeAuthIfLoggedIn(auth, setAuth);
     }
   }, [auth]);
@@ -137,7 +136,7 @@ export default function App() {
               path="chat"
               element={
                 <Chat
-                  userID={auth.userID}
+                  userID={auth.userID && auth.userID.id}
                   swipedUser={swipedUser}
                   setSwipedUser={setSwipedUser}
                 />
@@ -149,31 +148,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-  /* <RouterProvider router={router}/>
-  <Provider store={store}>
-      <Router>
-        <div className="App">
-          <Switch>
-            {" "}
-            {/* this will render the login page WITHOUT the navbar on routes / and /login //}
-            <Route exact path="/" component={Login} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/register" component={Register} />
-            <Route path="/:anything" component={Navbar} />
-          </Switch>
-          <PrivateRoute
-            exact
-            path="/admin"
-            component={Database}
-            childProps={{ title: "Admin", admin: true }}
-          />
-          {/*<PrivateRoute exact path="/database" component={Database}/> //}
-          <Route exact path="/dashboard" component={Dashboard} />
-          <PrivateRoute exact path="/swipe" component={Swipe} />
-          <PrivateRoute exact path="/edit" component={Edit} />
-          <PrivateRoute exact path="/chat" component={Chat} />
-          <Route exact path="/about" component={About} />
-        </div>
-      </Router>
-    </Provider> */
 }
