@@ -43,6 +43,7 @@ export const registerUser = (userData, auth, setAuth, setErrors) => {
       setCurrentUser(userID, auth, setAuth);
     })
     .catch((err) => {
+      console.log(err);
       logoutUser(auth, setAuth);
       setAuth({ ...auth, loading: false });
       setErrors({ status: err.message });
@@ -131,7 +132,12 @@ export function initializeAuthIfLoggedIn(auth, setAuth) {
     }
   } else {
     setAuth({ ...auth, loading: false });
-    if (window.location.pathname !== "/login") {
+    if (
+      !(
+        window.location.pathname === "/login" ||
+        window.location.pathname === "/register"
+      )
+    ) {
       window.location.href = "./login";
     }
   }
