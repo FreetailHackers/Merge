@@ -131,7 +131,12 @@ export function initializeAuthIfLoggedIn(auth, setAuth) {
     }
   } else {
     setAuth({ ...auth, loading: false });
-    if (window.location.pathname !== "/login") {
+    if (
+      !(
+        window.location.pathname === "/login" ||
+        window.location.pathname === "/register"
+      )
+    ) {
       window.location.href = "./login";
     }
   }
