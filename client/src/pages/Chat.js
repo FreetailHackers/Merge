@@ -412,7 +412,7 @@ class Chat extends Component {
 
   render() {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
+      <div className="chat">
         <ChatSidebar
           chats={this.state.chats}
           changeChat={(i) => this.setState({ activeChatIndex: i })}
@@ -483,6 +483,8 @@ Chat.propTypes = {
   userID: PropTypes.string.isRequired,
   swipedUser: PropTypes.string,
   setSwipedUser: PropTypes.func,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Chat;

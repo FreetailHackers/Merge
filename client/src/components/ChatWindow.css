@@ -1,9 +1,21 @@
 .chatWindow {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   height: 100vh;
+}
+
+
+@media all and (orientation:portrait) {
+  .chatWindow {
+    width: 100vw;
+  }
+}
+
+@media all and (orientation:landscape) {
+  .chatWindow {
+    width: calc(100vw - 550px);
+  }
 }
 
 .hidden {

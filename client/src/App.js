@@ -20,18 +20,24 @@ import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
 
+import { useMediaQuery } from "@mantine/hooks";
+
 import "./Theme.css";
 import "./App.css";
 
 function NavLayout(props) {
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
-      <Navbar
-        auth={props.auth}
-        user={props.auth.user}
-        logoutUser={props.logoutUser}
-      />
-      <Outlet />
+      {(props.displaySidebar || props.wideScreen) && (
+        <Navbar
+          auth={props.auth}
+          user={props.auth.user}
+          logoutUser={props.logoutUser}
+          wideScreen={props.wideScreen}
+          flipDisplaySidebar={props.flipDisplaySidebar}
+        />
+      )}
+      {(!props.displaySidebar || props.wideScreen) && <Outlet />}
     </div>
   );
 }
@@ -39,6 +45,9 @@ function NavLayout(props) {
 NavLayout.propTypes = {
   auth: PropTypes.object.isRequired,
   logoutUser: PropTypes.func,
+  displaySidebar: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
+  wideScreen: PropTypes.bool,
 };
 
 const initialUserState = {
@@ -52,6 +61,8 @@ export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [errors, setErrors] = useState({});
   const [swipedUser, setSwipedUser] = useState(null);
+  const [displaySidebar, setDisplaySidebar] = useState(true);
+  const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
     if (!auth.user.admitted && auth.loading) {
@@ -96,6 +107,9 @@ export default function App() {
               <NavLayout
                 auth={auth}
                 logoutUser={() => logoutUser(auth, setAuth)}
+                displaySidebar={displaySidebar}
+                flipDisplaySidebar={() => setDisplaySidebar(false)}
+                wideScreen={wideScreen}
               />
             }
           >
@@ -106,6 +120,8 @@ export default function App() {
                   auth={auth}
                   user={auth.user}
                   logoutUser={() => logoutUser(auth, setAuth)}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
             />
@@ -116,6 +132,8 @@ export default function App() {
                   auth={auth}
                   user={auth.user}
                   setSwipedUser={setSwipedUser}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
             />
@@ -129,6 +147,8 @@ export default function App() {
                   setCurrentUser={(userID, newUser) =>
                     setCurrentUser(userID, auth, setAuth, newUser)
                   }
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
             />
@@ -139,10 +159,20 @@ export default function App() {
                   userID={auth.userID && auth.userID.id}
                   swipedUser={swipedUser}
                   setSwipedUser={setSwipedUser}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
             />
-            <Route path="about" element={<About />} />
+            <Route
+              path="about"
+              element={
+                <About
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                />
+              }
+            />
           </Route>
         )}
       </Routes>

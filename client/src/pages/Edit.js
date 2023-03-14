@@ -216,6 +216,16 @@ function Edit(props) {
   return (
     <div className="profile-container">
       <div className="profile-child">
+        {!props.wideScreen && (
+          <div className="toggleHolder">
+            <button
+              className="toggleSidebar toggleCenter"
+              onClick={props.flipDisplaySidebar}
+            >
+              ≡
+            </button>
+          </div>
+        )}
         <section id="settings">
           <form>
             <Checkbox
@@ -445,6 +455,8 @@ Edit.propTypes = {
   user: PropTypes.object.isRequired,
   userID: PropTypes.object.isRequired,
   setCurrentUser: PropTypes.func.isRequired,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Edit;

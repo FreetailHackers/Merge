@@ -15,24 +15,40 @@ const Navbar = (props) => {
   if (!props.user) return null;
 
   const onLogoutClick = (e) => {
+    props.flipDisplaySidebar();
     e.preventDefault();
     props.logoutUser();
     navigate("/login");
   };
 
   return (
-    <div>
-      <div id="navbar-spacing" />
+    <div id="navbar-spacing">
       <nav id="navbar">
-        <Link to="/dashboard">
+        {!props.wideScreen && (
+          <button
+            className="toggle toggleSidebar"
+            onClick={props.flipDisplaySidebar}
+          >
+            ≡
+          </button>
+        )}
+        <Link to="/dashboard" onClick={props.flipDisplaySidebar}>
           <div className="logo white" />
         </Link>
-        <NavLink to="/swipe">Find Team Members</NavLink>
-        <NavLink to="/chat">Chat</NavLink>
-        <NavLink to="/edit">Edit Profile</NavLink>
+        <NavLink to="/swipe" onClick={props.flipDisplaySidebar}>
+          Find Team Members
+        </NavLink>
+        <NavLink to="/chat" onClick={props.flipDisplaySidebar}>
+          Chat
+        </NavLink>
+        <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
+          Edit Profile
+        </NavLink>
         {/*<NavLink to="/database">User List</NavLink>*/}
         {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
-        <NavLink to="/about">About</NavLink>
+        <NavLink to="/about" onClick={props.flipDisplaySidebar}>
+          About
+        </NavLink>
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
@@ -45,6 +61,8 @@ Navbar.propTypes = {
   auth: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
   logoutUser: PropTypes.func.isRequired,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Navbar;

@@ -11,3 +11,10 @@
 .themeButton:hover {
   background-color: var(--secondary);
 }
+
+.chat {
+  display: flex;
+  flex-direction: row;
+  width: calc(100vw - 250px);
+  height: 100vh;
+}
