@@ -18,3 +18,27 @@
   width: calc(100vw - 250px);
   height: 100vh;
 }
+
+@media all and (orientation:portrait) {
+  .chatSidebar {
+    width: 100vw;
+  }
+  .chatWindow {
+    width: 100vw;
+  }
+  .chat {
+    width: 100vw;
+  }
+}
+
+@media all and (orientation:landscape) {
+  .chatSidebar {
+    width: 300px;
+  }
+  .chatWindow {
+    width: calc(100vw - 550px);
+  }
+  .chat {
+    width: calc(100vw - 250px);
+  }
+}

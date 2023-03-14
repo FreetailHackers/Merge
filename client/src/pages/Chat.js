@@ -21,6 +21,7 @@ class Chat extends Component {
       userMap: {},
       otherUsers: [],
       blockedByMe: [],
+      displayWindow: false,
     };
     this.socket = io(process.env.REACT_APP_CHAT_URL, {
       transports: ["websocket"],
@@ -413,67 +414,78 @@ class Chat extends Component {
   render() {
     return (
       <div className="chat">
-        <ChatSidebar
-          chats={this.state.chats}
-          changeChat={(i) => this.setState({ activeChatIndex: i })}
-          activeChatIndex={this.state.activeChatIndex}
-          createChat={() => this.createChat(this.state.newChatInput)}
-          creatingNewChat={this.state.creatingNewChat}
-          setCreatingNewChat={(val) => this.setState({ creatingNewChat: val })}
-          newChatInput={this.state.newChatInput}
-          updateNewChatInput={(values) => {
-            this.setState({ newChatInput: values });
-          }}
-          otherUsers={this.state.otherUsers.filter(
-            (user) =>
-              !this.state.blockedByMe.includes(user._id) &&
-              !user.blockList.includes(this.props.userID)
-          )}
-          selfID={this.props.userID}
-        />
-        {this.state.chats.length === 0 ? (
-          <ChatMissing />
-        ) : (
-          <ChatWindow
-            messages={this.state.messages.filter(
-              (message) =>
-                message.chat ===
-                this.state.chats[this.state.activeChatIndex]._id
+        {(this.props.wideScreen || !this.state.displayWindow) && (
+          <ChatSidebar
+            chats={this.state.chats}
+            changeChat={(i) =>
+              this.setState({ activeChatIndex: i, displayWindow: true })
+            }
+            activeChatIndex={this.state.activeChatIndex}
+            createChat={() => this.createChat(this.state.newChatInput)}
+            creatingNewChat={this.state.creatingNewChat}
+            setCreatingNewChat={(val) =>
+              this.setState({ creatingNewChat: val })
+            }
+            flipDisplaySidebar={this.props.flipDisplaySidebar}
+            wideScreen={this.props.wideScreen}
+            newChatInput={this.state.newChatInput}
+            updateNewChatInput={(values) => {
+              this.setState({ newChatInput: values });
+            }}
+            otherUsers={this.state.otherUsers.filter(
+              (user) =>
+                !this.state.blockedByMe.includes(user._id) &&
+                !user.blockList.includes(this.props.userID)
             )}
-            getMessages={() => this.getMessages(this.state.activeChatIndex)}
-            sendMessage={this.sendMessage}
             selfID={this.props.userID}
-            addUsers={this.addUsers.bind(this)}
-            title={this.state.chats[this.state.activeChatIndex].name}
-            titleInput={this.state.titleInput}
-            editingTitle={this.state.editingTitle}
-            setEditingTitle={(editingTitle) =>
-              this.setState({ editingTitle: editingTitle })
-            }
-            setTitleInput={(newTitleInput) =>
-              this.setState({ titleInput: newTitleInput })
-            }
-            setTitle={(newTitle) => this.setTitle(newTitle)}
-            otherUsers={
-              this.state.otherUsers &&
-              this.state.otherUsers.filter(
-                (user) =>
-                  !this.state.chats[this.state.activeChatIndex].users.includes(
-                    user._id
-                  ) &&
-                  !this.state.blockedByMe.includes(user._id) &&
-                  !user.blockList.includes(this.props.userID)
-              )
-            }
-            chat={this.state.chats[this.state.activeChatIndex]}
-            deleteChat={this.deleteChat.bind(this)}
-            leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
-            blockedByMe={this.state.blockedByMe}
-            blockUsers={this.blockUsers.bind(this)}
-            kickUsers={this.kickUsersWS.bind(this)}
-            unblockUsers={this.unblockUsers.bind(this)}
           />
         )}
+        {(this.props.wideScreen || this.state.displayWindow) &&
+          (this.state.chats.length === 0 ? (
+            <ChatMissing />
+          ) : (
+            <ChatWindow
+              messages={this.state.messages.filter(
+                (message) =>
+                  message.chat ===
+                  this.state.chats[this.state.activeChatIndex]._id
+              )}
+              getMessages={() => this.getMessages(this.state.activeChatIndex)}
+              sendMessage={this.sendMessage}
+              selfID={this.props.userID}
+              addUsers={this.addUsers.bind(this)}
+              title={this.state.chats[this.state.activeChatIndex].name}
+              titleInput={this.state.titleInput}
+              editingTitle={this.state.editingTitle}
+              setEditingTitle={(editingTitle) =>
+                this.setState({ editingTitle: editingTitle })
+              }
+              setTitleInput={(newTitleInput) =>
+                this.setState({ titleInput: newTitleInput })
+              }
+              setTitle={(newTitle) => this.setTitle(newTitle)}
+              otherUsers={
+                this.state.otherUsers &&
+                this.state.otherUsers.filter(
+                  (user) =>
+                    !this.state.chats[
+                      this.state.activeChatIndex
+                    ].users.includes(user._id) &&
+                    !this.state.blockedByMe.includes(user._id) &&
+                    !user.blockList.includes(this.props.userID)
+                )
+              }
+              chat={this.state.chats[this.state.activeChatIndex]}
+              deleteChat={this.deleteChat.bind(this)}
+              leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
+              blockedByMe={this.state.blockedByMe}
+              blockUsers={this.blockUsers.bind(this)}
+              kickUsers={this.kickUsersWS.bind(this)}
+              unblockUsers={this.unblockUsers.bind(this)}
+              flipDisplaySidebar={() => this.setState({ displayWindow: false })}
+              wideScreen={this.props.wideScreen}
+            />
+          ))}
       </div>
     );
   }

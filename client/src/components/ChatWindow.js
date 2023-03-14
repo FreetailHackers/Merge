@@ -145,6 +145,16 @@ class ChatWindow extends Component {
   render = () => (
     <div className="chatWindow">
       <div className="chatWindowHeader">
+        {!this.props.wideScreen && (
+          <div className="windowToggleHolder">
+            <button
+              className="toggleSidebar"
+              onClick={this.props.flipDisplaySidebar}
+            >
+              ←
+            </button>
+          </div>
+        )}
         <div className="chatWindowTitle">
           {this.props.editingTitle ? (
             <input
@@ -173,74 +183,79 @@ class ChatWindow extends Component {
             </h3>
           )}
         </div>
-        <div
-          className="userAddition"
-          style={this.state.addingUsers ? { width: "30%", marginRight: 8 } : {}}
-        >
+        {this.props.wideScreen && (
           <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginBottom: this.state.addingUsers ? 10 : 0,
-            }}
+            className="userAddition"
+            style={
+              this.state.addingUsers ? { width: "30%", marginRight: 8 } : {}
+            }
           >
-            {this.state.addingUsers && (
-              <button
-                className="themeButton"
-                onClick={() => {
-                  this.setState({ addingUsers: false, newUserIDs: [] });
-                }}
-              >
-                Cancel
-              </button>
-            )}
-            {!this.state.reportPressed &&
-              this.props.chat.users.length < 5 &&
-              (!this.state.addingUsers || this.state.newUserIDs.length > 0) && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                marginBottom: this.state.addingUsers ? 10 : 0,
+              }}
+            >
+              {this.state.addingUsers && (
                 <button
                   className="themeButton"
                   onClick={() => {
-                    if (this.state.addingUsers) {
-                      this.props.addUsers(this.state.newUserIDs);
-                      this.setState({ newUserIDs: [], addingUsers: false });
-                    } else {
-                      this.setState({ addingUsers: true });
-                      this.props.setEditingTitle(false);
-                    }
+                    this.setState({ addingUsers: false, newUserIDs: [] });
                   }}
                 >
-                  Add Users
+                  Cancel
                 </button>
               )}
+              {!this.state.reportPressed &&
+                this.props.chat.users.length < 5 &&
+                (!this.state.addingUsers ||
+                  this.state.newUserIDs.length > 0) && (
+                  <button
+                    className="themeButton"
+                    onClick={() => {
+                      if (this.state.addingUsers) {
+                        this.props.addUsers(this.state.newUserIDs);
+                        this.setState({ newUserIDs: [], addingUsers: false });
+                      } else {
+                        this.setState({ addingUsers: true });
+                        this.props.setEditingTitle(false);
+                      }
+                    }}
+                  >
+                    Add Users
+                  </button>
+                )}
+            </div>
+            {this.state.addingUsers && (
+              <MultiSelect
+                style={{ width: "100%" }}
+                value={this.state.newUserIDs}
+                onChange={(values) =>
+                  this.setState({
+                    newUserIDs:
+                      values.length + this.props.chat.users.length > 5
+                        ? values.slice(
+                            0,
+                            5 - values.length - this.props.chat.users.length
+                          )
+                        : values,
+                  })
+                }
+                placeholder="Search for people"
+                searchable
+                data={
+                  this.props.otherUsers &&
+                  this.props.otherUsers.map((user) => ({
+                    value: user._id,
+                    label: user.name,
+                    image: user.profile && user.profile[0]?.profilePictureUrl,
+                  }))
+                }
+              />
+            )}
           </div>
-          {this.state.addingUsers && (
-            <MultiSelect
-              style={{ width: "100%" }}
-              value={this.state.newUserIDs}
-              onChange={(values) =>
-                this.setState({
-                  newUserIDs:
-                    values.length + this.props.chat.users.length > 5
-                      ? values.slice(
-                          0,
-                          5 - values.length - this.props.chat.users.length
-                        )
-                      : values,
-                })
-              }
-              placeholder="Search for people"
-              searchable
-              data={
-                this.props.otherUsers &&
-                this.props.otherUsers.map((user) => ({
-                  value: user._id,
-                  label: user.name,
-                  image: user.profile && user.profile[0]?.profilePictureUrl,
-                }))
-              }
-            />
-          )}
-        </div>
+        )}
         {this.props.chat.users.length > 1 && (
           <button
             className="themeButton"
@@ -251,7 +266,7 @@ class ChatWindow extends Component {
             Manage Users
           </button>
         )}
-        {this.state.leavingDeleting && (
+        {this.props.wideScreen && this.state.leavingDeleting && (
           <button
             className="themeButton"
             onClick={() => this.setState({ leavingDeleting: false })}
@@ -259,28 +274,32 @@ class ChatWindow extends Component {
             Cancel
           </button>
         )}
-        <button
-          className="themeButton"
-          type="button"
-          id="delete"
-          onClick={
-            !this.state.leavingDeleting
-              ? () => this.setState({ leavingDeleting: true })
-              : this.props.chat.owner === this.props.selfID
-              ? this.props.deleteChat
-              : this.props.leaveChat
-          }
-        >
-          {this.state.leavingDeleting
-            ? `Confirm ${
-                this.props.chat.owner === this.props.selfID
-                  ? "Deleting"
-                  : "Leaving"
-              }?`
-            : `${
-                this.props.chat.owner === this.props.selfID ? "Delete" : "Leave"
-              } Chat`}
-        </button>
+        {this.props.wideScreen && (
+          <button
+            className="themeButton"
+            type="button"
+            id="delete"
+            onClick={
+              !this.state.leavingDeleting
+                ? () => this.setState({ leavingDeleting: true })
+                : this.props.chat.owner === this.props.selfID
+                ? this.props.deleteChat
+                : this.props.leaveChat
+            }
+          >
+            {this.state.leavingDeleting
+              ? `Confirm ${
+                  this.props.chat.owner === this.props.selfID
+                    ? "Deleting"
+                    : "Leaving"
+                }?`
+              : `${
+                  this.props.chat.owner === this.props.selfID
+                    ? "Delete"
+                    : "Leave"
+                } Chat`}
+          </button>
+        )}
       </div>
       <div id="chatScrollBox" className="chatScrollBox">
         {this.props.messages
@@ -516,6 +535,8 @@ ChatWindow.propTypes = {
   unblockUsers: PropTypes.func,
   blockedByMe: PropTypes.array,
   kickUsers: PropTypes.func,
+  flipDisplaySidebar: PropTypes.func,
+  wideScreen: PropTypes.bool,
 };
 
 export default ChatWindow;

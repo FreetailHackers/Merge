@@ -6,18 +6,6 @@
 }
 
 
-@media all and (orientation:portrait) {
-  .chatWindow {
-    width: 100vw;
-  }
-}
-
-@media all and (orientation:landscape) {
-  .chatWindow {
-    width: calc(100vw - 550px);
-  }
-}
-
 .hidden {
   display: none;
 }
@@ -224,7 +212,7 @@ Messages
   padding-bottom: 15px;
 }
 
-.chatWindowHeader button {
+.chatWindowHeader .themeButton {
   min-width: 85px;
   font-size: 1em;
 }
@@ -274,4 +262,19 @@ h3 {
 
 #delete {
   margin-right: 16px;
+}
+
+
+.chatWindowHeader .windowToggleHolder {
+  margin-left: 10px;
+  margin-right: auto;
+  display: inline-block;
+}
+
+.chatWindowHeader .toggleSidebar {
+  background-color: white;
+}
+
+.chatWindowHeader .toggleSidebar {
+  margin: 0
 }
