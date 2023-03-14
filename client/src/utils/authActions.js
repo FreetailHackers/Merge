@@ -43,7 +43,6 @@ export const registerUser = (userData, auth, setAuth, setErrors) => {
       setCurrentUser(userID, auth, setAuth);
     })
     .catch((err) => {
-      console.log(err);
       logoutUser(auth, setAuth);
       setAuth({ ...auth, loading: false });
       setErrors({ status: err.message });
