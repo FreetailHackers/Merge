@@ -10,15 +10,29 @@
   display: none;
 }
 
+@media all and (orientation:landscape) {
+  .reportFloatingWindow {
+    width: 50%;
+    height: 50%;
+    top: 20%;
+  }
+}
+
+@media all and (orientation:portrait) {
+  .reportFloatingWindow {
+    left: 0%;
+    width: 98%;
+    height: 98%;
+    top: 0%;
+  }
+}
+
 .reportFloatingWindow {
   position: fixed;
   display: block;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   border-radius: 5px;
-  width: 50%;
-  height: 50%;
-  top: 20%;
-  padding-top: 2%;
+  padding: 1%;
   background-color: white;
   overflow-y: scroll;
 }
@@ -37,9 +51,9 @@
 }
 
 .exitButton {
-  float: right;
-  margin: -3% 5% 0 0;
+  float: left;
   background: #ddd;
+  margin: 0;
   border-radius: 15px;
   padding: 10px;
   border: none;
@@ -48,15 +62,15 @@
   font-weight: bold;
 }
 
-.reportWindowCheckbox {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  margin-top: 30px;
+.actionButton {
+  border: none;
+  width: 35px;
+  height: 25px;
+  border-radius: 15px;
+  margin-left: 12px;
+  margin-right: 0;
 }
-.reportWindowCheckbox input {
-  margin-right: 10px;
-}
+
 
 #submit {
   position: relative;
@@ -73,10 +87,12 @@
   align-items: center;
 }
 
-.reportWindowUserSelect div {
+.userRow {
   display: flex;
   flex-direction: row;
   margin-top: 15px;
+  align-items: center;
+  justify-content: center;
 }
 
 .reportFloatingWindow p {
@@ -257,7 +273,10 @@ h3 {
 .userAddition {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
+  width: 100%;
+  margin-top: 15px;
 }
 
 #delete {
@@ -267,7 +286,7 @@ h3 {
 
 .chatWindowHeader .windowToggleHolder {
   margin-left: 10px;
-  margin-right: auto;
+  margin-right: 20px;
   display: inline-block;
 }
 

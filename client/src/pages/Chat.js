@@ -376,7 +376,11 @@ class Chat extends Component {
     this.removeChatFromClient(leftChat);
   }
 
-  kickUsersWS(users, chatID) {
+  async kickUsersWS(users, chatID) {
+    await axios.post(
+      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
+      { users }
+    );
     this.socket.emit("remove-users", {
       chatID: chatID,
       users: users,
@@ -395,20 +399,32 @@ class Chat extends Component {
       .then(() => this.leaveChatWS(deletedChat));
   }
 
-  blockUsers(users) {
-    this.setState({
-      blockedByMe: [...new Set([...this.state.blockedByMe, ...users])],
-    });
-    this.socket.emit("block-users", { users });
-  }
-
-  unblockUsers(users) {
+  blockUnblockUsers(blocking, unblocking) {
+    for (const user of blocking) {
+      axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
+        { userID: this.props.userID }
+      );
+    }
+    if (blocking.length > 0) {
+      this.socket.emit("block-users", { users: blocking });
+    }
+    for (const user of unblocking) {
+      axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock",
+        { userID: this.props.userID }
+      );
+    }
+    if (unblocking.length > 0) {
+      this.socket.emit("unblock-users", { users: unblocking });
+    }
     this.setState({
       blockedByMe: [
-        ...this.state.blockedByMe.filter((u) => !users.includes(u)),
+        ...[...new Set([...this.state.blockedByMe, ...blocking])].filter(
+          (u) => !unblocking.includes(u)
+        ),
       ],
     });
-    this.socket.emit("unblock-users", { users });
   }
 
   render() {
@@ -479,9 +495,8 @@ class Chat extends Component {
               deleteChat={this.deleteChat.bind(this)}
               leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
               blockedByMe={this.state.blockedByMe}
-              blockUsers={this.blockUsers.bind(this)}
+              blockUnblockUsers={this.blockUnblockUsers.bind(this)}
               kickUsers={this.kickUsersWS.bind(this)}
-              unblockUsers={this.unblockUsers.bind(this)}
               flipDisplaySidebar={() => this.setState({ displayWindow: false })}
               wideScreen={this.props.wideScreen}
             />
