@@ -1,8 +1,6 @@
 {
-  "functions": {
-    "default-service/**/*": {
-      "excludeFiles": "chatServer.js"
-    }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
