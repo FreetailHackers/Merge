@@ -9,12 +9,14 @@ function ChatSettings(props) {
   const [reporting, setReporting] = useState([]);
   const [blocking, setBlocking] = useState([]);
   const [unblocking, setUnblocking] = useState([]);
+  const [leavingDeleting, setLeavingDeleting] = useState("");
 
   const anyAction =
     kicking.length > 0 ||
     reporting.length > 0 ||
     blocking.length > 0 ||
-    unblocking.length > 0;
+    unblocking.length > 0 ||
+    leavingDeleting === "confirmed";
 
   const chatOwner = props.chat.owner === props.selfID;
 
@@ -154,6 +156,37 @@ function ChatSettings(props) {
             />
           )}
         </div>
+
+        <div className="userRow">
+          {leavingDeleting && (
+            <button
+              className="themeButton"
+              onClick={() => setLeavingDeleting("")}
+            >
+              Cancel
+            </button>
+          )}
+          {leavingDeleting === "confirmed" ? (
+            <p style={{ color: "#900" }} className="redText">
+              {chatOwner ? "Deleting" : "Leaving"} Chat
+            </p>
+          ) : (
+            <button
+              className="themeButton"
+              type="button"
+              id="delete"
+              onClick={
+                !leavingDeleting
+                  ? () => setLeavingDeleting("pondering")
+                  : () => setLeavingDeleting("confirmed")
+              }
+            >
+              {leavingDeleting
+                ? `Confirm ${chatOwner ? "Deleting" : "Leaving"}?`
+                : `${chatOwner ? "Delete" : "Leave"} Chat`}
+            </button>
+          )}
+        </div>
       </div>
 
       {reporting.length > 0 && (
@@ -164,7 +197,13 @@ function ChatSettings(props) {
           id="submit"
           className="submitButton themeButton"
           onClick={() =>
-            props.submitReport(kicking, blocking, unblocking, reporting)
+            props.submitReport(
+              kicking,
+              blocking,
+              unblocking,
+              reporting,
+              leavingDeleting
+            )
           }
         >
           Submit

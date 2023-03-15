@@ -8,7 +8,6 @@ import ChatSettings from "./ChatSettings";
 const defaultState = {
   newMessage: "",
   reportPressed: false,
-  leavingDeleting: false,
 };
 
 class ChatWindow extends Component {
@@ -44,6 +43,20 @@ class ChatWindow extends Component {
     }
   }
 
+  /*
+  useEffect(() => {
+    props.getMessages();
+    setReportPressed(false)
+    setNewMessage(false)
+  }, [props.chat._id])
+
+  useEffect(() => {
+    document
+        .getElementById("chatScrollBox")
+        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
+  }, [props.messages])
+  */
+
   onKeyDown = (e) => {
     if (e.key.toLowerCase() === "enter") {
       this.props.sendMessage(e.target.value);
@@ -76,7 +89,13 @@ class ChatWindow extends Component {
     this.props.setEditingTitle(false);
   };
 
-  submitReport = async (kicking, blocking, unblocking, reporting) => {
+  submitReport = async (
+    kicking,
+    blocking,
+    unblocking,
+    reporting,
+    leavingDeleting
+  ) => {
     if (reporting.length > 0) {
       const contents = document.getElementById("reason").value;
       for (const user of reporting) {
@@ -92,11 +111,17 @@ class ChatWindow extends Component {
       document.getElementById("reason").value = "";
     }
     if (blocking.length > 0 || unblocking.length > 0) {
-      this.props.blockUnblockUsers(blocking, unblocking);
+      await this.props.blockUnblockUsers(blocking, unblocking);
     }
 
-    if (kicking.length > 0) {
-      await this.props.kickUsers(kicking, this.props.chat._id);
+    if (this.props.selfID === this.props.chat.owner) {
+      if (leavingDeleting) {
+        this.props.deleteChat();
+      } else if (kicking.length > 0) {
+        await this.props.kickUsers(kicking, this.props.chat._id);
+      }
+    } else if (leavingDeleting) {
+      this.props.leaveChat();
     }
   };
 
@@ -152,40 +177,6 @@ class ChatWindow extends Component {
             Settings
           </button>
         )}
-        {this.state.leavingDeleting && (
-          <button
-            className="themeButton"
-            onClick={() => this.setState({ leavingDeleting: false })}
-          >
-            Cancel
-          </button>
-        )}
-        {
-          <button
-            className="themeButton"
-            type="button"
-            id="delete"
-            onClick={
-              !this.state.leavingDeleting
-                ? () => this.setState({ leavingDeleting: true })
-                : this.props.chat.owner === this.props.selfID
-                ? this.props.deleteChat
-                : this.props.leaveChat
-            }
-          >
-            {this.state.leavingDeleting
-              ? `Confirm ${
-                  this.props.chat.owner === this.props.selfID
-                    ? "Deleting"
-                    : "Leaving"
-                }?`
-              : `${
-                  this.props.chat.owner === this.props.selfID
-                    ? "Delete"
-                    : "Leave"
-                } Chat`}
-          </button>
-        }
       </div>
       <div id="chatScrollBox" className="chatScrollBox">
         {this.props.messages

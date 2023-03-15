@@ -128,10 +128,6 @@
   .chatSidebarTop .toggleSidebar {
     background-color: white;
   }
-  .newChatButton {
-    margin-left: calc(50% - 86px);
-    margin-right: calc(50% - 50px);
-  }
 }
 
 @media all and (orientation:landscape) {
@@ -152,4 +148,16 @@
 .chatSidebarTop div {
    margin-top: 0;
    margin-bottom: 0;
+}
+
+.newChatButton {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.innerButtonHolder {
+  width: calc(100% - 15px);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

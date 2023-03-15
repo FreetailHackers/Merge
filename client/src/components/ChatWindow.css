@@ -58,6 +58,9 @@
   padding: 10px;
   border: none;
   cursor: pointer;
+}
+
+.exitButton, .reportFloatingWindow .themeButton, .redText {
   font-size: 16px;
   font-weight: bold;
 }
@@ -231,6 +234,7 @@ Messages
 .chatWindowHeader .themeButton {
   min-width: 85px;
   font-size: 1em;
+  margin-right: 16px;
 }
 
 .chatWindowHeader input {
@@ -255,10 +259,12 @@ h3 {
   background-color: #eee;
 }
 
-.chatWindowHeader h3, input, button {
+.chatWindowHeader h3, input {
   margin-left: 8px;
   margin-right: 8px;
 }
+
+
 
 .chatScrollBox {
   width: 100%;

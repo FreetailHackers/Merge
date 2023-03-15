@@ -368,15 +368,7 @@ class Chat extends Component {
       });
   }
 
-  leaveChatWS(leftChat) {
-    this.socket.emit("leave-chat", {
-      chatID: leftChat._id,
-      user: this.props.userID,
-    });
-    this.removeChatFromClient(leftChat);
-  }
-
-  async kickUsersWS(users, chatID) {
+  async kickUsers(users, chatID) {
     await axios.post(
       process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
       { users }
@@ -391,17 +383,21 @@ class Chat extends Component {
   }
 
   leaveChat(chatIndex) {
-    const deletedChat = this.state.chats[chatIndex];
+    const leftChat = this.state.chats[chatIndex];
     axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/leave`
-      )
-      .then(() => this.leaveChatWS(deletedChat));
+      .post(process.env.REACT_APP_API_URL + `/api/chats/${leftChat._id}/leave`)
+      .then(() => {
+        this.socket.emit("leave-chat", {
+          chatID: leftChat._id,
+          user: this.props.userID,
+        });
+        this.removeChatFromClient(leftChat);
+      });
   }
 
-  blockUnblockUsers(blocking, unblocking) {
+  async blockUnblockUsers(blocking, unblocking) {
     for (const user of blocking) {
-      axios.post(
+      await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
         { userID: this.props.userID }
       );
@@ -410,7 +406,7 @@ class Chat extends Component {
       this.socket.emit("block-users", { users: blocking });
     }
     for (const user of unblocking) {
-      axios.post(
+      await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock",
         { userID: this.props.userID }
       );
@@ -496,7 +492,7 @@ class Chat extends Component {
               leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
               blockedByMe={this.state.blockedByMe}
               blockUnblockUsers={this.blockUnblockUsers.bind(this)}
-              kickUsers={this.kickUsersWS.bind(this)}
+              kickUsers={this.kickUsers.bind(this)}
               flipDisplaySidebar={() => this.setState({ displayWindow: false })}
               wideScreen={this.props.wideScreen}
             />

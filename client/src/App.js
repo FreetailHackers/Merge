@@ -61,7 +61,7 @@ export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [errors, setErrors] = useState({});
   const [swipedUser, setSwipedUser] = useState(null);
-  const [displaySidebar, setDisplaySidebar] = useState(true);
+  const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {

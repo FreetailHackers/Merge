@@ -21,26 +21,30 @@ const ChatSidebar = (props) => (
             </button>
           </div>
         )}
-        {props.creatingNewChat && (
-          <button
-            className="newChatButton themeButton"
-            onClick={() => props.setCreatingNewChat(false)}
-          >
-            Cancel
-          </button>
-        )}
-        {(!props.creatingNewChat || props.newChatInput.length > 0) && (
-          <button
-            className="newChatButton themeButton"
-            onClick={
-              props.creatingNewChat
-                ? props.createChat
-                : () => props.setCreatingNewChat(true)
-            }
-          >
-            {props.creatingNewChat ? "Confirm" : "New Chat"}
-          </button>
-        )}
+        {
+          <div className={props.wideScreen ? "" : "innerButtonHolder"}>
+            {props.creatingNewChat && (
+              <button
+                className="newChatButton themeButton"
+                onClick={() => props.setCreatingNewChat(false)}
+              >
+                Cancel
+              </button>
+            )}
+            {(!props.creatingNewChat || props.newChatInput.length > 0) && (
+              <button
+                className="newChatButton themeButton"
+                onClick={
+                  props.creatingNewChat
+                    ? props.createChat
+                    : () => props.setCreatingNewChat(true)
+                }
+              >
+                {props.creatingNewChat ? "Confirm" : "New Chat"}
+              </button>
+            )}
+          </div>
+        }
       </div>
       {props.creatingNewChat && (
         <MultiSelect
