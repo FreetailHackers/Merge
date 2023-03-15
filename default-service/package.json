@@ -15,10 +15,6 @@
     "lint": "npx eslint '**/*.js'",
     "test": "jest --coverage --detectOpenHandles --passWithNoTests"
   },
-  "engines": {
-    "node": ">=16.16.0",
-    "npm": ">=8.1.2"
-  },
   "author": "",
   "license": "MIT",
   "dependencies": {
