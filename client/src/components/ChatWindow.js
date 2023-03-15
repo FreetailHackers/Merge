@@ -166,17 +166,14 @@ class ChatWindow extends Component {
             </h3>
           )}
         </div>
-
-        {this.props.chat.users.length > 1 && (
-          <button
-            className="themeButton"
-            type="button"
-            id="block"
-            onClick={this.showReport}
-          >
-            Settings
-          </button>
-        )}
+        <button
+          className="themeButton"
+          type="button"
+          id="block"
+          onClick={this.showReport}
+        >
+          Settings
+        </button>
       </div>
       <div id="chatScrollBox" className="chatScrollBox">
         {this.props.messages

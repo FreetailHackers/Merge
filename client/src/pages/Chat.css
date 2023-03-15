@@ -6,6 +6,8 @@
   color: var(--text-on-primary);
   border: none;
   cursor: pointer;
+  margin-left: 8px;
+  margin-right: 8px;
   }
 
 .themeButton:hover {

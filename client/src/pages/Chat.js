@@ -454,7 +454,10 @@ class Chat extends Component {
         )}
         {(this.props.wideScreen || this.state.displayWindow) &&
           (this.state.chats.length === 0 ? (
-            <ChatMissing />
+            <ChatMissing
+              flipDisplaySidebar={() => this.setState({ displayWindow: false })}
+              wideScreen={this.props.wideScreen}
+            />
           ) : (
             <ChatWindow
               messages={this.state.messages.filter(

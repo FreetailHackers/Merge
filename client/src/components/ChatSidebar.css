@@ -150,11 +150,6 @@
    margin-bottom: 0;
 }
 
-.newChatButton {
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
 .innerButtonHolder {
   width: calc(100% - 15px);
   display: flex;
