@@ -51,8 +51,8 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 
 // Routes
-app.use("/api/users", users.router);
-app.use("/api/chats", chats.router);
+// app.use("/api/users", users.router);
+// app.use("/api/chats", chats.router);
 
 app.get("/", (req, res) => {
   res.status(200).send("Hello World");
