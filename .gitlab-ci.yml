@@ -92,6 +92,26 @@ deploy_integ:
     - rm -r ~/.aws
     - git add .
 
+update_integ_api:
+  extends: create_integ
+  stage: staging
+  retry: 2
+  script:
+    - cp default-service/package.json .
+    - mv $CI_ENV_FILE_INTEG default-service/.env
+    - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
+    - echo "REACT_APP_CHAT_URL=$CI_ENVIRONMENT_URL:5003" >> ./client/.env
+    - rm -r .platform
+    - git add .
+    - git status
+    - ls -al
+    - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
+  after_script:
+    - rm default-service/.env
+    - rm ./client/.env
+    - rm -r ~/.aws
+    - git add .
+
 acceptance_test:
   image: alpine
   stage: test
@@ -131,67 +151,66 @@ stop_integ:
   after_script:
     - rm -r ~/.aws
 
-create_prod_api:
-  stage: pre-production
-  image: $EB_IMAGE
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  environment:
-    name: prod-api
-    url: https://merge-api.freetailhackers.com/
-  variables:
-    EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
-    FOLDER: .
-  before_script:
-    - mkdir ~/.aws/
-    - touch ~/.aws/credentials
-    - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
-    - rm .gitignore
-    - rm .ebextensions/integ-security-group.config
-    - echo $EB_ENVIRONMENT
-    - cd $FOLDER
-  script:
-    - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
-    - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
-    - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
-  after_script:
-    - rm -r ~/.aws
-    - sleep 30
+# create_prod_api:
+#   stage: pre-production
+#   image: $EB_IMAGE
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#   environment:
+#     name: prod-api
+#     url: https://merge-api.freetailhackers.com/
+#   variables:
+#     EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
+#     FOLDER: .
+#   before_script:
+#     - mkdir ~/.aws/
+#     - touch ~/.aws/credentials
+#     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
+#     - rm .gitignore
+#     - rm .ebextensions/integ-security-group.config
+#     - echo $EB_ENVIRONMENT
+#     - cd $FOLDER
+#   script:
+#     - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
+#     - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
+#     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
+#   after_script:
+#     - rm -r ~/.aws
+#     - sleep 30
 
-deploy_prod_api:
-  stage: production
-  extends: create_prod_api
-  retry: 2
-  variables:
-    FOLDER: default-service
-  script:
-    - mv $CI_ENV_FILE_PROD_API .env
-    - mv ../.elasticbeanstalk .elasticbeanstalk
-    - rm ../Procfile
-    - rm -r ../.ebextensions
-    - mkdir .ebextensions
-    - mv $PROD_HTTPS_API_ALB .ebextensions/securelistener-alb.config
-    - 'echo "web: npm install && npm run server" > Procfile'
-    - git add .
-    - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
-  after_script:
-    - cd $FOLDER
-    - rm .env
-    - rm .ebextensions/securelistener-alb.config
-    - rm -r ~/.aws
-    - git add .
+# deploy_prod_api:
+#   stage: production
+#   extends: create_prod_api
+#   retry: 2
+#   variables:
+#     FOLDER: default-service
+#   script:
+#     - mv $CI_ENV_FILE_PROD_API .env
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - rm ../Procfile
+#     - rm -r ../.ebextensions
+#     - mkdir .ebextensions
+#     - mv $PROD_HTTPS_API_ALB .ebextensions/securelistener-alb.config
+#     - 'echo "web: npm install && npm run server" > Procfile'
+#     - git add .
+#     - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
+#   after_script:
+#     - cd $FOLDER
+#     - rm .env
+#     - rm .ebextensions/securelistener-alb.config
+#     - rm -r ~/.aws
+#     - git add .
 
-
-stop_prod_api:
-  extends: deploy_prod_api
-  when: manual
-  environment:
-    action: stop
-  script:
-    - mv ../.elasticbeanstalk .elasticbeanstalk
-    - eb terminate --timeout 60 --force $EB_ENVIRONMENT
-  after_script:
-    - rm -r ~/.aws
+# stop_prod_api:
+#   extends: deploy_prod_api
+#   when: manual
+#   environment:
+#     action: stop
+#   script:
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - eb terminate --timeout 60 --force $EB_ENVIRONMENT
+#   after_script:
+#     - rm -r ~/.aws
 
 create_prod_chat:
   stage: pre-production
@@ -242,7 +261,6 @@ deploy_prod_chat:
     - rm .ebextensions/options.config
     - rm -r ~/.aws
     - git add .
-
 
 stop_prod_chat:
   extends: deploy_prod_chat

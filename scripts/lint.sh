@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FRONTEND_DIR="client/"
-BACKEND_DIR="default-service/"
+BACKEND_DIR="api/"
 FOLDER=""
 
 if [ "$1" == "frontend" ]; then

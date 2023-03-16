@@ -2,5 +2,5 @@
 
 echo ""
 echo "Testing backend code"
-cd default-service/
+cd api/
 npm run test
