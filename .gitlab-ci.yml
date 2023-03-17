@@ -194,7 +194,7 @@ lint_format_backend:
 
 update_vercel_prod:
   stage: production
-  image: node:16
+  image: node:16.16.0
   # rules:
   #   - if: '$CI_COMMIT_BRANCH == "main"'
   script:
