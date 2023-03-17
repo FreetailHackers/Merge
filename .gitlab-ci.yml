@@ -202,6 +202,7 @@ update_vercel_prod:
     - npm install esbuild
     - npx esbuild server.js --bundle --outfile=api/index.js --platform=node --target=node16
     - npm install -g vercel
+    - cat $VERCEL_TOKEN
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
     - vercel deploy --prod --token=$VERCEL_TOKEN
 
