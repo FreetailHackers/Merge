@@ -7,5 +7,28 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "((?!/api).*)", "destination": "/" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": ["https://merge.freetailhackers.com"]
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Origin, X-Requested-With, X-ACCESS-TOKEN, Content-Type, *, Accept"
+        }
+      ]
+    }
   ]
 }
