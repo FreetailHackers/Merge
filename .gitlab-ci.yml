@@ -201,6 +201,7 @@ update_vercel_prod:
     - cd default-service
     - npm install esbuild
     - npx esbuild server.js --bundle --outfile=api/index.js --platform=node --target=node16
+    - npm config delete engines.node && npm config delete engines.npm
     - npm install -g vercel
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
     - vercel deploy --prod --token=$VERCEL_TOKEN
