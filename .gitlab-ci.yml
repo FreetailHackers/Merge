@@ -1,8 +1,8 @@
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
-      when: never
+    # - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
+    #   when: never
     - if: "$CI_COMMIT_BRANCH == 'amplify-prod'"
       when: never
     - if: "$CI_COMMIT_BRANCH"
@@ -46,90 +46,90 @@ lint_format_backend:
   variables:
     FOLDER: default-service
 
-create_integ:
-  stage: pre-staging
-  image: $EB_IMAGE
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  environment:
-    name: integ
-    url: http://freetail-merge-integ.us-east-1.elasticbeanstalk.com
-  variables:
-    EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
-    FOLDER: .
-  before_script:
-    - mkdir ~/.aws/
-    - touch ~/.aws/credentials
-    - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
-    - rm .gitignore
-    - echo $EB_ENVIRONMENT
-    - cd $FOLDER
-  script:
-    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
-    - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
-  after_script:
-    - rm -r ~/.aws
-    - sleep 30
+# create_integ:
+#   stage: pre-staging
+#   image: $EB_IMAGE
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#   environment:
+#     name: integ
+#     url: http://freetail-merge-integ.us-east-1.elasticbeanstalk.com
+#   variables:
+#     EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
+#     FOLDER: .
+#   before_script:
+#     - mkdir ~/.aws/
+#     - touch ~/.aws/credentials
+#     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
+#     - rm .gitignore
+#     - echo $EB_ENVIRONMENT
+#     - cd $FOLDER
+#   script:
+#     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
+#     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
+#   after_script:
+#     - rm -r ~/.aws
+#     - sleep 30
 
 
-deploy_integ:
-  extends: create_integ
-  stage: staging
-  retry: 2
-  script:
-    - cp default-service/package.json .
-    - mv $CI_ENV_FILE_INTEG default-service/.env
-    - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
-    - echo "REACT_APP_CHAT_URL=$CI_ENVIRONMENT_URL:5003" >> ./client/.env
-    - rm -r .platform
-    - git add .
-    - git status
-    - ls -al
-    - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
-  after_script:
-    - rm default-service/.env
-    - rm ./client/.env
-    - rm -r ~/.aws
-    - git add .
+# deploy_integ:
+#   extends: create_integ
+#   stage: staging
+#   retry: 2
+#   script:
+#     - cp default-service/package.json .
+#     - mv $CI_ENV_FILE_INTEG default-service/.env
+#     - echo "REACT_APP_API_URL=$CI_ENVIRONMENT_URL:5002" > ./client/.env
+#     - echo "REACT_APP_CHAT_URL=$CI_ENVIRONMENT_URL:5003" >> ./client/.env
+#     - rm -r .platform
+#     - git add .
+#     - git status
+#     - ls -al
+#     - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
+#   after_script:
+#     - rm default-service/.env
+#     - rm ./client/.env
+#     - rm -r ~/.aws
+#     - git add .
 
-acceptance_test:
-  image: alpine
-  stage: test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: manual
-      allow_failure: false
-  script:
-    - echo "Acceptance tests not yet implemented, please add and replace this script!"
-    - echo "For now, this is just a manual inspection step"
-  # TODO: add script here
+# acceptance_test:
+#   image: alpine
+#   stage: test
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#       when: manual
+#       allow_failure: false
+#   script:
+#     - echo "Acceptance tests not yet implemented, please add and replace this script!"
+#     - echo "For now, this is just a manual inspection step"
+#   # TODO: add script here
 
-fail_manual_inspection:
-  image: alpine
-  stage: test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: manual
-      allow_failure: true
-  script:
-    - echo "Failing manual inspection..."
-    - echo "Now trigger the acceptance_test job!"
-    - touch ACCEPTANCE_FAIL.txt
-  artifacts:
-    paths:
-      - ACCEPTANCE_FAIL.txt
-    expire_in: 30 mins
+# fail_manual_inspection:
+#   image: alpine
+#   stage: test
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#       when: manual
+#       allow_failure: true
+#   script:
+#     - echo "Failing manual inspection..."
+#     - echo "Now trigger the acceptance_test job!"
+#     - touch ACCEPTANCE_FAIL.txt
+#   artifacts:
+#     paths:
+#       - ACCEPTANCE_FAIL.txt
+#     expire_in: 30 mins
 
-stop_integ:
-  extends: deploy_integ
-  stage: pre-production
-  when: manual
-  environment:
-    action: stop
-  script:
-    - eb terminate --timeout 30 --force $EB_ENVIRONMENT
-  after_script:
-    - rm -r ~/.aws
+# stop_integ:
+#   extends: deploy_integ
+#   stage: pre-production
+#   when: manual
+#   environment:
+#     action: stop
+#   script:
+#     - eb terminate --timeout 30 --force $EB_ENVIRONMENT
+#   after_script:
+#     - rm -r ~/.aws
 
 # create_prod_api:
 #   stage: pre-production
@@ -195,81 +195,73 @@ stop_integ:
 update_vercel_prod:
   stage: production
   image: node:16
-  variables:
-    PROD_URL: merge.freetailhackers.com
-  environment:
-    name: production
-    url: https://$PROD_URL
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+  # rules:
+  #   - if: '$CI_COMMIT_BRANCH == "main"'
   script:
     - cd default-service
     - npm install esbuild
     - npx esbuild server.js --bundle --outfile=api/index.js --platform=node --target=node16
     - npm install -g vercel
-    - npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - mv .vercel/.env.production.local .env
-    - npx vercel deploy --prod --token=$VERCEL_TOKEN > domain.txt
-    - npx vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` $PROD_URL
-    - rm .env domain.txt
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel deploy --prod --token=$VERCEL_TOKEN
 
-create_prod_chat:
-  stage: pre-production
-  image: $EB_IMAGE
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  environment:
-    name: prod-chat
-    url: https://merge-chat.freetailhackers.com/
-  variables:
-    EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
-    FOLDER: .
-  before_script:
-    - mkdir ~/.aws/
-    - touch ~/.aws/credentials
-    - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
-    - rm .gitignore
-    - rm .ebextensions/integ-security-group.config
-    - echo $EB_ENVIRONMENT
-    - cd $FOLDER
-  script:
-    - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
-    - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
-    - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
-  after_script:
-    - rm -r ~/.aws
-    - sleep 30
+# create_prod_chat:
+#   stage: pre-production
+#   image: $EB_IMAGE
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
+#   environment:
+#     name: prod-chat
+#     url: https://merge-chat.freetailhackers.com/
+#   variables:
+#     EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
+#     FOLDER: .
+#   before_script:
+#     - mkdir ~/.aws/
+#     - touch ~/.aws/credentials
+#     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
+#     - rm .gitignore
+#     - rm .ebextensions/integ-security-group.config
+#     - echo $EB_ENVIRONMENT
+#     - cd $FOLDER
+#   script:
+#     - if test -f "ACCEPTANCE_FAIL.txt"; then exit -1; fi
+#     - eb create $EB_ENVIRONMENT -d --timeout 60 -c $EB_ENVIRONMENT -r us-east-1 --elb-type application -im 2 -ix 20 -i t3.small,t3a.small || exit_code=$?
+#     - if [ $exit_code -ne 0 ]; then echo "Failed to create production environment"; fi;
+#   after_script:
+#     - rm -r ~/.aws
+#     - sleep 30
 
-deploy_prod_chat:
-  stage: production
-  extends: create_prod_chat
-  retry: 2
-  variables:
-    FOLDER: default-service
-  script:
-    - mv $CI_ENV_FILE_PROD_CHAT .env
-    - mv ../.elasticbeanstalk .elasticbeanstalk
-    - mv ../.ebextensions .ebextensions
-    - mv $PROD_REDIS_CONFIG .ebextensions/options.config
-    - rm ../Procfile
-    - mv $PROD_HTTPS_CHAT_ALB .ebextensions/securelistener-alb.config
-    - 'echo "web: npm install && CHAT_PORT=8080 npm run chat" > Procfile'
-    - git add .
-    - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
-  after_script:
-    - cd $FOLDER
-    - rm .ebextensions/securelistener-alb.config
-    - rm .ebextensions/options.config
-    - rm -r ~/.aws
-    - git add .
+# deploy_prod_chat:
+#   stage: production
+#   extends: create_prod_chat
+#   retry: 2
+#   variables:
+#     FOLDER: default-service
+#   script:
+#     - mv $CI_ENV_FILE_PROD_CHAT .env
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - mv ../.ebextensions .ebextensions
+#     - mv $PROD_REDIS_CONFIG .ebextensions/options.config
+#     - rm ../Procfile
+#     - mv $PROD_HTTPS_CHAT_ALB .ebextensions/securelistener-alb.config
+#     - 'echo "web: npm install && CHAT_PORT=8080 npm run chat" > Procfile'
+#     - git add .
+#     - eb deploy --timeout 60 --staged $EB_ENVIRONMENT
+#   after_script:
+#     - cd $FOLDER
+#     - rm .ebextensions/securelistener-alb.config
+#     - rm .ebextensions/options.config
+#     - rm -r ~/.aws
+#     - git add .
 
-stop_prod_chat:
-  extends: deploy_prod_chat
-  when: manual
-  environment:
-    action: stop
-  script:
-    - mv ../.elasticbeanstalk .elasticbeanstalk
-    - eb terminate --timeout 60 --force $EB_ENVIRONMENT
-  after_script:
-    - rm -r ~/.aws
+# stop_prod_chat:
+#   extends: deploy_prod_chat
+#   when: manual
+#   environment:
+#     action: stop
+#   script:
+#     - mv ../.elasticbeanstalk .elasticbeanstalk
+#     - eb terminate --timeout 60 --force $EB_ENVIRONMENT
+#   after_script:
+#     - rm -r ~/.aws
