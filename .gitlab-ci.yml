@@ -1,10 +1,8 @@
 workflow:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
-      when: never
-    - if: "$CI_COMMIT_BRANCH == 'amplify-prod'"
-      when: never
+    # - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_COMMIT_BRANCH != "main"'
+      # when: never
     - if: "$CI_COMMIT_BRANCH"
 
 stages:
@@ -50,7 +48,7 @@ create_integ:
   stage: pre-staging
   image: $EB_IMAGE
   only:
-    - main
+    - devops/240-vercel
   environment:
     name: integ
   variables:
@@ -110,7 +108,7 @@ acceptance_test:
   image: alpine
   stage: test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "devops/240-vercel"'
       when: manual
       allow_failure: false
   script:
@@ -122,7 +120,7 @@ fail_manual_inspection:
   image: alpine
   stage: test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "devops/240-vercel"'
       when: manual
       allow_failure: true
   script:
@@ -149,7 +147,7 @@ update_vercel_prod:
   stage: production
   image: node:16.16.0
   only:
-    - main
+    - devops/240-vercel
   script:
     - cd default-service
     - npm install esbuild
@@ -165,7 +163,7 @@ create_prod_chat:
   stage: pre-production
   image: $EB_IMAGE
   only:
-    - main
+    - devops/240-vercel
   environment:
     name: prod-chat
   variables:
