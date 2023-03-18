@@ -76,7 +76,6 @@ update_vercel_integ:
     - npm install esbuild
     - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
     - sed -i -e '18,21d' package.json
-    - rm package.json-e
     - cd ..
     - sed -i 's/merge/merge-integ/' vercel.json
     - npm install -g vercel
