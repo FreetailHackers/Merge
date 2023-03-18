@@ -18,7 +18,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": ["https://merge.freetailhackers.com"]
+          "value": "https://merge.freetailhackers.com"
         },
         {
           "key": "Access-Control-Allow-Methods",
