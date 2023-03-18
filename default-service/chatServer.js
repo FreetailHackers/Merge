@@ -1,6 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const http = require("http");
+const AWS = require("aws-sdk");
+const CronJob = require("cron").CronJob;
+const mongoose = require("mongoose");
+const User = require("./models/User");
+const Chat = require("./models/Chat");
 
 const app = express();
 const server = http.createServer(app);
@@ -212,6 +217,113 @@ async function removeUsers(data, socket) {
     }
   }
 }
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ID,
+  secretAccessKey: process.env.AWS_SECRET,
+  region: process.env.AWS_REGION,
+});
+
+const db = process.env.MONGO_URI;
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(() => console.log("MongoDB successfully connected"))
+  .catch((err) => console.log(err));
+
+const ses = new AWS.SES();
+
+async function sendEmails() {
+  const chats = await Chat.find();
+  const users = await User.find();
+  let promises = [];
+
+  for (let user of users) {
+    const unreadChats = chats.filter((chat) => !chat.readBy.includes(user._id));
+    if (unreadChats.length > 0 && user.email && user.name) {
+      const to = user?.email;
+      const subject = "Merge: You have unread messages - Freetail Hackers";
+      const message = `
+            <html>
+              <head>
+                <style>
+                  body {
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    color: #333;
+                  }
+                  h1 {
+                    color: #F90;
+                  }
+                  p {
+                    margin-bottom: 10px;
+                  }
+                </style>
+              </head>
+              <body>
+                Hey ${user.name},
+                <p>
+                  Greetings from the Merge team at Freetail Hackers! We hope you're doing well. We noticed that you have unread messages in the following chats:
+                </p>
+                <ol>
+                  ${unreadChats.map((chat) => `<li>${chat?.name}</li>`)}
+                </ol>
+                Please <a href="https://merge.freetailhackers.com">log in</a> to your account to read them.
+                <br>
+                <br>
+                <p>
+                  If you have any questions, you may email us at <a href="mailto:tech@freetailhackers.com">tech@freetailhackers.com</a>.
+                </p>
+                <br>
+                Thanks,
+                <br>
+                The Merge Team at Freetail Hackers
+              </body>
+            </html>
+          `;
+
+      const params = {
+        Destination: {
+          ToAddresses: [to],
+        },
+        Message: {
+          Body: {
+            Html: {
+              Data: message,
+            },
+          },
+          Subject: {
+            Data: subject,
+          },
+        },
+        Source: "tech@freetailhackers.com",
+      };
+
+      promises.push(
+        new Promise(() => {
+          ses.sendEmail(params, (err, data) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("Email sent:", data);
+            }
+          });
+        })
+      );
+    }
+
+    await Promise.all(promises);
+  }
+}
+
+new CronJob(
+  "00 0 */4 * * *",
+  () => {
+    sendEmails();
+  },
+  null,
+  true,
+  "America/Chicago"
+);
 
 const port = process.env.CHAT_PORT || 5000;
 
