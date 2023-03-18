@@ -71,6 +71,22 @@ lint_format_backend:
 #     - rm -r ~/.aws
 #     - sleep 30
 
+update_vercel_integ:
+  stage: staging
+  image: node:16.16.0
+  script:
+    - cd default-service
+    - npm install esbuild
+    - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
+    - sed -i -e '18,21d' package.json
+    - rm package.json-e
+    - cd ..
+    - sed -i 's/merge/merge-integ/' vercel.json
+    - npm install -g vercel
+    - vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+    - vercel deploy --token=$VERCEL_TOKEN > domain.txt
+    - vercel alias --token=$VERCEL_TOKEN set cat domain.txt merge-integ.freetailhackers.com
+    - rm domain.txt
 
 # deploy_integ:
 #   extends: create_integ
@@ -192,21 +208,21 @@ lint_format_backend:
 #   after_script:
 #     - rm -r ~/.aws
 
-update_vercel_prod:
-  stage: production
-  image: node:16.16.0
-  # rules:
-  #   - if: '$CI_COMMIT_BRANCH == "main"'
-  script:
-    - cd default-service
-    - npm install esbuild
-    - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
-    - sed -i -e '18,21d' package.json
-    - rm package.json-e
-    - cd ..
-    - npm install -g vercel
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel deploy --prod --token=$VERCEL_TOKEN
+# update_vercel_prod:
+#   stage: production
+#   image: node:16.16.0
+#   # rules:
+#   #   - if: '$CI_COMMIT_BRANCH == "main"'
+#   script:
+#     - cd default-service
+#     - npm install esbuild
+#     - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
+#     - sed -i -e '18,21d' package.json
+#     - rm package.json-e
+#     - cd ..
+#     - npm install -g vercel
+#     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+#     - vercel deploy --prod --token=$VERCEL_TOKEN
 
 # create_prod_chat:
 #   stage: pre-production
