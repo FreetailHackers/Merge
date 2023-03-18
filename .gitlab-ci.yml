@@ -202,7 +202,9 @@ update_vercel_prod:
     - npm install esbuild
     - npx esbuild server.js --bundle --outfile=api/index.js --platform=node --target=node16
     - ls
-    - sed -i '' -e '18,21d' package.json
+    - sed -i -e '18,21d' package.json
+    - ls
+    - rm package.json-e
     - npm install -g vercel
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
     - vercel deploy --prod --token=$VERCEL_TOKEN
