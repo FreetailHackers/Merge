@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { MultiSelect } from "@mantine/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faShield,
+  faShieldHeart,
+  faUserSlash,
+} from "@fortawesome/free-solid-svg-icons";
+import { faFlag } from "@fortawesome/free-regular-svg-icons";
 
 function ChatSettings(props) {
   const [addingUsers, setAddingUsers] = useState(false);
@@ -39,9 +46,11 @@ function ChatSettings(props) {
 
       <div className="reportWindowUserSelect">
         <h3>{props.title}</h3>
-        <p style={{ marginTop: 15 }}>
-          {props.chat.profiles[props.selfID].name} (you)
-        </p>
+        <div className="userRow">
+          <p style={!props.wideScreen ? { marginTop: 15 } : {}}>
+            {props.chat.profiles[props.selfID].name} (you)
+          </p>
+        </div>
         {props.chat &&
           props.chat.profiles &&
           Object.entries(props.chat.profiles)
@@ -50,19 +59,19 @@ function ChatSettings(props) {
               <div key={i} className="userRow">
                 <p>
                   {entry[1].name}{" "}
-                  {!props.chat.users.includes(entry[0]) && "(not present)"}
+                  {!props.chat.users.includes(entry[0]) && "(not present) "}
                   {props.blockedByMe.includes(entry[0]) && "(blocked)"}
                 </p>
                 {props.chat.users.includes(entry[0]) && chatOwner && (
-                  <button
+                  <div
                     className="actionButton"
                     style={{ backgroundColor: color(kicking, entry[0]) }}
                     onClick={() => pushPop(kicking, setKicking, entry[0])}
                   >
-                    K
-                  </button>
+                    <FontAwesomeIcon icon={faUserSlash} />
+                  </div>
                 )}
-                <button
+                <div
                   className="actionButton"
                   style={{
                     backgroundColor: color(
@@ -78,15 +87,21 @@ function ChatSettings(props) {
                       : () => pushPop(blocking, setBlocking, entry[0])
                   }
                 >
-                  {props.blockedByMe.includes(entry[0]) ? "U" : "B"}
-                </button>
-                <button
+                  <FontAwesomeIcon
+                    icon={
+                      props.blockedByMe.includes(entry[0])
+                        ? faShieldHeart
+                        : faShield
+                    }
+                  />
+                </div>
+                <div
                   className="actionButton"
                   style={{ backgroundColor: color(reporting, entry[0]) }}
                   onClick={() => pushPop(reporting, setReporting, entry[0])}
                 >
-                  R
-                </button>
+                  <FontAwesomeIcon icon={faFlag} />
+                </div>
               </div>
             ))}
         <div
@@ -222,6 +237,7 @@ ChatSettings.propTypes = {
   otherUsers: PropTypes.array,
   addUsers: PropTypes.func,
   title: PropTypes.string,
+  wideScreen: PropTypes.bool,
 };
 
 export default ChatSettings;

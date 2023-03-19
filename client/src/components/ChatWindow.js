@@ -22,40 +22,24 @@ class ChatWindow extends Component {
 
   componentDidUpdate(prevProps) {
     if (
-      (!prevProps.chat && this.props.chat) ||
-      (prevProps.chat &&
-        this.props.chat &&
-        prevProps.chat._id !== this.props.chat._id)
+      prevProps.chat &&
+      this.props.chat &&
+      prevProps.chat._id !== this.props.chat._id
     ) {
       this.setState({ ...defaultState });
       this.props.getMessages();
     }
     if (
-      (!prevProps.messages && this.props.messages) ||
-      (prevProps.messages &&
-        this.props.messages &&
-        prevProps.messages[prevProps.messages.length - 1] !==
-          this.props.messages[this.props.messages.length - 1])
+      prevProps.messages &&
+      this.props.messages &&
+      prevProps.messages[prevProps.messages.length - 1] !==
+        this.props.messages[this.props.messages.length - 1]
     ) {
       document
         .getElementById("chatScrollBox")
         .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
     }
   }
-
-  /*
-  useEffect(() => {
-    props.getMessages();
-    setReportPressed(false)
-    setNewMessage(false)
-  }, [props.chat._id])
-
-  useEffect(() => {
-    document
-        .getElementById("chatScrollBox")
-        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
-  }, [props.messages])
-  */
 
   onKeyDown = (e) => {
     if (e.key.toLowerCase() === "enter") {
@@ -123,6 +107,7 @@ class ChatWindow extends Component {
     } else if (leavingDeleting) {
       this.props.leaveChat();
     }
+    this.setState({ reportPressed: false });
   };
 
   render = () => (
@@ -229,6 +214,7 @@ class ChatWindow extends Component {
                   )
                 ).replaceAll(",", ", ")
           }
+          wideScreen={this.props.wideScreen}
         />
       )}
       <div className="newMessageBox">
