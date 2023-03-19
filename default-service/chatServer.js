@@ -5,7 +5,7 @@ const http = require("http");
 const app = express();
 const server = http.createServer(app);
 app.get("/", (req, res) => {
-  res.send(`Status Ok: ${new Date()}`);
+  res.status(200).send(`Status OK: ${new Date()}`);
 });
 
 const io = require("socket.io")(server, {
