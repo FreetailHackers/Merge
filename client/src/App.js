@@ -54,6 +54,7 @@ export default function App() {
   const [swipedUser, setSwipedUser] = useState(null);
 
   useEffect(() => {
+    console.log("this useEffect is screwing things up");
     if (!auth.user.admitted && auth.loading) {
       initializeAuthIfLoggedIn(auth, setAuth);
     }

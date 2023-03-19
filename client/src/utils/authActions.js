@@ -115,6 +115,8 @@ export function initializeAuthIfLoggedIn(auth, setAuth) {
     const token = localStorage.jwtToken;
     setAxiosHeaderAuthToken(token);
 
+    console.log("being called");
+
     axios
       .get(process.env.REACT_APP_API_URL + "/api/users/validate")
       .then((res) => {
