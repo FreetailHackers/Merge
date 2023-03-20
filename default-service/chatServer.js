@@ -265,7 +265,9 @@ async function sendEmails() {
                   Greetings from the Merge team at Freetail Hackers! We hope you're doing well. We noticed that you have unread messages in the following chats:
                 </p>
                 <ol>
-                  ${unreadChats.map((chat) => `<li>${chat?.name}</li>`)}
+                  ${unreadChats
+                    .map((chat) => `<li>${chat.name || "Untitled Chat"}</li>`)
+                    .join("")}
                 </ol>
                 Please <a href="https://merge.freetailhackers.com">log in</a> to your account to read them.
                 <br>
