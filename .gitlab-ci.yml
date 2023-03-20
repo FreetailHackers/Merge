@@ -156,7 +156,8 @@ update_vercel_prod:
     - cd ..
     - npm install -g vercel
     - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel deploy --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prod --token=$VERCEL_TOKEN > domain.txt
+    - vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` merge.freetailhackers.com
 
 create_prod_chat:
   stage: pre-production
