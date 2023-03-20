@@ -310,9 +310,9 @@ async function sendEmails() {
         })
       );
     }
-
-    await Promise.all(promises);
   }
+
+  await Promise.all(promises);
 }
 
 new CronJob(
