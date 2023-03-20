@@ -54,7 +54,7 @@ require("./config/passport")(passport);
 app.use("/api/users", users.router);
 app.use("/api/chats", chats.router);
 
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
   res.status(200).send(`Status OK: ${new Date()}`);
 });
 
