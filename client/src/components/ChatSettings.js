@@ -40,12 +40,13 @@ function ChatSettings(props) {
 
   return (
     <div id="reportFloatingWindow" className={"reportFloatingWindow"}>
-      <button id="exit" className="exitButton" onClick={props.exit}>
-        Back
-      </button>
-
       <div className="reportWindowUserSelect">
-        <h3>{props.title}</h3>
+        <div className={"reportFloatingWindowHeader"}>
+          <button id="exit" className="exitButton" onClick={props.exit}>
+            Back
+          </button>
+          <h3 style={{ flexGrow: 1, textAlign: "center" }}>{props.title}</h3>
+        </div>
         <div className="userRow">
           <p style={!props.wideScreen ? { marginTop: 15 } : {}}>
             {props.chat.profiles[props.selfID].name} (you)

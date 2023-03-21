@@ -56,8 +56,13 @@
 @media all and (orientation:portrait) {
   .profile-container {
     flex-direction: column;
-    padding: 0 20px;
+    padding: 20px;
+  }
 
+  #settings {
+    padding: 20px 20px 20px 0;
+    width: 90%;
+    font-size: 1.1em;
   }
 }
 
