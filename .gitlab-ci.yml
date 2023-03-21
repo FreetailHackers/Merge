@@ -71,6 +71,8 @@ create_integ:
 update_vercel_integ:
   stage: staging
   image: node:16.16.0
+  only:
+    - main
   script:
     - cd default-service
     - npm install esbuild
