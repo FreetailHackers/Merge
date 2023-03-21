@@ -79,19 +79,20 @@ update_vercel_integ:
     url: https://merge-integ.freetailhackers.com
   variables:
     DOMAIN_URL: merge-integ.freetailhackers.com
+    ENV_NAME: merge-integ
     VERCEL_ENVIRONMENT: preview
   before_script:
-    - sed -i 's/merge/merge-integ/' vercel.json
-  script:
     - cd default-service
-    - npm install esbuild
     - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
     - sed -i -e '18,21d' package.json
     - cd ..
-    - npm install -g vercel
-    - vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=$VERCEL_TOKEN
-    - vercel deploy --token=$VERCEL_TOKEN > domain.txt
-    - vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` $DOMAIN_URL
+    - sed -i 's/merge/' + $ENV_NAME + '/' vercel.json
+    - npx vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=$VERCEL_TOKEN
+  script:
+    - npx vercel deploy --token=$VERCEL_TOKEN > domain.txt
+  after_script:
+    - npx vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=$VERCEL_TOKEN
+    - npx vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` $DOMAIN_URL
     - rm domain.txt
 
 # deploy_integ:
@@ -185,8 +186,10 @@ update_vercel_prod:
   variables:
     DOMAIN_URL: merge.freetailhackers.com
     VERCEL_ENVIRONMENT: production
-  before_script:
-    - cd .
+    ENV_NAME: merge
+  script:
+    - npx vercel deploy --prod --token=$VERCEL_TOKEN > domain.txt
+
 
 # deploy_prod_chat:
 #   stage: production
