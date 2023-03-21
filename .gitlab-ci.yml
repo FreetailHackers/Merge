@@ -79,7 +79,7 @@ update_vercel_integ:
     url: https://merge-integ.freetailhackers.com
   variables:
     DOMAIN_URL: merge-integ.freetailhackers.com
-    ENV_NAME: merge-integ
+    VERCEL_CORS: 's/merge/merge-integ/'
     VERCEL_ENVIRONMENT: preview
   before_script:
     - cd default-service
@@ -87,7 +87,7 @@ update_vercel_integ:
     - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
     - sed -i -e '18,21d' package.json
     - cd ..
-    - sed -i 's/merge/' + $ENV_NAME + '/' vercel.json
+    - sed -i $VERCEL_CORS vercel.json
     - npx vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=$VERCEL_TOKEN
   script:
     - npx vercel deploy --token=$VERCEL_TOKEN > domain.txt
@@ -186,7 +186,7 @@ update_vercel_prod:
   variables:
     DOMAIN_URL: merge.freetailhackers.com
     VERCEL_ENVIRONMENT: production
-    ENV_NAME: merge
+    VERCEL_CORS: 's/merge/merge/'
   script:
     - npx vercel deploy --prod --token=$VERCEL_TOKEN > domain.txt
 
