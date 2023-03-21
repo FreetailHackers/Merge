@@ -83,6 +83,7 @@ update_vercel_integ:
     VERCEL_ENVIRONMENT: preview
   before_script:
     - cd default-service
+    - npm install esbuild
     - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
     - sed -i -e '18,21d' package.json
     - cd ..
@@ -91,7 +92,6 @@ update_vercel_integ:
   script:
     - npx vercel deploy --token=$VERCEL_TOKEN > domain.txt
   after_script:
-    - npx vercel pull --yes --environment=$VERCEL_ENVIRONMENT --token=$VERCEL_TOKEN
     - npx vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` $DOMAIN_URL
     - rm domain.txt
 
