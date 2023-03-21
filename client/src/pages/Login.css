@@ -45,8 +45,9 @@ section#register form,
   .container {
     flex-direction: column;
   }
-  section#login form, .about {
+  section#login form, section#register form, .about {
     margin-top: 2vh;
+    width: 75vw
   }
 }
 
@@ -91,7 +92,8 @@ section#register form,
 }
 
 .container {
-  width: 100%;
+  width: 95%;
+  margin: auto;
   display: flex;
   height: 100%;
   align-items: center;
@@ -106,9 +108,9 @@ section#register form,
 p#ToS {
   font-size: 16px;
   color: red;
-  position: relative;
-  left: 55%;
-  transform: translate(-50%, 0);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 section#login form {

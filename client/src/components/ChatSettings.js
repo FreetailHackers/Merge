@@ -106,7 +106,7 @@ function ChatSettings(props) {
             ))}
         <div
           className="userAddition"
-          style={addingUsers ? { width: "40%" } : {}}
+          style={addingUsers ? { width: "80%" } : {}}
         >
           <div
             style={{
