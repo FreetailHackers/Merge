@@ -2,10 +2,21 @@ import React from "react";
 
 import "./About.css";
 import groupPhoto from "../assets/images/group-photo.jpg";
+import PropTypes from "prop-types";
 
-export default function About() {
+function About(props) {
   return (
     <div className="about-page">
+      {!props.wideScreen && (
+        <div className="toggleHolder">
+          <button
+            className="toggleSidebar toggleCenter"
+            onClick={props.flipDisplaySidebar}
+          >
+            ≡
+          </button>
+        </div>
+      )}
       <h1>About</h1>
       <p>
         Proudly brought to you by{" "}
@@ -74,3 +85,10 @@ export default function About() {
     </div>
   );
 }
+
+About.propTypes = {
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
+};
+
+export default About;

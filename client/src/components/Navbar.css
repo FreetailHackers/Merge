@@ -1,21 +1,51 @@
 nav#navbar {
   position: fixed;
   overflow-y: auto;
-
   height: calc(100vh - 40px);
-  padding: 20px 0;
   z-index: 1;
-
   background-color: var(--primary);
+
+}
+
+.toggle {
+  background-color: var(--primary);
+  color: white;
 }
 
 #navbar-spacing {
-  width: 250px;
+  background-color: var(--primary);
+}
+
+@media all and (orientation:portrait) {
+  #navbar-spacing {
+    width: 100vw;
+    height: calc(100vh - 20px);
+
+  }
+
+  #navbar {
+    width: 100vw;
+    padding: 0 0 20px;
+
+  }
+}
+
+@media all and (orientation:landscape) {
+  #navbar-spacing {
+    width: 250px;
+    padding: 20px 0;
+    height: calc(100vh - 40px)
+  }
+
+  #navbar {
+    width: 250px;
+  }
+
 }
 
 nav#navbar a {
   display: block;
-  width: 200px;
+  width: calc(100% - 50px);
   padding: 20px;
   border-left: #fff0 10px solid;
   border-bottom: #fff3 1px solid;

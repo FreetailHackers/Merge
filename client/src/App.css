@@ -46,3 +46,21 @@ input {
     transform: rotate(360deg);
   }
 }
+
+.toggleSidebar {
+  border: none;
+  cursor: pointer;
+  font-size: 2.5rem;
+  padding: 0px;
+  margin-left: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.toggleCenter {
+  background-color: white;
+  color: black;
+  display: inline;
+
+}

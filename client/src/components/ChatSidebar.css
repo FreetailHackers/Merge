@@ -1,11 +1,10 @@
 .chatSidebar {
   height: calc(100vh - 30px);
-  width: 300px;
-  min-width: 300px;
   padding: 15px 10px;
   border-right: 1px #ddd solid;
   overflow-y: auto;
 }
+
 
 .chatPreview {
   padding: 15px 5px;
@@ -106,15 +105,44 @@
 
 .newChatButton {
   font-size: 1em;
-  margin-right: 10px;
   width: 100px;
 }
+
+.buttonHolder {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+@media all and (orientation:portrait) {
+  .buttonHolder {
+    justify-content: flex-start;
+    height: 100%;
+  }
+  .sidebarToggleHolder {
+    margin-left: 0;
+    margin-right: auto;
+    display: inline-block;
+  }
+
+  .chatSidebarTop .toggleSidebar {
+    background-color: white;
+  }
+}
+
+@media all and (orientation:landscape) {
+  .buttonHolder {
+    justify-content: center;
+  }
+}
+
 
 .chatSidebarTop {
   display: flex;
   flex-direction: column;
-  align-items: center;
   margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .chatSidebarTop div {
@@ -122,22 +150,9 @@
    margin-bottom: 0;
 }
 
-@media screen and (max-width: 1000px) {
-  .chatSidebar {
-    min-width: 60px;
-    width: 60px;
-    overflow-x: hidden;
-  }
-
-  .chatSidebar .chatPreview {
-    width: 60px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .chatSidebar p,
-  .chatSidebar h4,
-  .chatSidebar .unreadBubble {
-    display: none;
-  }
+.innerButtonHolder {
+  width: calc(100% - 15px);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

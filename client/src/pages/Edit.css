@@ -53,15 +53,36 @@
   opacity: 0.8;
 }
 
-.profile-container {
-  width: 100%;
-  padding: 20px;
+@media all and (orientation:portrait) {
+  .profile-container {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  #settings {
+    padding: 20px 20px 20px 0;
+    width: 90%;
+    font-size: 1.1em;
+  }
 }
 
-.profile-child {
-  width: 50%;
-  float: left;
+@media all and (orientation:landscape) {
+  .profile-container {
+    flex-direction: row;
+    padding: 20px;
+  }
+  .profile-child {
+    width: 50%;
+  }
 }
+
+
+.profile-container {
+  width: calc(100vw - 290px);
+  display: flex;
+  align-items: flex-start;
+}
+
 
 .mantine-radio-group-label {
   font-size: 14px;
