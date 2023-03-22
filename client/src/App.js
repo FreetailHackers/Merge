@@ -54,7 +54,7 @@ export default function App() {
   const [swipedUser, setSwipedUser] = useState(null);
 
   useEffect(() => {
-    if (!auth.user.admitted && auth.loading) {
+    if (!auth.user.status?.admitted && auth.loading) {
       initializeAuthIfLoggedIn(auth, setAuth);
     }
   }, [auth]);
