@@ -6,8 +6,41 @@
   color: var(--text-on-primary);
   border: none;
   cursor: pointer;
+  margin-left: 8px;
+  margin-right: 8px;
   }
 
 .themeButton:hover {
   background-color: var(--secondary);
+}
+
+.chat {
+  display: flex;
+  flex-direction: row;
+  width: calc(100vw - 250px);
+  height: 100vh;
+}
+
+@media all and (orientation:portrait) {
+  .chatSidebar {
+    width: 100vw;
+  }
+  .chatWindow {
+    width: 100vw;
+  }
+  .chat {
+    width: 100vw;
+  }
+}
+
+@media all and (orientation:landscape) {
+  .chatSidebar {
+    width: 300px;
+  }
+  .chatWindow {
+    width: calc(100vw - 550px);
+  }
+  .chat {
+    width: calc(100vw - 250px);
+  }
 }

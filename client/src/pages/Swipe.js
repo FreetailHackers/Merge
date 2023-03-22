@@ -355,6 +355,16 @@ class Swipe extends Component {
   render() {
     return (
       <section id={"swipe-profile"}>
+        {!this.props.wideScreen && (
+          <div className="toggleHolder">
+            <button
+              className="toggleSidebar toggleCenter"
+              onClick={this.props.flipDisplaySidebar}
+            >
+              ≡
+            </button>
+          </div>
+        )}
         {this.state.loadingUserToShow ? (
           <center>
             <Loading />
@@ -434,6 +444,8 @@ Swipe.propTypes = {
   user: PropTypes.object.isRequired,
   setSwipedUser: PropTypes.func,
   navigate: PropTypes.func,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default withRouter(Swipe);

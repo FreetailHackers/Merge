@@ -8,6 +8,16 @@ function Dashboard(props) {
 
   return (
     <section id="dashboard">
+      {!props.wideScreen && (
+        <div className="toggleHolder">
+          <button
+            className="toggleSidebar toggleCenter"
+            onClick={props.flipDisplaySidebar}
+          >
+            ≡
+          </button>
+        </div>
+      )}
       <div className="dash">
         <h1>Welcome home{name ? `, ${name}` : `!`}</h1>
         <p>Start finding your hackathon team members!</p>
@@ -55,6 +65,8 @@ Dashboard.propTypes = {
   auth: PropTypes.object.isRequired,
   logoutUser: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Dashboard;

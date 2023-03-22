@@ -21,6 +21,7 @@ class Chat extends Component {
       userMap: {},
       otherUsers: [],
       blockedByMe: [],
+      displayWindow: false,
     };
     this.socket = io(process.env.REACT_APP_CHAT_URL, {
       transports: ["websocket"],
@@ -367,15 +368,11 @@ class Chat extends Component {
       });
   }
 
-  leaveChatWS(leftChat) {
-    this.socket.emit("leave-chat", {
-      chatID: leftChat._id,
-      user: this.props.userID,
-    });
-    this.removeChatFromClient(leftChat);
-  }
-
-  kickUsersWS(users, chatID) {
+  async kickUsers(users, chatID) {
+    await axios.post(
+      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
+      { users }
+    );
     this.socket.emit("remove-users", {
       chatID: chatID,
       users: users,
@@ -386,94 +383,123 @@ class Chat extends Component {
   }
 
   leaveChat(chatIndex) {
-    const deletedChat = this.state.chats[chatIndex];
+    const leftChat = this.state.chats[chatIndex];
     axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/leave`
-      )
-      .then(() => this.leaveChatWS(deletedChat));
+      .post(process.env.REACT_APP_API_URL + `/api/chats/${leftChat._id}/leave`)
+      .then(() => {
+        this.socket.emit("leave-chat", {
+          chatID: leftChat._id,
+          user: this.props.userID,
+        });
+        this.removeChatFromClient(leftChat);
+      });
   }
 
-  blockUsers(users) {
-    this.setState({
-      blockedByMe: [...new Set([...this.state.blockedByMe, ...users])],
-    });
-    this.socket.emit("block-users", { users });
-  }
-
-  unblockUsers(users) {
+  async blockUnblockUsers(blocking, unblocking) {
+    for (const user of blocking) {
+      await axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
+        { userID: this.props.userID }
+      );
+    }
+    if (blocking.length > 0) {
+      this.socket.emit("block-users", { users: blocking });
+    }
+    for (const user of unblocking) {
+      await axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock",
+        { userID: this.props.userID }
+      );
+    }
+    if (unblocking.length > 0) {
+      this.socket.emit("unblock-users", { users: unblocking });
+    }
     this.setState({
       blockedByMe: [
-        ...this.state.blockedByMe.filter((u) => !users.includes(u)),
+        ...[...new Set([...this.state.blockedByMe, ...blocking])].filter(
+          (u) => !unblocking.includes(u)
+        ),
       ],
     });
-    this.socket.emit("unblock-users", { users });
   }
 
   render() {
     return (
-      <div style={{ display: "flex", width: "100%" }}>
-        <ChatSidebar
-          chats={this.state.chats}
-          changeChat={(i) => this.setState({ activeChatIndex: i })}
-          activeChatIndex={this.state.activeChatIndex}
-          createChat={() => this.createChat(this.state.newChatInput)}
-          creatingNewChat={this.state.creatingNewChat}
-          setCreatingNewChat={(val) => this.setState({ creatingNewChat: val })}
-          newChatInput={this.state.newChatInput}
-          updateNewChatInput={(values) => {
-            this.setState({ newChatInput: values });
-          }}
-          otherUsers={this.state.otherUsers.filter(
-            (user) =>
-              !this.state.blockedByMe.includes(user._id) &&
-              !user.blockList.includes(this.props.userID)
-          )}
-          selfID={this.props.userID}
-        />
-        {this.state.chats.length === 0 ? (
-          <ChatMissing />
-        ) : (
-          <ChatWindow
-            messages={this.state.messages.filter(
-              (message) =>
-                message.chat ===
-                this.state.chats[this.state.activeChatIndex]._id
+      <div className="chat">
+        {(this.props.wideScreen || !this.state.displayWindow) && (
+          <ChatSidebar
+            chats={this.state.chats}
+            changeChat={(i) =>
+              this.setState({ activeChatIndex: i, displayWindow: true })
+            }
+            activeChatIndex={this.state.activeChatIndex}
+            createChat={() => this.createChat(this.state.newChatInput)}
+            creatingNewChat={this.state.creatingNewChat}
+            setCreatingNewChat={(val) =>
+              this.setState({ creatingNewChat: val })
+            }
+            flipDisplaySidebar={this.props.flipDisplaySidebar}
+            wideScreen={this.props.wideScreen}
+            newChatInput={this.state.newChatInput}
+            updateNewChatInput={(values) => {
+              this.setState({ newChatInput: values });
+            }}
+            otherUsers={this.state.otherUsers.filter(
+              (user) =>
+                !this.state.blockedByMe.includes(user._id) &&
+                !user.blockList.includes(this.props.userID)
             )}
-            getMessages={() => this.getMessages(this.state.activeChatIndex)}
-            sendMessage={this.sendMessage}
             selfID={this.props.userID}
-            addUsers={this.addUsers.bind(this)}
-            title={this.state.chats[this.state.activeChatIndex].name}
-            titleInput={this.state.titleInput}
-            editingTitle={this.state.editingTitle}
-            setEditingTitle={(editingTitle) =>
-              this.setState({ editingTitle: editingTitle })
-            }
-            setTitleInput={(newTitleInput) =>
-              this.setState({ titleInput: newTitleInput })
-            }
-            setTitle={(newTitle) => this.setTitle(newTitle)}
-            otherUsers={
-              this.state.otherUsers &&
-              this.state.otherUsers.filter(
-                (user) =>
-                  !this.state.chats[this.state.activeChatIndex].users.includes(
-                    user._id
-                  ) &&
-                  !this.state.blockedByMe.includes(user._id) &&
-                  !user.blockList.includes(this.props.userID)
-              )
-            }
-            chat={this.state.chats[this.state.activeChatIndex]}
-            deleteChat={this.deleteChat.bind(this)}
-            leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
-            blockedByMe={this.state.blockedByMe}
-            blockUsers={this.blockUsers.bind(this)}
-            kickUsers={this.kickUsersWS.bind(this)}
-            unblockUsers={this.unblockUsers.bind(this)}
           />
         )}
+        {(this.props.wideScreen || this.state.displayWindow) &&
+          (this.state.chats.length === 0 ? (
+            <ChatMissing
+              flipDisplaySidebar={() => this.setState({ displayWindow: false })}
+              wideScreen={this.props.wideScreen}
+            />
+          ) : (
+            <ChatWindow
+              messages={this.state.messages.filter(
+                (message) =>
+                  message.chat ===
+                  this.state.chats[this.state.activeChatIndex]._id
+              )}
+              getMessages={() => this.getMessages(this.state.activeChatIndex)}
+              sendMessage={this.sendMessage}
+              selfID={this.props.userID}
+              addUsers={this.addUsers.bind(this)}
+              title={this.state.chats[this.state.activeChatIndex].name}
+              titleInput={this.state.titleInput}
+              editingTitle={this.state.editingTitle}
+              setEditingTitle={(editingTitle) =>
+                this.setState({ editingTitle: editingTitle })
+              }
+              setTitleInput={(newTitleInput) =>
+                this.setState({ titleInput: newTitleInput })
+              }
+              setTitle={(newTitle) => this.setTitle(newTitle)}
+              otherUsers={
+                this.state.otherUsers &&
+                this.state.otherUsers.filter(
+                  (user) =>
+                    !this.state.chats[
+                      this.state.activeChatIndex
+                    ].users.includes(user._id) &&
+                    !this.state.blockedByMe.includes(user._id) &&
+                    !user.blockList.includes(this.props.userID)
+                )
+              }
+              chat={this.state.chats[this.state.activeChatIndex]}
+              deleteChat={this.deleteChat.bind(this)}
+              leaveChat={() => this.leaveChat(this.state.activeChatIndex)}
+              blockedByMe={this.state.blockedByMe}
+              blockUnblockUsers={this.blockUnblockUsers.bind(this)}
+              kickUsers={this.kickUsers.bind(this)}
+              flipDisplaySidebar={() => this.setState({ displayWindow: false })}
+              wideScreen={this.props.wideScreen}
+            />
+          ))}
       </div>
     );
   }
@@ -483,6 +509,8 @@ Chat.propTypes = {
   userID: PropTypes.string.isRequired,
   swipedUser: PropTypes.string,
   setSwipedUser: PropTypes.func,
+  wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Chat;

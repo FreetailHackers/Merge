@@ -32,12 +32,48 @@ section#register form,
   transform: translate(-50%, -50%);
   display: none;
   background-color: #fff;
-  width: 35vw;
   box-shadow: 0px 0px 50vw 15vw rgba(0, 0, 0, 0.7);
   border-radius:10px;
   align-items: center;
   justify-content: center;
 }
+
+@media all and (orientation: portrait) {
+  .terms {
+    width: 70vw;
+  }
+  .container {
+    flex-direction: column;
+  }
+  section#login form, section#register form, .about {
+    margin-top: 2vh;
+    width: 75vw
+  }
+}
+
+@media all and (orientation: landscape) {
+  .terms {
+    width: 35vw;
+  }
+  .container {
+    flex-direction: row;
+  }
+
+  section#login form {
+    margin-left: auto;
+    margin-right: 5vw;
+    margin-bottom: 0;
+    margin-top: 200px;
+  }
+  .about {
+    margin-right: auto;
+    margin-left: 5vw;
+    margin-top: 0;
+    margin-bottom: 200px;
+  }
+
+}
+
 
 .terms strong {
   position: relative;
@@ -56,36 +92,29 @@ section#register form,
 }
 
 .container {
-  width: 100%;
+  width: 95%;
+  margin: auto;
   display: flex;
-  flex-direction: row;
   height: 100%;
   align-items: center;
 }
 
+
 .about {
   font-size: 22px;
   padding: 10px 30px 30px 30px;
-  margin-right: auto;
-  margin-left: 5vw;
-  margin-top: 0;
-  margin-bottom: 200px;
 }
 
 p#ToS {
   font-size: 16px;
   color: red;
-  position: relative;
-  left: 55%;
-  transform: translate(-50%, 0);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 section#login form {
   padding: 50px 30px 30px 30px;
-  margin-left: auto;
-  margin-right: 5vw;
-  margin-bottom: 0;
-  margin-top: 200px;
 }
 
 section#register form {
