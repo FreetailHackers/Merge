@@ -44,30 +44,30 @@ lint_format_backend:
   variables:
     FOLDER: default-service
 
-# create_integ:
-#   stage: pre-staging
-#   image: $EB_IMAGE
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#   environment:
-#     name: integ
-#     url: https://merge-integ-chat.freetailhackers.com
-#   variables:
-#     EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
-#     FOLDER: .
-#   before_script:
-#     - mkdir ~/.aws/
-#     - touch ~/.aws/credentials
-#     - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
-#     - rm .gitignore
-#     - echo $EB_ENVIRONMENT
-#     - cd $FOLDER
-#   script:
-#     - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
-#     - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
-#   after_script:
-#     - rm -r ~/.aws
-#     - sleep 30
+create_integ:
+  stage: pre-staging
+  image: $EB_IMAGE
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "devops/240-vercel"'
+  environment:
+    name: integ
+    url: https://merge-integ-chat.freetailhackers.com
+  variables:
+    EB_ENVIRONMENT: freetail-merge-$CI_ENVIRONMENT_NAME
+    FOLDER: .
+  before_script:
+    - mkdir ~/.aws/
+    - touch ~/.aws/credentials
+    - 'printf "[eb-cli]\naws_access_key_id = %s\naws_secret_access_key = %s\n" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials'
+    - rm .gitignore
+    - echo $EB_ENVIRONMENT
+    - cd $FOLDER
+  script:
+    - eb create $EB_ENVIRONMENT -d --timeout 30 -c $EB_ENVIRONMENT -r us-east-1 --single -i t4g.small || exit_code=$?
+    - if [ $exit_code -ne 0 ]; then echo "Failed to create staging environment"; fi;
+  after_script:
+    - rm -r ~/.aws
+    - sleep 30
 
 update_vercel_integ:
   stage: staging
@@ -95,25 +95,25 @@ update_vercel_integ:
     - npx vercel alias --token=$VERCEL_TOKEN set `cat domain.txt` $DOMAIN_URL
     - rm domain.txt
 
-# deploy_integ:
-#   extends: create_integ
-#   stage: staging
-#   retry: 2
-#   variables:
-#     FOLDER: default-service
-#   script:
-#     - mv $CI_ENV_FILE_INTEG .env
-#     - mv ../.elasticbeanstalk .elasticbeanstalk
-#     - mv ../.ebextensions .ebextensions
-#     - git add .
-#     - git status
-#     - ls -al
-#     - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
-#   after_script:
-#     - rm default-service/.env
-#     - rm ./client/.env
-#     - rm -r ~/.aws
-#     - git add .
+deploy_integ:
+  extends: create_integ
+  stage: staging
+  retry: 2
+  variables:
+    FOLDER: default-service
+  script:
+    - mv $CI_ENV_FILE_INTEG .env
+    - mv ../.elasticbeanstalk .elasticbeanstalk
+    - mv ../.ebextensions .ebextensions
+    - git add .
+    - git status
+    - ls -al
+    - eb deploy --timeout 30 --staged $EB_ENVIRONMENT
+  after_script:
+    - rm default-service/.env
+    - rm ./client/.env
+    - rm -r ~/.aws
+    - git add .
 
 # acceptance_test:
 #   image: alpine
