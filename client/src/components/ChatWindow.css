@@ -102,6 +102,17 @@
   margin-block-end: 0;
 }
 
+.userRowActions {
+  display: flex;
+  gap: 5px;
+  width: 140px;
+  justify-content: space-evenly;
+}
+
+.userRowActions div {
+  margin: 0;
+}
+
 
 /*
 New message box
@@ -263,8 +274,6 @@ h3 {
   margin-right: 8px;
 }
 
-
-
 .chatScrollBox {
   width: 100%;
   margin-top: 0;
@@ -283,8 +292,6 @@ h3 {
   width: 100%;
   margin-top: 15px;
 }
-
-
 
 .chatWindowHeader .windowToggleHolder {
   /* margin-left: 10px;
@@ -316,5 +323,9 @@ h3 {
     width: 98%;
     height: 98%;
     top: 0%;
+  }
+
+  .message {
+    max-width: 95%;
   }
 }

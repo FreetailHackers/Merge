@@ -51,6 +51,11 @@ function ChatSettings(props) {
           <p style={!props.wideScreen ? { marginTop: 15 } : {}}>
             {props.chat.profiles[props.selfID].name} (you)
           </p>
+          <div className="userRowActions">
+            {chatOwner && <div>Kick</div>}
+            <div>Block</div>
+            <div>Report</div>
+          </div>
         </div>
         {props.chat &&
           props.chat.profiles &&
@@ -63,45 +68,47 @@ function ChatSettings(props) {
                   {!props.chat.users.includes(entry[0]) && "(not present) "}
                   {props.blockedByMe.includes(entry[0]) && "(blocked)"}
                 </p>
-                {props.chat.users.includes(entry[0]) && chatOwner && (
+                <div className="userRowActions">
+                  {props.chat.users.includes(entry[0]) && chatOwner && (
+                    <div
+                      className="actionButton"
+                      style={{ backgroundColor: color(kicking, entry[0]) }}
+                      onClick={() => pushPop(kicking, setKicking, entry[0])}
+                    >
+                      <FontAwesomeIcon icon={faUserSlash} />
+                    </div>
+                  )}
                   <div
                     className="actionButton"
-                    style={{ backgroundColor: color(kicking, entry[0]) }}
-                    onClick={() => pushPop(kicking, setKicking, entry[0])}
-                  >
-                    <FontAwesomeIcon icon={faUserSlash} />
-                  </div>
-                )}
-                <div
-                  className="actionButton"
-                  style={{
-                    backgroundColor: color(
+                    style={{
+                      backgroundColor: color(
+                        props.blockedByMe.includes(entry[0])
+                          ? unblocking
+                          : blocking,
+                        entry[0]
+                      ),
+                    }}
+                    onClick={
                       props.blockedByMe.includes(entry[0])
-                        ? unblocking
-                        : blocking,
-                      entry[0]
-                    ),
-                  }}
-                  onClick={
-                    props.blockedByMe.includes(entry[0])
-                      ? () => pushPop(unblocking, setUnblocking, entry[0])
-                      : () => pushPop(blocking, setBlocking, entry[0])
-                  }
-                >
-                  <FontAwesomeIcon
-                    icon={
-                      props.blockedByMe.includes(entry[0])
-                        ? faShieldHeart
-                        : faShield
+                        ? () => pushPop(unblocking, setUnblocking, entry[0])
+                        : () => pushPop(blocking, setBlocking, entry[0])
                     }
-                  />
-                </div>
-                <div
-                  className="actionButton"
-                  style={{ backgroundColor: color(reporting, entry[0]) }}
-                  onClick={() => pushPop(reporting, setReporting, entry[0])}
-                >
-                  <FontAwesomeIcon icon={faFlag} />
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        props.blockedByMe.includes(entry[0])
+                          ? faShieldHeart
+                          : faShield
+                      }
+                    />
+                  </div>
+                  <div
+                    className="actionButton"
+                    style={{ backgroundColor: color(reporting, entry[0]) }}
+                    onClick={() => pushPop(reporting, setReporting, entry[0])}
+                  >
+                    <FontAwesomeIcon icon={faFlag} />
+                  </div>
                 </div>
               </div>
             ))}
@@ -222,7 +229,7 @@ function ChatSettings(props) {
             )
           }
         >
-          Submit
+          Confirm {}
         </button>
       )}
     </div>
