@@ -13,6 +13,7 @@
     "buffer": "^6.0.3",
     "buil": "^0.0.0",
     "crypto-browserify": "^3.12.0",
+    "firebase": "^9.18.0",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "jwt-decode-non-json": "^3.1.2",
@@ -30,7 +31,7 @@
     "util": "^0.12.4"
   },
   "scripts": {
-    "start": " react-scripts start",
+    "start": "PORT=3001 react-scripts start",
     "start-windows": "set PORT=5000 && cross-env REACT_APP_API_URL=$npm_config_api REACT_APP_CHAT_URL=$npm_config_chat_api react-scripts start",
     "debug_api_string": "echo $npm_config_api",
     "build": "react-scripts build",
