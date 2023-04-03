@@ -124,8 +124,7 @@ class Chat extends Component {
               chat.detachNewMessagesListener = listenForNewMessages(
                 { roomId: chat._id, userId: this.props.userID },
                 (message) => {
-                  // this.setState({chats: message});
-                  // console.log("new message", message);
+                  this.broadcastMessageWS(message);
                 }
               );
               // chat.detachUserAdditionsListener = listenForUserAdditions(chat._id, (user) => {
@@ -155,7 +154,6 @@ class Chat extends Component {
         // console.log("removed room", room);
       }
     );
-    this.socket.on("broadcast-message", this.broadcastMessageWS);
     this.socket.on("added-to-room", async (chat) => {
       chat.seen = false;
       this.socket.emit("join-room", { id: chat._id });
@@ -274,30 +272,16 @@ class Chat extends Component {
     const message = {
       author: this.props.userID,
       contents: contents,
-      chat: chat._id,
       recipients: chat.users,
       timestamp: new Date().toISOString(),
     };
     this.setState({ messages: [...this.state.messages, message] });
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`, {
-        contents,
-      })
-      .then((res) => {
-        // Update the last message of the chat and move it to the top
-        // this.socket.emit("new-message", message);
-        chat.lastMessage = res.data;
-        const chatStateCopy = [...this.state.chats];
-        chatStateCopy.splice(this.state.activeChatIndex, 1);
-        this.setState({ activeChatIndex: 0, chats: [chat, ...chatStateCopy] });
-
-        newMessage({
-          author: this.props.userID,
-          chatId: chat._id,
-          contents: contents,
-          recipients: res.data.recipients,
-        });
-      });
+    newMessage(chat._id, message);
+    message.chat = chat._id;
+    chat.lastMessage = message;
+    const chatStateCopy = [...this.state.chats];
+    chatStateCopy.splice(this.state.activeChatIndex, 1);
+    this.setState({ activeChatIndex: 0, chats: [chat, ...chatStateCopy] });
   };
 
   async createChat(users) {

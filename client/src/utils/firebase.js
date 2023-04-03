@@ -59,7 +59,7 @@ const listenForRoomAdditions = (userId, callback) => {
       _id: chatSnapshot.key,
       ...chatSnapshot.val(),
     };
-    results.created = new Date(results.created);
+    results.created = new Date(results.created).toISOString();
 
     // change users from being keys to an array
     results.users = Object.keys(results.users);
@@ -88,19 +88,11 @@ const listenForRoomAdditions = (userId, callback) => {
   return () => off(roomsRef, "child_added");
 };
 
-const newMessage = (data) => {
-  const message = {};
-  message.author = {};
-  message.recipients = {};
-  message.author[data.author] = true;
-  message.contents = data.contents;
-  message.timestamp = serverTimestamp();
-
+const newMessage = (id, data) => {
   for (let recipient of data.recipients) {
-    message.recipients[recipient] = true;
+    data.recipients[recipient] = true;
   }
-
-  push(ref(db, `messages/${data.chatId}`), message);
+  push(ref(db, `messages/${id}`), data);
 };
 
 const listenForNewMessages = (data, callback) => {
@@ -111,7 +103,12 @@ const listenForNewMessages = (data, callback) => {
   );
 
   onChildAdded(messagesRef, (snapshot) => {
-    callback(snapshot.val());
+    let result = snapshot.val();
+    result._id = snapshot.key;
+    result.chat = data.roomId;
+    result.recipients = Object.keys(result.recipients);
+    result.timestamp = new Date(result.timestamp).toISOString();
+    callback(result);
   });
   return () => off(messagesRef, "child_added");
 };
