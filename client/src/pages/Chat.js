@@ -89,72 +89,12 @@ class Chat extends Component {
         this.setState({ blockedByMe: res.data[0].blockList });
       });
 
-    axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-        params: {
-          id: this.props.userID,
-        },
-      })
-      .then((res) => {
-        this.setState({
-          userMap: Object.fromEntries(
-            res.data.map((i) => [
-              i._id,
-              { name: i.name, profilePicture: i.profile[0]?.profilePictureUrl },
-            ])
-          ),
-          otherUsers: [
-            ...res.data.filter(
-              (user) => user._id && user._id !== this.props.userID
-            ),
-          ],
-        });
-      })
-      .then(() => {
-        axios
-          .get(process.env.REACT_APP_API_URL + "/api/chats")
-          .then(async (res) => {
-            for (const chat of res.data) {
-              // join websocket room
-              this.socket.emit("join-room", { id: chat._id });
-              chat.profiles = Object.fromEntries(
-                chat.users.map((id) => [id, this.state.userMap[id]])
-              );
-              chat.seen = chat.readBy.includes(this.props.userID);
-              // chat.detachUserAdditionsListener = listenForUserAdditions(chat._id, (user) => {
-              //   // console.log("added user", user);
-              // });
-              // chat.detachUserRemovalsListener = listenForUserRemovals(chat._id, (user) => {
-              //   console.log("removed user", user);
-              // });
-              // chat.detachNameChangesListener = listenForNameChanges(chat._id, (name) => {
-              //   console.log("chat renamed", name);
-              // });
-              // console.log(chat)
-            }
-            console.log(res.data);
-            // this.setState({ chats: res.data });
-          })
-          .then(() => {
-            if (this.props.swipedUser !== null) {
-              this.createChat([this.props.swipedUser]);
-            }
-          });
-      });
-
     this.detachRoomDeletionsListener = listenForRoomDeletions(
       this.props.userID,
       (room) => {
         // console.log("removed room", room);
       }
     );
-    // this.socket.on("added-to-room", async (chat) => {
-    //   chat.seen = false;
-    //   this.socket.emit("join-room", { id: chat._id });
-    //   console.log('in socket.io event');
-    //   console.log(chat);
-    //   this.setState({ chats: [...this.state.chats, chat] });
-    // });
     this.socket.on("new-user-added", async (chat) => {
       let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
       this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
@@ -179,11 +119,39 @@ class Chat extends Component {
     this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
     this.detachRoomAdditionsListener = listenForRoomAdditions(
       this.props.userID,
-      (data) => {
+      async (data) => {
+        let userMap;
+        await axios
+          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+            params: {
+              id: this.props.userID,
+            },
+          })
+          .then((res) => {
+            userMap = Object.fromEntries(
+              res.data.map((i) => [
+                i._id,
+                {
+                  name: i.name,
+                  profilePicture: i.profile[0]?.profilePictureUrl,
+                },
+              ])
+            );
+            this.setState((prevState) => {
+              return {
+                userMap: userMap,
+                otherUsers: [
+                  ...res.data.filter(
+                    (user) => user._id && user._id !== this.props.userID
+                  ),
+                ],
+              };
+            });
+          });
         data.seen = data.readBy.includes(this.props.userID);
         data.lastMessage = null;
         data.profiles = Object.fromEntries(
-          data.users.map((id) => [id, this.state.userMap[id]])
+          data.users.map((id) => [id, userMap[id]])
         );
         data.detachNewMessagesListener = listenForNewMessages(
           { roomId: data._id, userId: this.props.userID },

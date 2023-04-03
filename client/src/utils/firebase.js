@@ -74,7 +74,6 @@ const listenForRoomAdditions = (userId, callback) => {
       results.lastMessage = message;
     });
 
-    console.log(results);
     callback(results);
   });
   return () => off(roomsRef, "child_added");
