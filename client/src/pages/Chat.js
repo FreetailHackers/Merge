@@ -9,7 +9,6 @@ import "./Chat.css";
 import {
   createRoom,
   newMessage,
-  listenForRoomAdditions,
   listenForNewMessages,
   addUser,
   // blockUsers,
@@ -18,10 +17,11 @@ import {
   leaveRoom,
   // removeUsers,
   deleteRoom,
-  listenForUserAdditions,
-  listenForUserRemovals,
+  listenForRoomAdditions,
   listenForRoomDeletions,
-  listenForNameChanges,
+  // listenForUserAdditions,
+  // listenForUserRemovals,
+  // listenForNameChanges,
 } from "../utils/firebase";
 
 class Chat extends Component {
@@ -121,22 +121,25 @@ class Chat extends Component {
                 chat.users.map((id) => [id, this.state.userMap[id]])
               );
               chat.seen = chat.readBy.includes(this.props.userID);
-              listenForNewMessages(
+              chat.detachNewMessagesListener = listenForNewMessages(
                 { roomId: chat._id, userId: this.props.userID },
                 (message) => {
-                  console.log("new message", message);
+                  // this.setState({chats: message});
+                  // console.log("new message", message);
                 }
               );
-              listenForUserAdditions(chat._id, (user) => {
-                console.log("added user", user);
-              });
-              listenForUserRemovals(chat._id, (user) => {
-                console.log("removed user", user);
-              });
-              listenForNameChanges(chat._id, (name) => {
-                console.log("chat renamed", name);
-              });
+              // chat.detachUserAdditionsListener = listenForUserAdditions(chat._id, (user) => {
+              //   // console.log("added user", user);
+              // });
+              // chat.detachUserRemovalsListener = listenForUserRemovals(chat._id, (user) => {
+              //   console.log("removed user", user);
+              // });
+              // chat.detachNameChangesListener = listenForNameChanges(chat._id, (name) => {
+              //   console.log("chat renamed", name);
+              // });
+              // console.log(chat)
             }
+            console.log(res.data);
             this.setState({ chats: res.data });
           })
           .then(() => {
@@ -146,16 +149,17 @@ class Chat extends Component {
           });
       });
 
-    listenForRoomAdditions(this.props.userID, (room) => {
-      console.log("added room", room);
-    });
-    listenForRoomDeletions(this.props.userID, (room) => {
-      console.log("removed room", room);
-    });
+    this.detachRoomDeletionsListener = listenForRoomDeletions(
+      this.props.userID,
+      (room) => {
+        // console.log("removed room", room);
+      }
+    );
     this.socket.on("broadcast-message", this.broadcastMessageWS);
     this.socket.on("added-to-room", async (chat) => {
       chat.seen = false;
       this.socket.emit("join-room", { id: chat._id });
+      // console.log(chat);
       this.setState({ chats: [...this.state.chats, chat] });
     });
     this.socket.on("new-user-added", async (chat) => {
@@ -180,6 +184,18 @@ class Chat extends Component {
     });
     this.socket.on("blocked-by", (data) => this.blockedWS(data, true));
     this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
+    this.detachRoomAdditionsListener = listenForRoomAdditions(
+      this.props.userID,
+      (key, data) => {
+        console.log("added room", data);
+        const chat = {
+          _id: key,
+          ...data,
+        };
+        console.log(chat);
+        // this.setState({ chats: [...this.state.chats, chat] });
+      }
+    );
   }
 
   broadcastMessageWS = (data) => {
@@ -248,6 +264,8 @@ class Chat extends Component {
 
   componentWillUnmount() {
     this.socket.disconnect({ userID: this.props.userID });
+    this.detachRoomAdditionsListener();
+    this.detachRoomDeletionsListener();
   }
 
   sendMessage = (contents) => {
@@ -267,7 +285,7 @@ class Chat extends Component {
       })
       .then((res) => {
         // Update the last message of the chat and move it to the top
-        this.socket.emit("new-message", message);
+        // this.socket.emit("new-message", message);
         chat.lastMessage = res.data;
         const chatStateCopy = [...this.state.chats];
         chatStateCopy.splice(this.state.activeChatIndex, 1);
@@ -277,6 +295,7 @@ class Chat extends Component {
           author: this.props.userID,
           chatId: chat._id,
           contents: contents,
+          recipients: res.data.recipients,
         });
       });
   };
@@ -319,11 +338,11 @@ class Chat extends Component {
           name: chat.name,
           owner: chat.owner,
         });
-        this.socket.emit("create-room", {
-          _id: chat._id,
-          otherUsers: users,
-          chat: chat,
-        });
+        // this.socket.emit("create-room", {
+        //   _id: chat._id,
+        //   otherUsers: users,
+        //   chat: chat,
+        // });
         this.setState({
           chats: [...this.state.chats, chat],
           newChatInput: [],
@@ -392,6 +411,11 @@ class Chat extends Component {
   }
 
   removeChatFromClient(deletedChat) {
+    deletedChat.detachNewMessagesListener();
+    deletedChat.detachUserAdditionsListener();
+    deletedChat.detachUserRemovalsListener();
+    deletedChat.detachNameChangesListener();
+
     const newChats = [...this.state.chats].filter(
       (chat) => chat._id !== deletedChat._id
     );

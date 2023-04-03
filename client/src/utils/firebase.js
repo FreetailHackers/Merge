@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, setLogLevel } from "firebase/app";
 import {
   getDatabase,
   serverTimestamp,
@@ -13,6 +13,8 @@ import {
   update,
   remove,
   onChildChanged,
+  off,
+  limitToLast,
 } from "firebase/database";
 
 // Initialize Firebase
@@ -27,6 +29,7 @@ const firebaseConfig = {
   appId: "1:984268791583:web:3da2a7008a8a73089b1a2a",
 };
 initializeApp(firebaseConfig);
+setLogLevel("silent");
 const db = getDatabase();
 
 // Functions to interact with the Firebase Realtime Database
@@ -39,6 +42,7 @@ const createRoom = (data) => {
     readBy: [],
   };
 
+  room.users[data.owner] = true;
   for (let user of data.users) room.users[user] = true;
 
   set(ref(db, `chats/${data.chatId}`), room);
@@ -50,18 +54,52 @@ const listenForRoomAdditions = (userId, callback) => {
     orderByChild("users/" + userId),
     equalTo(true)
   );
-  onChildAdded(roomsRef, (snapshot) => {
-    callback(snapshot.val());
+  onChildAdded(roomsRef, (chatSnapshot) => {
+    const results = {
+      _id: chatSnapshot.key,
+      ...chatSnapshot.val(),
+    };
+    results.created = new Date(results.created);
+
+    // change users from being keys to an array
+    results.users = Object.keys(results.users);
+
+    // get the last message
+    const lastMessageRef = query(
+      ref(db, `messages/${chatSnapshot.key}/`),
+      orderByChild("timestamp"),
+      limitToLast(1)
+    );
+    onChildAdded(lastMessageRef, (messageSnapshot) => {
+      const message = {
+        _id: messageSnapshot.key,
+        ...messageSnapshot.val(),
+      };
+      message.author = Object.keys(message.author);
+      message.timestamp = new Date(message.timestamp);
+      message.chat = chatSnapshot.key;
+      message.recipients = Object.keys(message.recipients);
+      results.lastMessage = message;
+    });
+
+    console.log(results);
+    callback(results);
   });
-  return () => roomsRef.off("child_added");
+  return () => off(roomsRef, "child_added");
 };
 
 const newMessage = (data) => {
-  console.log(data);
   const message = {};
-  message[data.author] = true;
+  message.author = {};
+  message.recipients = {};
+  message.author[data.author] = true;
   message.contents = data.contents;
   message.timestamp = serverTimestamp();
+
+  for (let recipient of data.recipients) {
+    message.recipients[recipient] = true;
+  }
+
   push(ref(db, `messages/${data.chatId}`), message);
 };
 
@@ -75,7 +113,7 @@ const listenForNewMessages = (data, callback) => {
   onChildAdded(messagesRef, (snapshot) => {
     callback(snapshot.val());
   });
-  return () => messagesRef.off("child_added");
+  return () => off(messagesRef, "child_added");
 };
 
 const addUser = (data) => {
@@ -89,7 +127,7 @@ const listenForUserAdditions = (roomId, callback) => {
   onChildAdded(usersRef, (snapshot) => {
     callback(snapshot.key);
   });
-  return () => usersRef.off("value");
+  return () => off(usersRef, "value");
 };
 
 const listenForUserRemovals = (roomId, callback) => {
@@ -97,7 +135,7 @@ const listenForUserRemovals = (roomId, callback) => {
   onChildRemoved(usersRef, (snapshot) => {
     callback(snapshot.key);
   });
-  return () => usersRef.off("value");
+  return () => off(usersRef, "value");
 };
 
 const blockUsers = (roomId, userIds) => {
@@ -121,7 +159,7 @@ const listenForNameChanges = (roomId, callback) => {
   onChildChanged(chatRef, (snapshot) => {
     callback(snapshot.key);
   });
-  return () => chatRef.off("value");
+  return () => off(chatRef, "value");
 };
 
 const leaveRoom = (data) => {
@@ -147,7 +185,7 @@ const listenForRoomDeletions = (userId, callback) => {
   onChildRemoved(roomsRef, (snapshot) => {
     callback(snapshot.val());
   });
-  return () => roomsRef.off("child_added");
+  return () => off(roomsRef, "child_added");
 };
 
 export {
