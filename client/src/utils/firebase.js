@@ -8,7 +8,6 @@ import {
   onChildAdded,
   onChildRemoved,
   equalTo,
-  set,
   orderByChild,
   update,
   remove,
@@ -34,18 +33,11 @@ const db = getDatabase();
 
 // Functions to interact with the Firebase Realtime Database
 const createRoom = (data) => {
-  const room = {
-    created: serverTimestamp(),
-    name: data.name || "",
-    owner: data.owner,
-    users: [],
-    readBy: [],
-  };
-
-  room.users[data.owner] = true;
-  for (let user of data.users) room.users[user] = true;
-
-  set(ref(db, `chats/${data.chatId}`), room);
+  data.created = serverTimestamp();
+  data.users = data.users.reduce((result, userId) => {
+    return { ...result, [userId]: true };
+  }, {});
+  push(ref(db, `chats/`), data);
 };
 
 const listenForRoomAdditions = (userId, callback) => {

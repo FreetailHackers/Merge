@@ -46,31 +46,31 @@ class Chat extends Component {
     });
   }
 
-  getMessages(index, newChats = null) {
-    let chat = newChats ? newChats[index] : this.state.chats[index];
-    this.setState({ editingTitle: false, titleInput: chat.name });
-    axios
-      .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
-      .then(async (res) => {
-        chat.seen = true;
-        const messages = res.data;
+  // getMessages(index, newChats = null) {
+  //   let chat = newChats ? newChats[index] : this.state.chats[index];
+  //   this.setState({ editingTitle: false, titleInput: chat.name });
+  //   axios
+  //     .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
+  //     .then(async (res) => {
+  //       chat.seen = true;
+  //       const messages = res.data;
 
-        // fill in missing profiles (needed if someone leaves the chat)
-        const authors = [...new Set(messages.map((message) => message.author))];
-        for (const author of authors) {
-          if (!(author in chat.profiles)) {
-            chat.profiles[author] = this.state.userMap[author];
-          }
-        }
-        this.setState({
-          chats: this.chatStateCopy(chat, false, index),
-          activeChatIndex: index,
-          messages: res.data,
-        });
-      });
-    document.getElementById("newMessageInput") &&
-      document.getElementById("newMessageInput").focus();
-  }
+  //       // fill in missing profiles (needed if someone leaves the chat)
+  //       const authors = [...new Set(messages.map((message) => message.author))];
+  //       for (const author of authors) {
+  //         if (!(author in chat.profiles)) {
+  //           chat.profiles[author] = this.state.userMap[author];
+  //         }
+  //       }
+  //       this.setState({
+  //         chats: this.chatStateCopy(chat, false, index),
+  //         activeChatIndex: index,
+  //         messages: res.data,
+  //       });
+  //     });
+  //   document.getElementById("newMessageInput") &&
+  //     document.getElementById("newMessageInput").focus();
+  // }
 
   async componentDidMount() {
     this.socket.emit("new-connection", { userID: this.props.userID });
@@ -121,12 +121,6 @@ class Chat extends Component {
                 chat.users.map((id) => [id, this.state.userMap[id]])
               );
               chat.seen = chat.readBy.includes(this.props.userID);
-              chat.detachNewMessagesListener = listenForNewMessages(
-                { roomId: chat._id, userId: this.props.userID },
-                (message) => {
-                  this.broadcastMessageWS(message);
-                }
-              );
               // chat.detachUserAdditionsListener = listenForUserAdditions(chat._id, (user) => {
               //   // console.log("added user", user);
               // });
@@ -139,7 +133,7 @@ class Chat extends Component {
               // console.log(chat)
             }
             console.log(res.data);
-            this.setState({ chats: res.data });
+            // this.setState({ chats: res.data });
           })
           .then(() => {
             if (this.props.swipedUser !== null) {
@@ -154,12 +148,13 @@ class Chat extends Component {
         // console.log("removed room", room);
       }
     );
-    this.socket.on("added-to-room", async (chat) => {
-      chat.seen = false;
-      this.socket.emit("join-room", { id: chat._id });
-      // console.log(chat);
-      this.setState({ chats: [...this.state.chats, chat] });
-    });
+    // this.socket.on("added-to-room", async (chat) => {
+    //   chat.seen = false;
+    //   this.socket.emit("join-room", { id: chat._id });
+    //   console.log('in socket.io event');
+    //   console.log(chat);
+    //   this.setState({ chats: [...this.state.chats, chat] });
+    // });
     this.socket.on("new-user-added", async (chat) => {
       let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
       this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
@@ -184,14 +179,21 @@ class Chat extends Component {
     this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
     this.detachRoomAdditionsListener = listenForRoomAdditions(
       this.props.userID,
-      (key, data) => {
-        console.log("added room", data);
-        const chat = {
-          _id: key,
-          ...data,
-        };
-        console.log(chat);
-        // this.setState({ chats: [...this.state.chats, chat] });
+      (data) => {
+        data.seen = data.readBy.includes(this.props.userID);
+        data.lastMessage = null;
+        data.profiles = Object.fromEntries(
+          data.users.map((id) => [id, this.state.userMap[id]])
+        );
+        data.detachNewMessagesListener = listenForNewMessages(
+          { roomId: data._id, userId: this.props.userID },
+          (message) => {
+            this.broadcastMessageWS(message);
+          }
+        );
+        this.setState((prevState) => {
+          return { chats: [...prevState.chats, data] };
+        });
       }
     );
   }
@@ -300,43 +302,46 @@ class Chat extends Component {
         this.setState({ userMap: newUserMap });
       }
     }
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/new`)
-      .then(async (res) => {
-        let chat = res.data;
-        chat.seen = true;
-        chat.users = [...chat.users, ...users];
-        for (const user of users) {
-          axios.post(
-            process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`,
-            { user }
-          );
-        }
-        chat.profiles = Object.fromEntries(
-          chat.users.map((id) => [id, this.state.userMap[id]])
-        );
-        chat.lastMessage = null;
-        createRoom({
-          chatId: chat._id,
-          users: users,
-          name: chat.name,
-          owner: chat.owner,
-        });
-        // this.socket.emit("create-room", {
-        //   _id: chat._id,
-        //   otherUsers: users,
-        //   chat: chat,
-        // });
-        this.setState({
-          chats: [...this.state.chats, chat],
-          newChatInput: [],
-          creatingNewChat: false,
-          activeChatIndex: this.state.chats.length,
-        });
-        if (this.props.swipedUser) {
-          this.props.setSwipedUser(null);
-        }
-      });
+    users.push(this.props.userID);
+    let chat = {
+      users: users,
+      owner: this.props.userID,
+      name: "",
+      readBy: [this.props.userID],
+    };
+    createRoom(chat);
+    chat.profiles = Object.fromEntries(
+      chat.users.map((id) => [id, this.state.userMap[id]])
+    );
+    chat.lastMessage = null;
+    console.log(chat);
+
+    this.setState({
+      chats: [...this.state.chats, chat],
+      newChatInput: [],
+      creatingNewChat: false,
+      activeChatIndex: this.state.chats.length,
+    });
+    if (this.props.swipedUser) {
+      this.props.setSwipedUser(null);
+    }
+    // axios
+    //   .post(process.env.REACT_APP_API_URL + `/api/chats/new`)
+    //   .then(async (res) => {
+    //     let chat = res.data;
+    //     chat.users = [...chat.users, ...users];
+    //     createRoom({
+    //       chatId: chat._id,
+    //       users: users,
+    //       name: chat.name,
+    //       owner: chat.owner,
+    //     });
+    // this.socket.emit("create-room", {
+    //   _id: chat._id,
+    //   otherUsers: users,
+    //   chat: chat,
+    // });
+    //   });
   }
 
   addUsers(newUserIDs) {
