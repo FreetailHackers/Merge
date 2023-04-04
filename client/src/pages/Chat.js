@@ -10,6 +10,7 @@ import {
   createRoom,
   newMessage,
   listenForNewMessages,
+  readMessage,
   addUser,
   // blockUsers,
   // unblockUsers,
@@ -89,6 +90,33 @@ class Chat extends Component {
         this.setState({ blockedByMe: res.data[0].blockList });
       });
 
+    let userMap;
+    await axios
+      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
+        params: {
+          id: this.props.userID,
+        },
+      })
+      .then((res) => {
+        userMap = Object.fromEntries(
+          res.data.map((i) => [
+            i._id,
+            {
+              name: i.name,
+              profilePicture: i.profile[0]?.profilePictureUrl,
+            },
+          ])
+        );
+        this.setState({
+          userMap: userMap,
+          otherUsers: [
+            ...res.data.filter(
+              (user) => user._id && user._id !== this.props.userID
+            ),
+          ],
+        });
+      });
+
     this.detachRoomDeletionsListener = listenForRoomDeletions(
       this.props.userID,
       (room) => {
@@ -119,35 +147,7 @@ class Chat extends Component {
     this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
     this.detachRoomAdditionsListener = listenForRoomAdditions(
       this.props.userID,
-      async (data) => {
-        let userMap;
-        await axios
-          .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-            params: {
-              id: this.props.userID,
-            },
-          })
-          .then((res) => {
-            userMap = Object.fromEntries(
-              res.data.map((i) => [
-                i._id,
-                {
-                  name: i.name,
-                  profilePicture: i.profile[0]?.profilePictureUrl,
-                },
-              ])
-            );
-            this.setState((prevState) => {
-              return {
-                userMap: userMap,
-                otherUsers: [
-                  ...res.data.filter(
-                    (user) => user._id && user._id !== this.props.userID
-                  ),
-                ],
-              };
-            });
-          });
+      (data) => {
         data.seen = data.readBy.includes(this.props.userID);
         data.lastMessage = null;
         data.profiles = Object.fromEntries(
@@ -173,7 +173,7 @@ class Chat extends Component {
     if (chatIndex !== this.state.activeChatIndex) {
       chat.seen = false;
     } else {
-      axios.post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/read`);
+      readMessage(data.chat, this.props.userID);
     }
     if (!this.state.blockedByMe.includes(data.author)) {
       chat.lastMessage = data;
@@ -338,19 +338,19 @@ class Chat extends Component {
 
   setTitle(newTitle) {
     let chat = this.state.chats[this.state.activeChatIndex];
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/rename`, {
-        name: newTitle,
-      })
-      .then(() => {
-        chat.name = newTitle;
-        this.setState({ chats: this.chatStateCopy(chat, true, 0) });
-        this.socket.emit("rename-chat", {
-          chatID: chat._id,
-          newName: chat.name,
-        });
-        renameRoom({ chatId: chat._id, name: chat.name });
-      });
+    // axios
+    //   .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/rename`, {
+    //     name: newTitle,
+    //   })
+    //   .then(() => {
+    //     chat.name = newTitle;
+    //     this.socket.emit("rename-chat", {
+    //       chatID: chat._id,
+    //       newName: chat.name,
+    //     });
+    //   });
+    renameRoom({ chatId: chat._id, name: newTitle });
+    this.setState({ chats: this.chatStateCopy(chat, true, 0) });
   }
 
   chatStateCopy(chat, isActive, index) {

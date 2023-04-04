@@ -12,6 +12,7 @@ import {
   update,
   remove,
   onChildChanged,
+  // set,
   off,
   limitToLast,
 } from "firebase/database";
@@ -31,12 +32,44 @@ initializeApp(firebaseConfig);
 setLogLevel("silent");
 const db = getDatabase();
 
+// TODO: Figure out why only the last message is shown
+// TODO: Correctly detach the listeners
+
+// #1:
+// TODO: Rename a chat
+// TODO: Listen for a chat being renamed
+
+// #2:
+// TODO: Add a user to a chat
+// TODO: Listen for a user being added to a chat
+
+// #3:
+// TODO: Remove a user from a chat
+// TODO: Listen for a user being removed from a chat
+
+// #4:
+// TODO: Delete a chat
+// TODO: Listen for a chat being deleted
+
+// #5:
+// TODO: Leave a chat
+// TODO: Listen for a user leaving a chat
+
+// #6:
+// TODO: Block a user from a chat
+// TODO: Listen for a user being blocked from a chat
+
+// #7:
+// TODO: Unblock a user from a chat
+// TODO: Listen for a user being unblocked from a chat
+
 // Functions to interact with the Firebase Realtime Database
 const createRoom = (data) => {
   data.created = serverTimestamp();
   data.users = data.users.reduce((result, userId) => {
     return { ...result, [userId]: true };
   }, {});
+  data.readBy = data.users;
   push(ref(db, `chats/`), data);
 };
 
@@ -55,6 +88,7 @@ const listenForRoomAdditions = (userId, callback) => {
 
     // change users from being keys to an array
     results.users = Object.keys(results.users);
+    results.readBy = Object.keys(results.readBy);
 
     // get the last message
     const lastMessageRef = query(
@@ -74,16 +108,21 @@ const listenForRoomAdditions = (userId, callback) => {
       results.lastMessage = message;
     });
 
+    console.log(results);
     callback(results);
   });
   return () => off(roomsRef, "child_added");
 };
 
 const newMessage = (id, data) => {
+  const updates = {};
   for (let recipient of data.recipients) {
     data.recipients[recipient] = true;
+    updates[`chats/${id}/readBy/${recipient}`] = false;
   }
+  updates[`chats/${id}/readBy/${data.author}`] = true;
   push(ref(db, `messages/${id}`), data);
+  update(ref(db), updates);
 };
 
 const listenForNewMessages = (data, callback) => {
@@ -102,6 +141,12 @@ const listenForNewMessages = (data, callback) => {
     callback(result);
   });
   return () => off(messagesRef, "child_added");
+};
+
+const readMessage = (messageId, userId) => {
+  const readBy = {};
+  readBy[userId] = true;
+  update(ref(db, `chats/${messageId}/readBy/`), readBy);
 };
 
 const addUser = (data) => {
@@ -181,6 +226,7 @@ export {
   listenForRoomAdditions,
   newMessage,
   listenForNewMessages,
+  readMessage,
   addUser,
   listenForUserAdditions,
   listenForUserRemovals,
