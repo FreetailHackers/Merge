@@ -12,17 +12,17 @@ import {
   listenForNewMessages,
   readMessage,
   addUser,
+  removeUsers,
   // blockUsers,
   // unblockUsers,
   renameRoom,
   leaveRoom,
-  // removeUsers,
   deleteRoom,
   listenForRoomAdditions,
   listenForRoomDeletions,
-  // listenForUserAdditions,
-  // listenForUserRemovals,
-  // listenForNameChanges,
+  listenForUserAdditions,
+  listenForUserRemovals,
+  listenForNameChanges,
 } from "../utils/firebase";
 
 class Chat extends Component {
@@ -46,32 +46,6 @@ class Chat extends Component {
       query: { token: localStorage.jwtToken },
     });
   }
-
-  // getMessages(index, newChats = null) {
-  //   let chat = newChats ? newChats[index] : this.state.chats[index];
-  //   this.setState({ editingTitle: false, titleInput: chat.name });
-  //   axios
-  //     .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
-  //     .then(async (res) => {
-  //       chat.seen = true;
-  //       const messages = res.data;
-
-  //       // fill in missing profiles (needed if someone leaves the chat)
-  //       const authors = [...new Set(messages.map((message) => message.author))];
-  //       for (const author of authors) {
-  //         if (!(author in chat.profiles)) {
-  //           chat.profiles[author] = this.state.userMap[author];
-  //         }
-  //       }
-  //       this.setState({
-  //         chats: this.chatStateCopy(chat, false, index),
-  //         activeChatIndex: index,
-  //         messages: res.data,
-  //       });
-  //     });
-  //   document.getElementById("newMessageInput") &&
-  //     document.getElementById("newMessageInput").focus();
-  // }
 
   async componentDidMount() {
     this.socket.emit("new-connection", { userID: this.props.userID });
@@ -123,28 +97,29 @@ class Chat extends Component {
         // console.log("removed room", room);
       }
     );
-    this.socket.on("new-user-added", async (chat) => {
-      let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
-      this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-    });
-    this.socket.on("chat-renamed", (data) => {
-      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
-      let chat = this.state.chats[chatIndex];
-      chat.name = data.newName;
-      this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-    });
-    this.socket.on("chat-deleted", (deletedChat) => {
-      this.removeChatFromClient(deletedChat);
-    });
-    this.socket.on("user-left", this.userLeftWS);
-    this.socket.on("removed-from", (data) => {
-      const index = this.state.chats.findIndex((e) => e._id === data.chatID);
-      if (index >= 0) {
-        this.removeChatFromClient(this.state.chats[index]);
-      }
-    });
-    this.socket.on("blocked-by", (data) => this.blockedWS(data, true));
-    this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
+    // this.socket.on("new-user-added", async (chat) => {
+    //   let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
+    //   this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+    // });
+    // this.socket.on("chat-renamed", (data) => {
+    //   let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
+    //   let chat = this.state.chats[chatIndex];
+    //   chat.name = data.newName;
+    //   this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+    // });
+    // this.socket.on("chat-deleted", (deletedChat) => {
+    //   this.removeChatFromClient(deletedChat);
+    // });
+    // this.socket.on("user-left", this.userLeftWS);
+    // this.socket.on("removed-from", (data) => {
+    //   const index = this.state.chats.findIndex((e) => e._id === data.chatID);
+    //   if (index >= 0) {
+    //     this.removeChatFromClient(this.state.chats[index]);
+    //   }
+    // });
+    // this.socket.on("blocked-by", (data) => this.blockedWS(data, true));
+    // this.socket.on("unblocked-by", (data) => this.blockedWS(data, false));
+
     this.detachRoomAdditionsListener = listenForRoomAdditions(
       this.props.userID,
       (data) => {
@@ -155,9 +130,19 @@ class Chat extends Component {
         );
         data.detachNewMessagesListener = listenForNewMessages(
           { roomId: data._id, userId: this.props.userID },
-          (message) => {
-            this.broadcastMessageWS(message);
-          }
+          (message) => this.broadcastMessageWS(message)
+        );
+        data.detachNameChangesListener = listenForNameChanges(
+          data._id,
+          (newName) => this.setTitle(newName, false)
+        );
+        data.detachUserAdditionsListener = listenForUserAdditions(
+          data._id,
+          (newUser) => this.addUsers([newUser], false)
+        );
+        data.detachUserRemovalsListener = listenForUserRemovals(
+          data._id,
+          (newUser) => this.userLeft(newUser, data._id)
         );
         this.setState((prevState) => {
           return { chats: [...prevState.chats, data] };
@@ -167,7 +152,9 @@ class Chat extends Component {
   }
 
   broadcastMessageWS = (data) => {
-    this.setState({ messages: [...this.state.messages, data] });
+    this.setState((prevState) => {
+      return { messages: [...prevState.messages, data] };
+    });
     let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chat);
     const chat = this.state.chats[chatIndex];
     if (chatIndex !== this.state.activeChatIndex) {
@@ -195,17 +182,20 @@ class Chat extends Component {
     });
   };
 
-  userLeftWS = (data) => {
-    if (data.user === this.props.userID) {
+  userLeft = (user, chatID) => {
+    if (user === this.props.userID) {
       this.removeChatFromClient(
-        this.state.chats.find((chat) => chat._id === data.chatID)
+        this.state.chats.find((chat) => chat._id === chatID)
       );
     } else {
-      let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
+      let chatIndex = this.state.chats.map((e) => e._id).indexOf(chatID);
       if (chatIndex >= 0) {
         let chat = this.state.chats[chatIndex];
-        chat.users = [...chat.users.filter((user) => user !== data.user)];
-        this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+        let userIndex = chat.users.indexOf(user);
+        if (userIndex >= 0) {
+          chat.users.splice(chat.users.indexOf(user), 1);
+          this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
+        }
       }
     }
   };
@@ -232,6 +222,13 @@ class Chat extends Component {
 
   componentWillUnmount() {
     this.socket.disconnect({ userID: this.props.userID });
+    let chats = this.state.chats;
+    for (let chat of chats) {
+      chat.detachNewMessagesListener();
+      chat.detachNameChangesListener();
+      chat.detachUserAdditionsListener();
+      chat.detachUserRemovalsListener();
+    }
     this.detachRoomAdditionsListener();
     this.detachRoomDeletionsListener();
   }
@@ -282,7 +279,6 @@ class Chat extends Component {
       chat.users.map((id) => [id, this.state.userMap[id]])
     );
     chat.lastMessage = null;
-    console.log(chat);
 
     this.setState({
       chats: [...this.state.chats, chat],
@@ -312,44 +308,29 @@ class Chat extends Component {
     //   });
   }
 
-  addUsers(newUserIDs) {
+  addUsers(newUserIDs, updateFirebase = true) {
     const chat = this.state.chats[this.state.activeChatIndex];
     if (chat.users.length + newUserIDs.length > 5) return;
     for (const user of newUserIDs) {
-      axios
-        .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`, {
-          user,
-        })
-        .then(() => {
-          chat.profiles[user] = this.state.userMap[user];
-          chat.users.push(user);
-          const chatStateCopy = [...this.state.chats];
-          chatStateCopy.splice(this.state.activeChatIndex, 1);
-          this.setState({
-            activeChatIndex: 0,
-            chats: [chat, ...chatStateCopy],
-          });
-          this.socket.emit("add-user", { userID: user, chat: chat });
-          addUser({ roomId: chat._id, userId: user });
-          // tell the others!!
-        });
+      if (chat.users.includes(user)) continue;
+      chat.profiles[user] = this.state.userMap[user];
+      chat.users.push(user);
     }
+    if (updateFirebase) {
+      addUser({ roomId: chat._id, users: newUserIDs });
+    }
+    const chatStateCopy = [...this.state.chats];
+    chatStateCopy.splice(this.state.activeChatIndex, 1);
+    this.setState({
+      activeChatIndex: 0,
+      chats: [chat, ...chatStateCopy],
+    });
   }
 
-  setTitle(newTitle) {
+  setTitle(newTitle, updateFirebase = true) {
     let chat = this.state.chats[this.state.activeChatIndex];
-    // axios
-    //   .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/rename`, {
-    //     name: newTitle,
-    //   })
-    //   .then(() => {
-    //     chat.name = newTitle;
-    //     this.socket.emit("rename-chat", {
-    //       chatID: chat._id,
-    //       newName: chat.name,
-    //     });
-    //   });
-    renameRoom({ chatId: chat._id, name: newTitle });
+    chat.name = newTitle;
+    if (updateFirebase) renameRoom({ chatId: chat._id, name: newTitle });
     this.setState({ chats: this.chatStateCopy(chat, true, 0) });
   }
 
@@ -402,18 +383,8 @@ class Chat extends Component {
       });
   }
 
-  async kickUsers(users, chatID) {
-    await axios.post(
-      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
-      { users }
-    );
-    this.socket.emit("remove-users", {
-      chatID: chatID,
-      users: users,
-    });
-    for (const user of users) {
-      this.userLeftWS({ user: user, chatID: chatID });
-    }
+  kickUsers(users, chatID) {
+    removeUsers(chatID, users);
   }
 
   leaveChat(chatIndex) {

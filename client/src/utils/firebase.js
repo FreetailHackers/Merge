@@ -11,7 +11,7 @@ import {
   orderByChild,
   update,
   remove,
-  onChildChanged,
+  onValue,
   // set,
   off,
   limitToLast,
@@ -32,20 +32,20 @@ initializeApp(firebaseConfig);
 setLogLevel("silent");
 const db = getDatabase();
 
-// TODO: Figure out why only the last message is shown
-// TODO: Correctly detach the listeners
+// DONE: Figure out why only the last message is shown
+// IN-PROGRESS: Correctly detach the listeners
 
 // #1:
-// TODO: Rename a chat
-// TODO: Listen for a chat being renamed
+// DONE: Rename a chat
+// DONE: Listen for a chat being renamed
 
 // #2:
-// TODO: Add a user to a chat
-// TODO: Listen for a user being added to a chat
+// DONE: Add a user to a chat
+// DONE: Listen for a user being added to a chat
 
 // #3:
-// TODO: Remove a user from a chat
-// TODO: Listen for a user being removed from a chat
+// DONE: Remove a user from a chat
+// DONE: Listen for a user being removed from a chat
 
 // #4:
 // TODO: Delete a chat
@@ -62,6 +62,8 @@ const db = getDatabase();
 // #7:
 // TODO: Unblock a user from a chat
 // TODO: Listen for a user being unblocked from a chat
+
+// TODO: Ensure people can swipe and create chats
 
 // Functions to interact with the Firebase Realtime Database
 const createRoom = (data) => {
@@ -108,7 +110,6 @@ const listenForRoomAdditions = (userId, callback) => {
       results.lastMessage = message;
     });
 
-    console.log(results);
     callback(results);
   });
   return () => off(roomsRef, "child_added");
@@ -150,9 +151,11 @@ const readMessage = (messageId, userId) => {
 };
 
 const addUser = (data) => {
-  const newUser = {};
-  newUser[data.userId] = true;
-  update(ref(db, `chats/${data.roomId}/users/`), newUser);
+  const newUsers = {};
+  for (let user of data.users) {
+    newUsers[`chats/${data.roomId}/users/${user}`] = true;
+  }
+  update(ref(db), newUsers);
 };
 
 const listenForUserAdditions = (roomId, callback) => {
@@ -189,8 +192,8 @@ const renameRoom = (data) => {
 
 const listenForNameChanges = (roomId, callback) => {
   const chatRef = ref(db, `chats/${roomId}/name`);
-  onChildChanged(chatRef, (snapshot) => {
-    callback(snapshot.key);
+  onValue(chatRef, (snapshot) => {
+    callback(snapshot.val());
   });
   return () => off(chatRef, "value");
 };
@@ -200,9 +203,11 @@ const leaveRoom = (data) => {
 };
 
 const removeUsers = (roomId, userIds) => {
+  const updates = {};
   userIds.forEach((userId) => {
-    db.ref(`chats/${roomId}/users`).child(userId).remove();
+    updates[`chats/${roomId}/users/${userId}`] = null;
   });
+  update(ref(db), updates);
 };
 
 const deleteRoom = (roomId) => {
