@@ -19,7 +19,6 @@ import {
   leaveRoom,
   deleteRoom,
   listenForRoomAdditions,
-  listenForRoomDeletions,
   listenForUserAdditions,
   listenForUserRemovals,
   listenForNameChanges,
@@ -91,22 +90,6 @@ class Chat extends Component {
         });
       });
 
-    this.detachRoomDeletionsListener = listenForRoomDeletions(
-      this.props.userID,
-      (room) => {
-        // console.log("removed room", room);
-      }
-    );
-    // this.socket.on("new-user-added", async (chat) => {
-    //   let chatIndex = this.state.chats.map((e) => e._id).indexOf(chat._id);
-    //   this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-    // });
-    // this.socket.on("chat-renamed", (data) => {
-    //   let chatIndex = this.state.chats.map((e) => e._id).indexOf(data.chatID);
-    //   let chat = this.state.chats[chatIndex];
-    //   chat.name = data.newName;
-    //   this.setState({ chats: this.chatStateCopy(chat, false, chatIndex) });
-    // });
     // this.socket.on("chat-deleted", (deletedChat) => {
     //   this.removeChatFromClient(deletedChat);
     // });
@@ -349,10 +332,11 @@ class Chat extends Component {
   }
 
   removeChatFromClient(deletedChat) {
-    deletedChat.detachNewMessagesListener();
-    deletedChat.detachUserAdditionsListener();
-    deletedChat.detachUserRemovalsListener();
-    deletedChat.detachNameChangesListener();
+    console.trace();
+    // deletedChat.detachNewMessagesListener();
+    // deletedChat.detachUserAdditionsListener();
+    // deletedChat.detachUserRemovalsListener();
+    // deletedChat.detachNameChangesListener();
 
     const newChats = [...this.state.chats].filter(
       (chat) => chat._id !== deletedChat._id
@@ -372,15 +356,15 @@ class Chat extends Component {
 
   deleteChat() {
     const deletedChat = this.state.chats[this.state.activeChatIndex];
-    axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`
-      )
-      .then(() => {
-        this.socket.emit("delete-chat", deletedChat);
-        deleteRoom(deletedChat._id);
-        this.removeChatFromClient(deletedChat);
-      });
+    // axios
+    //   .post(
+    //     process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`
+    //   )
+    //   .then(() => {
+    //     this.socket.emit("delete-chat", deletedChat);
+    //   });
+    deleteRoom(deletedChat._id);
+    this.removeChatFromClient(deletedChat);
   }
 
   kickUsers(users, chatID) {

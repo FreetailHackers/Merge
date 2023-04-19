@@ -214,18 +214,6 @@ const deleteRoom = (roomId) => {
   remove(ref(db, `chats/${roomId}`));
 };
 
-const listenForRoomDeletions = (userId, callback) => {
-  const roomsRef = query(
-    ref(db, "chats"),
-    orderByChild("users/" + userId),
-    equalTo(true)
-  );
-  onChildRemoved(roomsRef, (snapshot) => {
-    callback(snapshot.val());
-  });
-  return () => off(roomsRef, "child_added");
-};
-
 export {
   createRoom,
   listenForRoomAdditions,
@@ -242,5 +230,4 @@ export {
   leaveRoom,
   removeUsers,
   deleteRoom,
-  listenForRoomDeletions,
 };
