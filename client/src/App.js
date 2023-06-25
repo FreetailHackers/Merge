@@ -19,6 +19,8 @@ import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
+import MyTeam from "./pages/MyTeam";
+import { SocketContext, socket } from "./socket.js";
 
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -60,122 +62,137 @@ const initialUserState = {
 export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [errors, setErrors] = useState({});
-  const [swipedUser, setSwipedUser] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
+  const [team, setTeam] = useState(null);
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
-    if (!auth.user.status?.admitted && auth.loading) {
-      initializeAuthIfLoggedIn(auth, setAuth);
+    if (!auth.user.admitted && auth.loading && !team) {
+      initializeAuthIfLoggedIn(setAuth, setTeam);
     }
-  }, [auth]);
+  }, [auth, team]);
 
   const login = (
     <Login
       auth={auth}
       errors={errors}
       isLoading={auth.loading}
-      loginUser={(userData) => loginUser(userData, auth, setAuth, setErrors)}
-      registerUser={(userData) =>
-        registerUser(userData, auth, setAuth, setErrors)
-      }
+      loginUser={(userData) => loginUser(userData, setAuth, setTeam, setErrors)}
     />
   );
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={login} />
-        <Route path="/login" element={login} />
-        <Route
-          path="/register"
-          element={
-            <Register
-              auth={auth}
-              errors={errors}
-              registerUser={(userData) =>
-                registerUser(userData, auth, setAuth, setErrors)
-              }
-              isLoading={auth.loading}
-            />
-          }
-        />
-        {auth.userID && (
+    <SocketContext.Provider value={socket}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={login} />
+          <Route path="/login" element={login} />
           <Route
-            path="/"
+            path="/register"
             element={
-              <NavLayout
+              <Register
                 auth={auth}
-                logoutUser={() => logoutUser(auth, setAuth)}
-                displaySidebar={displaySidebar}
-                flipDisplaySidebar={() => setDisplaySidebar(false)}
-                wideScreen={wideScreen}
+                errors={errors}
+                registerUser={(userData) =>
+                  registerUser(userData, setAuth, setTeam, setErrors)
+                }
+                isLoading={auth.loading}
               />
             }
-          >
+          />
+          {auth.userID && (
             <Route
-              path="dashboard"
+              path="/"
               element={
-                <Dashboard
+                <NavLayout
                   auth={auth}
-                  user={auth.user}
-                  logoutUser={() => logoutUser(auth, setAuth)}
+                  logoutUser={() => logoutUser(setAuth)}
+                  displaySidebar={displaySidebar}
+                  flipDisplaySidebar={() => setDisplaySidebar(false)}
                   wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
-            />
-            <Route
-              path="swipe"
-              element={
-                <Swipe
-                  auth={auth}
-                  user={auth.user}
-                  setSwipedUser={setSwipedUser}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
-            <Route
-              path="edit"
-              element={
-                <Edit
-                  auth={auth}
-                  user={auth.user}
-                  userID={auth.userID}
-                  setCurrentUser={(userID, newUser) =>
-                    setCurrentUser(userID, auth, setAuth, newUser)
-                  }
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
-            <Route
-              path="chat"
-              element={
-                <Chat
-                  userID={auth.userID && auth.userID.id}
-                  swipedUser={swipedUser}
-                  setSwipedUser={setSwipedUser}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
-            <Route
-              path="about"
-              element={
-                <About
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
-          </Route>
-        )}
-      </Routes>
-    </BrowserRouter>
+            >
+              <Route
+                path="dashboard"
+                element={
+                  <Dashboard
+                    auth={auth}
+                    user={auth.user}
+                    logoutUser={() => logoutUser(setAuth)}
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  />
+                }
+              />
+              <Route
+                path="swipe"
+                element={
+                  <Swipe
+                    auth={auth}
+                    user={auth.user}
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                    team={team}
+                    setTeam={setTeam}
+                  />
+                }
+              />
+              <Route
+                path="edit"
+                element={
+                  <Edit
+                    auth={auth}
+                    user={auth.user}
+                    userID={auth.userID}
+                    setCurrentUser={(userID, newUser) =>
+                      setCurrentUser(userID, setAuth, newUser)
+                    }
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  />
+                }
+              />
+              <Route
+                path="myteam"
+                element={
+                  team !== null ? (
+                    <MyTeam
+                      userID={auth.userID.id}
+                      wideScreen={wideScreen}
+                      flipDisplaySidebar={() => setDisplaySidebar(true)}
+                      team={team}
+                      setTeam={setTeam}
+                    />
+                  ) : (
+                    <div />
+                  )
+                }
+              />
+              <Route
+                path="chat"
+                element={
+                  <Chat
+                    userID={auth.userID && auth.userID.id}
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                    blockList={auth.user?.blockList}
+                  />
+                }
+              />
+              <Route
+                path="about"
+                element={
+                  <About
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  />
+                }
+              />
+            </Route>
+          )}
+        </Routes>
+      </BrowserRouter>
+    </SocketContext.Provider>
   );
 }

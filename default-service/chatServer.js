@@ -41,6 +41,7 @@ io.use((socket, next) => {
         next(err);
       } else {
         socket.request.user = decoded.id;
+        socket.data.mongoID = decoded.id;
         next();
       }
     });
@@ -51,16 +52,19 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
   // handles new connection
-  socket.on("new-connection", (data) => newConnection(data, socket));
 
   // handles message posted by client
   socket.on("new-message", (data) => newMessage(data, socket));
 
   socket.on("join-room", (data) => joinRoom(data, socket));
 
+  socket.on("leave-room", (data) => leaveRoom(data, socket));
+
+  socket.on("leave-chat-rooms", () => leaveChatRooms(socket));
+
   socket.on("create-room", (data) => createRoom(data, socket));
 
-  socket.on("add-user", (data) => addUser(data, socket));
+  socket.on("add-users", (data) => addUsers(data, socket));
 
   socket.on("block-users", (data) => blockUsers(data, socket));
 
@@ -73,6 +77,18 @@ io.on("connection", (socket) => {
   socket.on("remove-users", (data) => removeUsers(data, socket));
 
   socket.on("delete-chat", (data) => deleteChat(data, socket));
+
+  socket.on("leave-team", (data) => leaveTeam(data, socket));
+
+  socket.on("request-merge", (data) => requestMerge(data, socket));
+
+  socket.on("accept-merge", (data) => acceptMerge(data, socket));
+
+  socket.on("reject-merge", (data) => rejectMerge(data, socket));
+
+  socket.on("cancel-request", (data) => cancelRequest(data, socket));
+
+  socket.on("update-profile", (data) => updateProfile(data, socket));
 });
 
 // error handler function
@@ -83,13 +99,6 @@ function errHandler(data, socket) {
     console.error("No socket provided");
   }
   return;
-}
-
-async function newConnection(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.data.mongoID = data.userID;
-  }
 }
 
 function newMessage(data, socket) {
@@ -103,6 +112,21 @@ function joinRoom(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
     socket.join(data.id);
+  }
+}
+
+function leaveRoom(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.leave(data.id);
+  }
+}
+
+function leaveChatRooms(socket) {
+  for (const room of socket.rooms) {
+    if (room != socket.id) {
+      socket.leave(room);
+    }
   }
 }
 
@@ -124,26 +148,20 @@ async function createRoom(data, socket) {
   }
 }
 
-async function addUser(data, socket) {
+async function addUsers(data, socket) {
   errHandler(data, socket);
   if (data && socket) {
     const fetched = await io.fetchSockets();
-    let foundSocket = false;
     for (let fetchedSocket of fetched) {
-      if (data.userID === fetchedSocket.data.mongoID) {
-        foundSocket = true;
+      if (data.userIDs.includes(fetchedSocket.data.mongoID)) {
         socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
       } else if (
         data.chat.users.includes(fetchedSocket.data.mongoID) &&
-        data.userID != fetchedSocket.data.mongoID &&
+        !data.userIDs.includes(fetchedSocket.data.mongoID) &&
         socket.id != fetchedSocket.id
       ) {
         socket.to(fetchedSocket.id).emit("new-user-added", data.chat);
-        foundSocket = true;
       }
-    }
-    if (!foundSocket) {
-      console.error("Added users do not have sockets");
     }
   }
 }
@@ -218,6 +236,54 @@ async function removeUsers(data, socket) {
   }
 }
 
+async function leaveTeam(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.to(data.teamID).emit("teammate-left", { userID: data.userID });
+  }
+}
+
+async function requestMerge(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    let requestingCopy = { ...data };
+    requestingCopy.requestingTeam = { _id: data.requestingTeam._id };
+    let requestedCopy = { ...data };
+    requestedCopy.requestedTeam = { _id: data.requestedTeam._id };
+    socket.to(data.requestingTeam._id).emit("merge-requested", requestingCopy);
+    socket.to(data.requestedTeam._id).emit("merge-requested", requestedCopy);
+  }
+}
+
+async function acceptMerge(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.to(data.teamID).emit("merge-accepted", { newTeam: data.newTeam });
+  }
+}
+
+async function rejectMerge(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.to(data.requestingTeamID).emit("merge-rejected", data);
+    socket.to(data.rejectingTeamID).emit("merge-rejected", data);
+  }
+}
+
+async function cancelRequest(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.to(data.cancellingTeamID).emit("request-cancelled", data);
+    socket.to(data.requestedTeamID).emit("request-cancelled", data);
+  }
+}
+
+async function updateProfile(data, socket) {
+  errHandler(data, socket);
+  if (data && socket) {
+    socket.to(data.teamID).emit("profile-updated", data);
+  }
+}
 AWS.config.update({
   accessKeyId: process.env.AWS_ID,
   secretAccessKey: process.env.AWS_SECRET,

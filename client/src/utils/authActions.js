@@ -12,8 +12,8 @@ const setAxiosHeaderAuthToken = (token) => {
 };
 
 // Register - create user in database and get token
-export const registerUser = (userData, auth, setAuth, setErrors) => {
-  setAuth({ ...auth, loading: true });
+export const registerUser = (userData, setAuth, setTeam, setErrors) => {
+  setAuth((prev) => ({ ...prev, loading: true }));
   axios
     .post(process.env.REACT_APP_API_URL + "/api/users/register", userData)
     .then((res) => {
@@ -36,22 +36,27 @@ export const registerUser = (userData, auth, setAuth, setErrors) => {
 
       // Set token to Auth header
       setAxiosHeaderAuthToken(token);
-
       // Decode token to get user data
       const userID = jwt_decode(token);
+      axios
+        .post(process.env.REACT_APP_API_URL + "/api/teams/create", {
+          user: userID.id,
+        })
+        .then((res2) => setTeam(res2.data));
+
       // Set current user
-      setCurrentUser(userID, auth, setAuth);
+      setCurrentUser(userID, setAuth);
     })
     .catch((err) => {
-      logoutUser(auth, setAuth);
-      setAuth({ ...auth, loading: false });
+      logoutUser(setAuth);
+      setAuth((prev) => ({ ...prev, loading: false }));
       setErrors({ status: err.message });
     });
 };
 
 // Login - get user token
-export const loginUser = async (userData, auth, setAuth, setErrors) => {
-  setAuth({ ...auth, loading: true });
+export const loginUser = async (userData, setAuth, setTeam, setErrors) => {
+  setAuth((prev) => ({ ...prev, loading: true }));
   await axios
     .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
     .then((res) => {
@@ -70,37 +75,37 @@ export const loginUser = async (userData, auth, setAuth, setErrors) => {
       // Decode token to get user data
       const userID = jwt_decode(token);
       // Set current user
-      setCurrentUser(userID, auth, setAuth);
+      initializeProfiles(setAuth, setTeam, userID);
     })
     .catch((err) => {
       console.log(err);
-      logoutUser(auth, setAuth);
-      setAuth({ ...auth, loading: false });
+      logoutUser(setAuth);
+      setAuth((prev) => ({ ...prev, loading: false }));
       setErrors({ status: err.message });
     });
 };
 
 // Set logged in user
-export const setCurrentUser = (userID, auth, setAuth, newUser = null) => {
-  setAuth({
-    ...auth,
+export const setCurrentUser = (userID, setAuth, newUser = null) => {
+  setAuth((prev) => ({
+    ...prev,
     isAuthenticated: !!userID,
     userID,
     user: newUser
-      ? newUser
+      ? { ...newUser }
       : {
           status: { admitted: true },
         },
-  });
+  }));
 };
 
 // Log user out
-export const logoutUser = (auth, setAuth) => {
+export const logoutUser = (setAuth) => {
   // Remove token from local storage
   localStorage.removeItem("jwtToken");
   // Remove auth header for future requests
   setAxiosHeaderAuthToken(false);
-  setCurrentUser(null, auth, setAuth);
+  setCurrentUser(null, setAuth);
   // window.location.href = '/login';
 };
 
@@ -110,27 +115,38 @@ function isTokenExpired(token) {
   return exp < timeInSeconds;
 }
 
-export function initializeAuthIfLoggedIn(auth, setAuth) {
+function initializeProfiles(setAuth, setTeam, userID) {
+  axios
+    .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
+    .then((res2) => setTeam(res2.data));
+  axios
+    .get(process.env.REACT_APP_API_URL + `/api/users/${userID.id}`)
+    .then((res) => {
+      setCurrentUser(userID, setAuth, res.data);
+    });
+}
+
+export function initializeAuthIfLoggedIn(setAuth, setTeam) {
   if (localStorage.jwtToken && localStorage.jwtToken !== "undefined") {
     const token = localStorage.jwtToken;
     setAxiosHeaderAuthToken(token);
-
     axios
       .get(process.env.REACT_APP_API_URL + "/api/users/validate")
       .then((res) => {
-        setCurrentUser(jwt_decode(token), auth, setAuth);
+        const userID = jwt_decode(token);
+        initializeProfiles(setAuth, setTeam, userID);
       })
       .catch((err) => {
-        logoutUser(auth, setAuth);
+        logoutUser(setAuth);
         window.location.href = "./login";
       });
 
     if (isTokenExpired(token)) {
-      logoutUser(auth, setAuth);
+      logoutUser(setAuth);
       window.location.href = "./login";
     }
   } else {
-    setAuth({ ...auth, loading: false });
+    setAuth((prev) => ({ ...prev, loading: false }));
     if (
       !(
         window.location.pathname === "/login" ||

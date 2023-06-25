@@ -13,8 +13,16 @@ function ChatMissing(props) {
           </button>
         </div>
       )}
-      <h1>No conversations to display!</h1>
-      <p>Match with more people to start conversations!</p>
+      <h1>
+        {props.hasChats
+          ? "No conversation selected"
+          : "No conversations to display!"}
+      </h1>
+      <p>
+        {props.hasChats
+          ? "Select any chat from the left sidebar!"
+          : "Match with more people to start conversations!"}
+      </p>
       <div className="team-image">
         <div className="background" />
         <div className="main" />
@@ -26,6 +34,7 @@ function ChatMissing(props) {
 }
 
 ChatMissing.propTypes = {
+  hasChats: PropTypes.bool,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
 };

@@ -44,6 +44,9 @@ const Navbar = (props) => {
         <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
           Edit Profile
         </NavLink>
+        <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
+          My Team
+        </NavLink>
         {/*<NavLink to="/database">User List</NavLink>*/}
         {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
         <NavLink to="/about" onClick={props.flipDisplaySidebar}>

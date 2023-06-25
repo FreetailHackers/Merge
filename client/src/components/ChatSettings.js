@@ -40,13 +40,12 @@ function ChatSettings(props) {
 
   return (
     <div id="reportFloatingWindow" className={"reportFloatingWindow"}>
+      <button id="exit" className="exitButton" onClick={props.exit}>
+        Back
+      </button>
+
       <div className="reportWindowUserSelect">
-        <div className={"reportFloatingWindowHeader"}>
-          <button id="exit" className="exitButton" onClick={props.exit}>
-            Back
-          </button>
-          <h3 style={{ flexGrow: 1, textAlign: "center" }}>{props.title}</h3>
-        </div>
+        <h3>{props.title}</h3>
         <div className="userRow">
           <p style={!props.wideScreen ? { marginTop: 15 } : {}}>
             {props.chat.profiles[props.selfID].name} (you)
@@ -68,53 +67,51 @@ function ChatSettings(props) {
                   {!props.chat.users.includes(entry[0]) && "(not present) "}
                   {props.blockedByMe.includes(entry[0]) && "(blocked)"}
                 </p>
-                <div className="userRowActions">
-                  {props.chat.users.includes(entry[0]) && chatOwner && (
-                    <div
-                      className="actionButton"
-                      style={{ backgroundColor: color(kicking, entry[0]) }}
-                      onClick={() => pushPop(kicking, setKicking, entry[0])}
-                    >
-                      <FontAwesomeIcon icon={faUserSlash} />
-                    </div>
-                  )}
+                {props.chat.users.includes(entry[0]) && chatOwner && (
                   <div
                     className="actionButton"
-                    style={{
-                      backgroundColor: color(
-                        props.blockedByMe.includes(entry[0])
-                          ? unblocking
-                          : blocking,
-                        entry[0]
-                      ),
-                    }}
-                    onClick={
+                    style={{ backgroundColor: color(kicking, entry[0]) }}
+                    onClick={() => pushPop(kicking, setKicking, entry[0])}
+                  >
+                    <FontAwesomeIcon icon={faUserSlash} />
+                  </div>
+                )}
+                <div
+                  className="actionButton"
+                  style={{
+                    backgroundColor: color(
                       props.blockedByMe.includes(entry[0])
-                        ? () => pushPop(unblocking, setUnblocking, entry[0])
-                        : () => pushPop(blocking, setBlocking, entry[0])
+                        ? unblocking
+                        : blocking,
+                      entry[0]
+                    ),
+                  }}
+                  onClick={
+                    props.blockedByMe.includes(entry[0])
+                      ? () => pushPop(unblocking, setUnblocking, entry[0])
+                      : () => pushPop(blocking, setBlocking, entry[0])
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={
+                      props.blockedByMe.includes(entry[0])
+                        ? faShieldHeart
+                        : faShield
                     }
-                  >
-                    <FontAwesomeIcon
-                      icon={
-                        props.blockedByMe.includes(entry[0])
-                          ? faShieldHeart
-                          : faShield
-                      }
-                    />
-                  </div>
-                  <div
-                    className="actionButton"
-                    style={{ backgroundColor: color(reporting, entry[0]) }}
-                    onClick={() => pushPop(reporting, setReporting, entry[0])}
-                  >
-                    <FontAwesomeIcon icon={faFlag} />
-                  </div>
+                  />
+                </div>
+                <div
+                  className="actionButton"
+                  style={{ backgroundColor: color(reporting, entry[0]) }}
+                  onClick={() => pushPop(reporting, setReporting, entry[0])}
+                >
+                  <FontAwesomeIcon icon={faFlag} />
                 </div>
               </div>
             ))}
         <div
           className="userAddition"
-          style={addingUsers ? { width: "80%" } : {}}
+          style={addingUsers ? { width: props.wideScreen ? "40%" : "80%" } : {}}
         >
           <div
             style={{
@@ -134,38 +131,28 @@ function ChatSettings(props) {
                 Cancel
               </button>
             )}
-            {props.chat.users.length < 5 &&
-              (!addingUsers || newUserIDs.length > 0) && (
-                <button
-                  className="themeButton"
-                  onClick={() => {
-                    if (addingUsers) {
-                      props.addUsers(newUserIDs);
-                      setNewUserIDs([]);
-                      setAddingUsers(false);
-                    } else {
-                      setAddingUsers(true);
-                    }
-                  }}
-                >
-                  Add Users
-                </button>
-              )}
+            {(!addingUsers || newUserIDs.length > 0) && (
+              <button
+                className="themeButton"
+                onClick={() => {
+                  if (addingUsers) {
+                    props.addUsers(newUserIDs);
+                    setNewUserIDs([]);
+                    setAddingUsers(false);
+                  } else {
+                    setAddingUsers(true);
+                  }
+                }}
+              >
+                Add Users
+              </button>
+            )}
           </div>
           {addingUsers && (
             <MultiSelect
               style={{ width: "100%" }}
               value={newUserIDs}
-              onChange={(values) =>
-                setNewUserIDs(
-                  values.length + props.chat.users.length > 5
-                    ? values.slice(
-                        0,
-                        5 - values.length - props.chat.users.length
-                      )
-                    : values
-                )
-              }
+              onChange={(values) => setNewUserIDs(values)}
               placeholder="Search for people"
               searchable
               data={

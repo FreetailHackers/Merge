@@ -6,6 +6,7 @@
   --secondary-transparent: #47389930;
   --secondary-less-transparent: #47389950;
   --tertiary: #4c82cc;
+  --tertiary-transparent: #4c82cc55;
 
   --accept: var(
     --tertiary

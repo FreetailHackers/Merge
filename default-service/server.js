@@ -6,6 +6,7 @@ const passport = require("passport");
 
 const users = require("./routes/api/users");
 const chats = require("./routes/api/chats");
+const teams = require("./routes/api/teams");
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -53,6 +54,7 @@ require("./config/passport")(passport);
 // Routes
 app.use("/api/users", users.router);
 app.use("/api/chats", chats.router);
+app.use("/api/teams", teams.router);
 
 app.get("/api/", (req, res) => {
   res.status(200).send(`Status OK: ${new Date()}`);

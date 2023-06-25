@@ -45,9 +45,8 @@ section#register form,
   .container {
     flex-direction: column;
   }
-  section#login form, section#register form, .about {
+  section#login form, .about {
     margin-top: 2vh;
-    width: 75vw
   }
 }
 

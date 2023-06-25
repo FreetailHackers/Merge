@@ -8,6 +8,8 @@ import ChatSettings from "./ChatSettings";
 const defaultState = {
   newMessage: "",
   reportPressed: false,
+  editingTitle: false,
+  titleInput: "",
 };
 
 class ChatWindow extends Component {
@@ -26,7 +28,7 @@ class ChatWindow extends Component {
       this.props.chat &&
       prevProps.chat._id !== this.props.chat._id
     ) {
-      this.setState({ ...defaultState });
+      this.setState({ ...defaultState, titleInput: this.props.chat.name });
       this.props.getMessages();
     }
     if (
@@ -53,11 +55,13 @@ class ChatWindow extends Component {
   titleOnKeyDown = (e) => {
     const key = e.key.toLowerCase();
     if (key === "escape") {
-      this.props.setEditingTitle(false);
-      this.props.setTitleInput(this.props.title ? this.props.title : "");
+      this.setState({
+        editingTitle: false,
+        titleInput: this.props.title ?? "",
+      });
     } else if (key === "enter") {
-      this.props.setEditingTitle(false);
-      this.props.setTitle(this.props.titleInput);
+      this.setState({ editingTitle: false });
+      this.props.setTitle(this.state.titleInput);
     }
   };
 
@@ -69,8 +73,7 @@ class ChatWindow extends Component {
   };
 
   showReport = () => {
-    this.setState({ reportPressed: true });
-    this.props.setEditingTitle(false);
+    this.setState({ reportPressed: true, editingTitle: false });
   };
 
   submitReport = async (
@@ -124,10 +127,10 @@ class ChatWindow extends Component {
           </div>
         )}
         <div className="chatWindowTitle">
-          {this.props.editingTitle ? (
+          {this.state.editingTitle ? (
             <input
-              value={this.props.titleInput}
-              onChange={(e) => this.props.setTitleInput(e.target.value)}
+              value={this.state.titleInput}
+              onChange={(e) => this.setState({ titleInput: e.target.value })}
               onKeyDown={this.titleOnKeyDown}
               placeholder="New Chat Title"
               autoComplete="off"
@@ -137,7 +140,7 @@ class ChatWindow extends Component {
               className="chatTitle"
               onClick={() => {
                 if (!this.state.reportPressed) {
-                  this.props.setEditingTitle(true);
+                  this.setState({ editingTitle: true });
                 }
               }}
             >
@@ -203,7 +206,12 @@ class ChatWindow extends Component {
           chat={this.props.chat}
           selfID={this.props.selfID}
           blockedByMe={this.props.blockedByMe}
-          otherUsers={this.props.otherUsers}
+          otherUsers={
+            this.props.otherUsers &&
+            this.props.otherUsers.filter(
+              (user) => !this.props.chat.users.includes(user._id)
+            )
+          }
           addUsers={this.props.addUsers}
           title={
             this.props.title
@@ -256,12 +264,8 @@ ChatWindow.propTypes = {
   getMessages: PropTypes.func,
   otherUsers: PropTypes.arrayOf(PropTypes.object),
   addUsers: PropTypes.func.isRequired,
-  setEditingTitle: PropTypes.func.isRequired,
-  setTitleInput: PropTypes.func.isRequired,
   setTitle: PropTypes.func.isRequired,
   selfID: PropTypes.string.isRequired,
-  titleInput: PropTypes.string.isRequired,
-  editingTitle: PropTypes.bool.isRequired,
   leaveChat: PropTypes.func,
   deleteChat: PropTypes.func,
   blockUnblockUsers: PropTypes.func,
