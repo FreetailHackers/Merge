@@ -56,13 +56,13 @@
 @media all and (orientation:portrait) {
   .profile-container {
     flex-direction: column;
-    padding: 20px;
+    padding: 0 20px;
   }
-
-  #settings {
-    padding: 20px 20px 20px 0;
-    width: 90%;
-    font-size: 1.1em;
+  .merge-requests {
+    flex-direction: column;
+  }
+  .mrColumn {
+    width: 100%;
   }
 }
 
@@ -74,6 +74,26 @@
   .profile-child {
     width: 50%;
   }
+  .merge-requests {
+    flex-direction: row;
+  }
+  .mrColumn {
+    width: 50%;
+    height: 100%;
+  }
+  .profile-container, .myTeam {
+    width: calc(100vw - 290px);
+  }
+}
+
+
+.profile-container, .myTeam {
+  display: flex;
+  align-items: flex-start;
+}
+
+.myTeam {
+  flex-direction: column;
 }
 
 
@@ -94,4 +114,56 @@
 
 .question {
   margin-bottom: 10px;
+}
+
+.teamRequests, .teamRequests > div {
+  width: 100%;
+  align-items: center;
+
+}
+
+.mergeRequest {
+  background-color: var(--tertiary-transparent);
+  padding: 5px;
+  border-radius: 10px;
+  align-items: center;
+  width: 60%;
+  margin-top: 10px;
+}
+
+.myTeam p, .merge-requests h3, .merge-requests h4 {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+.mrButtons {
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.hideDiv {
+  width: 100%;
+  justify-content: center;
+}
+
+.profile-child .swipe-profile {
+  margin: auto auto;
+}
+
+.myTeam .flexColumn, .myTeam .hideDivClosed {
+  margin-bottom: 20px;
+}
+
+
+.merge-requests {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.mrColumn {
+  align-items: center;
+
 }

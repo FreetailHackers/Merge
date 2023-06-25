@@ -18,12 +18,6 @@ const MessageSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
-  recipients: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
-  ],
 });
 
 module.exports = mongoose.model("messages", MessageSchema);

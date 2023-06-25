@@ -46,8 +46,6 @@ router.post("/update", authenticateToken, async (req, res) => update(req, res));
 // @access Public
 router.get("/list", authenticateToken, async (req, res) => list_func(req, res));
 
-router.post("/swipe", authenticateToken, async (req, res) => swipe(req, res));
-
 // @route POST api/users/list
 // @desc Update the profile information of a sepcific user
 // @access Public
@@ -219,27 +217,6 @@ function register_func(req, res) {
   });
 }
 
-async function swipe(req, res) {
-  const id = req.body.id;
-  if (req.user !== id) {
-    return res.sendStatus(403);
-  }
-  const options = {
-    upsert: true,
-  };
-  User.updateOne(
-    { _id: req.body.auth.userID.id },
-    { $push: { swipeList: req.body.otherUser._id } },
-    options
-  )
-    .then(() => {
-      res.json({
-        success: true,
-      });
-    })
-    .catch((err) => console.log(err));
-}
-
 async function s3Upload(file_name, files, res) {
   var params = {
     Bucket: BUCKET_NAME,
@@ -341,7 +318,37 @@ router.get("/:user", (req, res) => {
     }
     user.email = undefined;
     user.password = undefined;
+    user.__v = undefined;
+    user.date = undefined;
+    if (req.params.user !== req.user) {
+      req.blockList = undefined;
+    }
     return res.json(user);
+  });
+});
+
+/**
+ * Get the name and profile picture of a user.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ * RETURNS an Object
+ */
+router.get("/conciseInfo/:user", authenticateToken, (req, res) => {
+  if (!req.user) {
+    return res.sendStatus(403);
+  }
+  User.findById(req.params.user, (err, user) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!user) {
+      return res.sendStatus(404);
+    }
+    return res.json({
+      name: user.name,
+      profilePictureUrl: user.profile[0]?.profilePictureUrl,
+    });
   });
 });
 

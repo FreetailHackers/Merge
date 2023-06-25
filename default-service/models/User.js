@@ -6,6 +6,10 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  team: {
+    type: Schema.Types.ObjectId,
+    required: false, // required in practice, but not to create a user in the database
+  },
   email: {
     type: String,
     required: true,
@@ -22,7 +26,6 @@ const UserSchema = new Schema({
     {
       socialMedia: { String, required: false },
       school: String,
-      swipeReady: Boolean,
       major: String,
       class: String,
       skills: [String],
@@ -39,7 +42,6 @@ const UserSchema = new Schema({
     },
   ],
   //make this a set
-  swipeList: [],
   blockList: [],
 });
 

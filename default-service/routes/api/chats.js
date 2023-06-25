@@ -24,8 +24,7 @@ const Chat = require("../../models/Chat");
 const Message = require("../../models/Message");
 const User = require("../../models/User");
 const authenticateToken = require("../helpers/authentication");
-
-const MAX_CHAT_SIZE = 5;
+const addProfiles = require("../helpers/addProfiles");
 
 router.get("/", authenticateToken, async (req, res) =>
   get_default_function(req, res)
@@ -75,21 +74,22 @@ async function get_default_function(req, res) {
       chat.lastMessage = await Message.findOne({ chat: chat })
         .sort({ _id: -1 })
         .exec();
+      await addProfiles(chat);
       result.push(chat);
-      // Sort chats in reverse chronological order; i.e., most recent on top
-      result.sort((a, b) => {
-        if (!a.lastMessage && !b.lastMessage) {
-          return b.created - a.created;
-        }
-        if (!a.lastMessage) {
-          return b.lastMessage.timestamp - a.created;
-        }
-        if (!b.lastMessage) {
-          return b.created - a.lastMessage.timestamp;
-        }
-        return b.lastMessage.timestamp - a.lastMessage.timestamp;
-      });
     }
+    // Sort chats in reverse chronological order; i.e., most recent on top
+    result.sort((a, b) => {
+      if (!a.lastMessage && !b.lastMessage) {
+        return b.created - a.created;
+      }
+      if (!a.lastMessage) {
+        return b.lastMessage.timestamp - a.created;
+      }
+      if (!b.lastMessage) {
+        return b.created - a.lastMessage.timestamp;
+      }
+      return b.lastMessage.timestamp - a.lastMessage.timestamp;
+    });
     return res.json(result);
   } catch (err) {
     console.error(err);
@@ -144,7 +144,6 @@ async function post_messages_function(req, res) {
       author: req.user,
       contents: req.body.contents,
       chat: req.params.chat,
-      recipients: chat.users,
     });
     const saved = await message.save();
     return res.json(saved);
@@ -155,41 +154,47 @@ async function post_messages_function(req, res) {
 }
 
 /**
- * Add a user to a chat, if the the chat is not full.
+ * Add users to a chat, if the the chat is not full.
  *
  * PATH PARAMETER chat: ObjectId of Chat
- * BODY PARAMETER user: ObjectId of User
+ * BODY PARAMETER users: ObjectIds of Users
  *
  * RETURNS the modified Chat Object
- * RETURNS 400 if the User was already a member of the Chat or if the Chat was full
+ * RETURNS 400 if any User was already a member of the Chat or if the Chat was full
+ * RETURNS 403 if the calling user was blocked by any User
  */
+
 async function post_add_function(req, res) {
   try {
     const chat = await Chat.findOne({ _id: req.params.chat }).exec();
-    if (!req.body.user) {
-      console.error("User does not exist");
+    if (!req.body.users || req.body.users.length === 0) {
+      console.error("No users provided");
       return res.sendStatus(400);
     }
-    if (chat.users.includes(req.body.user)) {
-      console.error("User already in chat");
-      return res.sendStatus(400);
-    }
-    if (chat.users.length >= MAX_CHAT_SIZE) {
-      console.error("Chat is full");
-      return res.sendStatus(400);
-    }
+
     if (!chat.users.includes(req.user)) {
       console.error("User attempting add not in chat");
       return res.sendStatus(403);
     }
-    const user = await User.findOne({ _id: req.body.user });
-    if (user.blockList.includes(chat.owner)) {
-      console.error("User attempting to add someone who blocked them");
-      res.sendStatus(403);
+
+    for (const userID of req.body.users) {
+      if (chat.users.includes(userID)) {
+        console.error("User already in chat");
+        return res.sendStatus(400);
+      }
+
+      const user = await User.findOne({ _id: userID });
+      if (user.blockList.includes(req.user)) {
+        console.error("User attempting to add someone who blocked them");
+        res.sendStatus(403);
+      }
+      chat.users.push(userID);
     }
-    chat.users.push(req.body.user);
     const saved = await chat.save();
-    return res.json(saved);
+
+    let chatObj = saved.toObject();
+    await addProfiles(chatObj);
+    return res.json(chatObj);
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
@@ -307,8 +312,23 @@ async function post_new_function(req, res) {
       name: req.body && req.body.name ? req.body.name : "",
       owner: req.user,
     });
+    const otherUsers = req.body.otherUsers
+      ? req.body.otherUsers.filter((e) => e !== req.user)
+      : [];
+    for (const userID of otherUsers) {
+      const user = await User.findOne({ _id: userID });
+      if (user.blockList.includes(req.user)) {
+        console.error(
+          "User attempting to create chat with someone who blocked them"
+        );
+        res.sendStatus(403);
+      }
+      chat.users.push(userID);
+    }
     const saved = await chat.save();
-    return res.json(saved);
+    let chatObj = saved.toObject();
+    await addProfiles(chatObj);
+    return res.json(chatObj);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
@@ -361,6 +381,44 @@ async function post_read_function(req, res) {
     return res.sendStatus(500);
   }
 }
+
+/**
+ * Get the name and profile picture of all users you could chat with.
+ *
+ * PATH PARAMETER user: ObjectId of User
+ *
+ * RETURNS an Array of Objects
+ */
+
+router.get("/reachableUsers", authenticateToken, (req, res) => {
+  if (!req.user) {
+    return res.sendStatus(403);
+  }
+  User.find({}, (err, users) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!users) {
+      return res.sendStatus(404);
+    }
+    const you = users[users.findIndex((e) => String(e._id) === req.user)];
+    const filtered = [
+      ...users.filter(
+        (e) =>
+          String(e._id) !== req.user &&
+          !e.blockList.includes(req.user) &&
+          !you.blockList.includes(e._id)
+      ),
+    ];
+    return res.json([
+      ...filtered.map((user) => ({
+        _id: user._id,
+        name: user.name,
+        profilePictureUrl: user.profile[0]?.profilePictureUrl,
+      })),
+    ]);
+  });
+});
 
 module.exports = {
   router,

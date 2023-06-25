@@ -10,6 +10,7 @@ function About(props) {
       {!props.wideScreen && (
         <div className="toggleHolder">
           <button
+            style={{ marginLeft: 20 }}
             className="toggleSidebar toggleCenter"
             onClick={props.flipDisplaySidebar}
           >

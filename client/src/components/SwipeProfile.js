@@ -17,6 +17,7 @@ const SwipeProfile = (props) => {
       onMouseDown={props.onMouseDown}
       onMouseUp={props.onMouseUp}
       onMouseMove={props.onMouseMove}
+      onMouseLeave={props.onMouseUp}
       style={{
         left: `${relativePosition[0]}px`,
         top: `${relativePosition[1]}px`,
@@ -24,34 +25,45 @@ const SwipeProfile = (props) => {
       }}
     >
       <h3 draggable={false}>{props.name}</h3>
-      <img src={props.profilePictureUrl} alt="" />
-      <h4 draggable={false}>{props.school}</h4>
+      <img src={props.profile.profilePictureUrl} alt="" />
+      <h4 draggable={false}>{props.profile.school}</h4>
       <p draggable={false} style={{ marginBottom: 60 }}>
-        {props.intro}
+        {props.isAlone ? props.profile.intro : props.profile.bio}
       </p>
-      {props.github && props.githubFinished ? (
-        <GithubCard username={props.github} change={props.githubFinished} />
+      <div draggable={false}>
+        {!props.isAlone &&
+          Object.keys(props.userProfiles).map((e, i) => (
+            <p key={i}>{props.userProfiles[e].name}</p>
+          ))}
+      </div>
+
+      {props.isAlone && props.profile.github && props.githubFinished ? (
+        <GithubCard
+          username={props.profile.github}
+          change={props.githubFinished}
+        />
       ) : null}
-      {props.linkedin ? <LinkedInCard link={props.linkedin} /> : null}
-      {props.portfolio ? <PortfolioCard link={props.portfolio} /> : null}
+      {props.isAlone && props.profile.linkedin ? (
+        <LinkedInCard link={props.profile.linkedin} />
+      ) : null}
+      {props.isAlone && props.profile.portfolio ? (
+        <PortfolioCard link={props.profile.portfolio} />
+      ) : null}
     </div>
   );
 };
 
 SwipeProfile.propTypes = {
-  name: PropTypes.string.isRequired,
-  school: PropTypes.string,
-  intro: PropTypes.string.isRequired,
-  relativePosition: PropTypes.array.isRequired,
-  relativeAngle: PropTypes.number.isRequired,
-  borderColor: PropTypes.string.isRequired,
-  onMouseDown: PropTypes.func.isRequired,
+  profile: PropTypes.object.isRequired,
+  isAlone: PropTypes.bool.isRequired,
+  name: PropTypes.string,
+  userProfiles: PropTypes.object,
+  relativePosition: PropTypes.array,
+  relativeAngle: PropTypes.number,
+  borderColor: PropTypes.string,
+  onMouseDown: PropTypes.func,
   onMouseUp: PropTypes.func,
   onMouseMove: PropTypes.func,
-  profilePictureUrl: PropTypes.string,
-  github: PropTypes.string,
-  linkedin: PropTypes.object,
-  portfolio: PropTypes.object,
   githubFinished: PropTypes.bool,
 };
 

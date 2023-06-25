@@ -1,7 +1,7 @@
 nav#navbar {
   position: fixed;
   overflow-y: auto;
-  height: calc(100vh - 40px);
+  height: calc(100vh);
   z-index: 1;
   background-color: var(--primary);
 

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
+import SkillSelector from "../components/SkillSelector";
 
 // FileInput,
 import {
@@ -10,75 +11,11 @@ import {
   TextInput,
   MultiSelect,
   Radio,
-  Checkbox,
   Textarea,
   NativeSelect,
 } from "@mantine/core";
 
 import "./Edit.css";
-
-const Demo = (props) => {
-  const [data, setData] = useState([
-    { value: "python", label: "Python" },
-    { value: "java", label: "Java" },
-    { value: "c", label: "C" },
-    { value: "c++", label: "C++" },
-    { value: "c#", label: "C#" },
-    { value: "rust", label: "Rust" },
-    { value: "javascript", label: "JavaScript" },
-    { value: "typescript", label: "TypeScript" },
-    { value: "html", label: "HTML" },
-    { value: "css", label: "CSS" },
-    { value: "go", label: "Go" },
-    { value: "lua", label: "Lua" },
-    { value: "swift", label: "Swift" },
-    { value: "php", label: "PhP" },
-    { value: "react", label: "React" },
-    { value: "reactnative", label: "React Native" },
-    { value: "express", label: "Express" },
-    { value: "mongodb", label: "MongoDB" },
-    { value: "postgresql", label: "PostgreSQL" },
-    { value: "prisma", label: "Prisma" },
-    { value: "nextjs", label: "NextJS" },
-    { value: "sveltejs", label: "SvelteJS" },
-    { value: "vuejs", label: "VueJS" },
-    { value: "angularjs", label: "AngularJS" },
-    { value: "spring", label: "Spring" },
-    { value: "flutter", label: "Flutter" },
-    { value: "flask", label: "Flask" },
-    { value: "django", label: "Django" },
-    { value: "swiftui", label: "SwiftUI" },
-    { value: "laravel", label: "Laravel" },
-  ]);
-
-  return (
-    <MultiSelect
-      label="Skills"
-      data={data}
-      searchable
-      creatable
-      clearable
-      getCreateLabel={(query) => `+ Create ${query}`}
-      onCreate={(query) => {
-        const item = { value: query, label: query };
-        setData((current) => [...current, item]);
-        return item;
-      }}
-      placeholder="Python, Java, C, etc."
-      nothingFound="Nothing found"
-      value={props.userProfile.skills}
-      onChange={(value) => props.setProfile("skills", value)}
-      className="question"
-      error={props.userProfile.skills?.length === 0 ? "Required" : ""}
-      required
-    />
-  );
-};
-
-Demo.propTypes = {
-  userProfile: PropTypes.object,
-  setProfile: PropTypes.func,
-};
 
 function Edit(props) {
   //frontend for updating
@@ -127,32 +64,25 @@ function Edit(props) {
         setSaved(true);
         setPortfolioRegex(true);
         setLinkedinRegex(true);
+        props.setCurrentUser(props.userID, {
+          ...props.user,
+          profile: [userProfile],
+        });
       });
   };
 
   useEffect(() => {
-    var queryParamters = {
-      start: 0,
-      limit: 0,
-      id: props.userID.id,
-      filters: {
-        _id: props.userID.id,
-      },
-    };
     axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/list", {
-        params: queryParamters,
-      })
+      .get(process.env.REACT_APP_API_URL + "/api/users/" + props.userID.id)
       .then((res) => {
         const data = {
-          name: res.data[0].name,
+          name: res.data.name,
         };
-        for (const prop in res.data[0].profile[0]) {
+        for (const prop in res.data.profile[0]) {
           if (prop !== "_id") {
-            data[prop] = res.data[0].profile[0][prop];
+            data[prop] = res.data.profile[0][prop];
           }
         }
-        if (!("swipeReady" in data)) data.swipeReady = true;
         data.githubFinished = data.github;
         setUserProfile(data);
         // profilePictureUrl: data.profilePictureUrl,
@@ -228,12 +158,6 @@ function Edit(props) {
         )}
         <section id="settings">
           <form>
-            <Checkbox
-              label="Ready to swipe?"
-              onChange={(e) => setProfile("swipeReady", e.target.checked)}
-              checked={userProfile.swipeReady}
-              className="question"
-            />
             <TextInput
               label="Name"
               placeholder="Your full name"
@@ -340,7 +264,10 @@ function Edit(props) {
               onChange={(value) => setProfile("hours", value)}
               className="question"
             />
-            <Demo setProfile={setProfile} userProfile={userProfile} />
+            <SkillSelector
+              setSkills={(value) => setProfile("skills", value)}
+              skills={userProfile.skills}
+            />
             <NativeSelect
               label="Years of coding experience"
               placeholder="Pick one"
@@ -437,13 +364,9 @@ function Edit(props) {
       </div>
       <div className="profile-child">
         <SwipeProfile
+          profile={userProfile}
           name={userProfile.name}
-          school={userProfile.school}
-          intro={userProfile.intro}
-          linkedin={userProfile.linkedin}
-          github={userProfile.github}
-          githubFinished={userProfile.githubFinished}
-          // profilePictureUrl={profilePictureUrl}
+          isAlone={true}
         />
       </div>
     </div>
