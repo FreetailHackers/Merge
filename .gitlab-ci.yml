@@ -14,7 +14,7 @@ stages:
   - production
 
 build_backend:
-  image: node:16.16.0-slim
+  image: node:18.0-slim
   stage: build
   variables:
     FOLDER: default-service
@@ -71,7 +71,7 @@ create_integ:
 
 update_vercel_integ:
   stage: staging
-  image: node:16.16.0
+  image: node:18.0
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   environment:
@@ -84,7 +84,7 @@ update_vercel_integ:
   before_script:
     - cd default-service
     - npm install esbuild
-    - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node16
+    - npx esbuild server.js --bundle --outfile=../api/index.js --platform=node --target=node18
     - sed -i -e '18,21d' package.json
     - cd ..
     - sed -i $VERCEL_CORS vercel.json
