@@ -26,62 +26,35 @@ function Swipe(props) {
   const [profileState, setProfileState] = useState({ ...defaultProfileState });
 
   useEffect(() => {
-    setContainsRequired(() => {
-      if (!props.team || !props.team.users) return false;
-      if (props.team.users.length === 1) {
-        const user = props.auth.user;
-        const profile = user?.profile && user.profile[0];
-        return (
-          user &&
-          user.name?.length !== 0 &&
-          profile &&
-          profile.intro?.length !== 0 &&
-          profile.skills?.length !== 0 &&
-          profile.experience?.length !== 0 &&
-          profile.competitiveness?.length !== 0
-        );
-      }
-      const profile = props.team?.profile;
-      return (
-        profile &&
-        profile.name?.length !== 0 &&
-        profile.bio?.length !== 0 &&
-        profile.skills?.length !== 0 &&
-        profile.wantedSkills?.length !== 0 &&
-        profile.competitiveness?.length !== 0
-      );
-    });
-  }, [props.team, props.auth]);
-
-  useEffect(() => {
     async function findTeam() {
       const res = await axios.get(
         process.env.REACT_APP_API_URL +
           "/api/teams/teamsToSwipe/" +
-          props.auth.userID.id
+          props.userID
       );
-      setTeamToShow(res.data[0] ?? null);
+      if (res.data.ready) {
+        setTeamToShow(res.data.teams[0] ?? null);
+      }
+      setContainsRequired(res.data.ready);
       setLoading(false);
     }
 
-    if (containsRequired && props.auth?.userID?.id) {
+    if (props.userID) {
       setLoading(true);
       findTeam();
     }
-  }, [containsRequired, props.auth]);
+  }, [props.userID]);
 
   async function getTeamToShow() {
     const res = await axios.get(
-      process.env.REACT_APP_API_URL +
-        "/api/teams/teamsToSwipe/" +
-        props.auth.userID.id,
+      process.env.REACT_APP_API_URL + "/api/teams/teamsToSwipe/" + props.userID,
       {
         params: {
           idealSize: idealSize,
         },
       }
     );
-    setTeamToShow(res.data[0] ?? null);
+    setTeamToShow(res.data.teams[0] ?? null);
     setLoading(false);
     setProfileState((prev) => ({
       ...prev,
@@ -301,8 +274,7 @@ function Swipe(props) {
 }
 
 Swipe.propTypes = {
-  auth: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  userID: PropTypes.string.isRequired,
   navigate: PropTypes.func,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,

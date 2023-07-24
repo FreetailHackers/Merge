@@ -64,17 +64,17 @@ class Database extends Component {
               const keys = [];
               const data = [];
               if (res.data.list[0]) {
-                for (const key in res.data.list[0].profile[0]) {
+                for (const key in res.data.list[0].profile) {
                   if (key !== "_id") keys.push(key);
                 }
               }
               for (const user of res.data.list) {
                 var profile = {};
                 for (const key of keys) {
-                  if (user.profile[0] === undefined) {
-                    user.profile[0] = {};
+                  if (user.profile === undefined) {
+                    user.profile = {};
                   }
-                  profile[key] = user.profile[0][key];
+                  profile[key] = user.profile[key];
                 }
                 profile.name = user.name;
                 data.push(profile);

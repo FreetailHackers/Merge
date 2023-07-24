@@ -67,6 +67,19 @@ export default function App() {
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.innerHeight * 0.01}px`
+    );
+    window.addEventListener("resize", () => {
+      document.documentElement.style.setProperty(
+        "--vh",
+        `${window.innerHeight * 0.01}px`
+      );
+    });
+  });
+
+  useEffect(() => {
     if (!auth.user.admitted && auth.loading && !team) {
       initializeAuthIfLoggedIn(setAuth, setTeam);
     }
@@ -129,8 +142,7 @@ export default function App() {
                 path="swipe"
                 element={
                   <Swipe
-                    auth={auth}
-                    user={auth.user}
+                    userID={auth.userID.id}
                     wideScreen={wideScreen}
                     flipDisplaySidebar={() => setDisplaySidebar(true)}
                     team={team}

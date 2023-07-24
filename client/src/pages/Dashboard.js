@@ -21,11 +21,13 @@ function Dashboard(props) {
       <div className="dash">
         <h1>Welcome home{name ? `, ${name}` : `!`}</h1>
         <p>Start finding your hackathon team members!</p>
-        <div className="team-image">
-          <div className="background" />
-          <div className="main" />
-          <div className="primary" />
-          <div className="secondary" />
+        <div>
+          <div className="team-image">
+            <div className="background" />
+            <div className="main" />
+            <div className="primary" />
+            <div className="secondary" />
+          </div>
         </div>
         <div className="forms">
           <div className="help">
@@ -52,8 +54,9 @@ function Dashboard(props) {
               with a read-only mirror on{" "}
               <a href="https://github.com/FreetailHackers/Merge">GitHub</a>
             </span>
-            <br /> <br /> <br /> <br />
-            <span>Made with ❤️ by Freetail Hackers</span>
+            <br />
+            <br />
+            <span id="madewithlove">Made with ❤️ by Freetail Hackers</span>
           </div>
         </div>
       </div>

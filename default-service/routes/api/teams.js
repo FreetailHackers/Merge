@@ -380,6 +380,41 @@ async function update(req, res) {
   }
 }
 
+const requiredTeamFields = [
+  "name",
+  "bio",
+  "skills",
+  "wantedSkills",
+  "competitiveness",
+];
+const requiredUserFields = ["intro", "skills", "experience", "competitiveness"];
+
+async function isTeamSwipeReady(teamId) {
+  try {
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return false;
+    }
+    if (team.users.length === 1) {
+      const user = await User.findById(team.leader);
+      return (
+        user &&
+        user.name?.length !== 0 &&
+        user.profile &&
+        requiredUserFields.every((e) => user.profile[e]?.length !== 0)
+      );
+    } else {
+      return (
+        team.profile &&
+        requiredTeamFields.every((e) => team.profile[e]?.length !== 0)
+      );
+    }
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+}
+
 async function getTeamsToSwipe(req, res) {
   try {
     const team = await Team.findOne({ users: { $in: [req.user] } });
@@ -387,15 +422,18 @@ async function getTeamsToSwipe(req, res) {
       console.error("Invalid user ID provided");
       return res.sendStatus(400);
     }
+    const swipeReady = await isTeamSwipeReady(team);
+    if (!swipeReady) {
+      return res.json({ ready: false, teams: [] });
+    }
     const userFilter =
       req.query.idealSize && req.query.idealSize > 0
         ? { users: { $size: req.query.idealSize } }
         : {
             $or: [
-              { users: { $size: 4 } },
-              { users: { $size: 3 } },
-              { users: { $size: 2 } },
-              { users: { $size: 1 } },
+              ...[...Array(MAX_TEAM_SIZE - 1).keys()].map((i) => ({
+                users: { $size: i + 1 },
+              })),
             ],
           };
     let teamList = await Team.find({
@@ -409,16 +447,19 @@ async function getTeamsToSwipe(req, res) {
     }
     let out = [];
     for (const team of teamList) {
-      let newTeam = team.toObject();
-      await addProfilesAndSanitize(newTeam);
-      if (team.users.length === 1) {
-        const user = await User.findById(team.users[0]);
-        const userObj = user.toObject();
-        newTeam.profile = { ...userObj.profile[0], name: userObj.name };
+      const swipeReady = await isTeamSwipeReady(team);
+      if (swipeReady) {
+        let newTeam = team.toObject();
+        await addProfilesAndSanitize(newTeam);
+        if (team.users.length === 1) {
+          const user = await User.findById(team.users[0]);
+          const userObj = user.toObject();
+          newTeam.profile = { ...userObj.profile, name: userObj.name };
+        }
+        out.push(newTeam);
       }
-      out.push(newTeam);
     }
-    return res.json(out);
+    return res.json({ ready: true, teams: out });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

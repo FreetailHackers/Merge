@@ -14,11 +14,9 @@ const fakeId2 = new mongoose.Types.ObjectId("deadbeefdeadbeefdeaddead");
 const mockUserData = {
   _id: fakeId2,
   name: "fakeuser",
-  profile: [
-    {
-      profilePictureUrl: "fu",
-    },
-  ],
+  profile: {
+    profilePictureUrl: "fu",
+  },
 };
 
 const mockChatData = {

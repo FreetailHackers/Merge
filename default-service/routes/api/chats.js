@@ -414,7 +414,7 @@ router.get("/reachableUsers", authenticateToken, (req, res) => {
       ...filtered.map((user) => ({
         _id: user._id,
         name: user.name,
-        profilePictureUrl: user.profile[0]?.profilePictureUrl,
+        profilePictureUrl: user.profile?.profilePictureUrl,
       })),
     ]);
   });

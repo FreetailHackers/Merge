@@ -78,9 +78,9 @@ function Edit(props) {
         const data = {
           name: res.data.name,
         };
-        for (const prop in res.data.profile[0]) {
+        for (const prop in res.data.profile) {
           if (prop !== "_id") {
-            data[prop] = res.data.profile[0][prop];
+            data[prop] = res.data.profile[prop];
           }
         }
         data.githubFinished = data.github;

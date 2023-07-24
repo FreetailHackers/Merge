@@ -160,7 +160,7 @@ function ChatSettings(props) {
                 props.otherUsers.map((user) => ({
                   value: user._id,
                   label: user.name,
-                  image: user.profile && user.profile[0]?.profilePictureUrl,
+                  image: user.profile && user.profile?.profilePictureUrl,
                 }))
               }
             />
