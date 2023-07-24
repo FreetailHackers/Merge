@@ -1,6 +1,7 @@
 #settings {
-  padding: 20px;
+  padding: 10px;
   font-size: 1.1em;
+  width: calc(100% - 20px);
 }
 
 #settings label {
@@ -53,10 +54,16 @@
   opacity: 0.8;
 }
 
+.profile-child {
+  display: flex;
+  flex-direction: column;
+}
+
 @media all and (orientation:portrait) {
   .profile-container {
     flex-direction: column;
     padding: 0 20px;
+    width: calc(100vw - 40px);
   }
   .merge-requests {
     flex-direction: column;
@@ -64,7 +71,12 @@
   .mrColumn {
     width: 100%;
   }
+  .profile-child {
+    align-items: flex-start;
+    width: 100%;
+  }
 }
+
 
 @media all and (orientation:landscape) {
   .profile-container {
@@ -73,6 +85,7 @@
   }
   .profile-child {
     width: 50%;
+    align-items: center;
   }
   .merge-requests {
     flex-direction: row;
@@ -87,7 +100,7 @@
 }
 
 
-.profile-container, .myTeam {
+.myTeam {
   display: flex;
   align-items: flex-start;
 }
@@ -98,9 +111,7 @@
 
 
 .profile-container {
-  width: calc(100vw - 290px);
   display: flex;
-  align-items: flex-start;
 }
 
 

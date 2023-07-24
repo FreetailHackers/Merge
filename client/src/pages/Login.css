@@ -2,7 +2,7 @@ section#login,
 section#register {
   display: flex;
   width: 100vw;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   overflow: scroll;
   background-image: var(--login-background);
   background-color: var(--primary);
@@ -16,7 +16,7 @@ section#login form,
 section#register form,
 .about {
   display: inline-block;
-  width: 400px;
+  width: min(400px, 85vw);
   border-radius: 10px;
   background-color: #fff;
   box-shadow: 15px 8px 8px rgba(0, 0, 0, 0.55);
@@ -118,7 +118,7 @@ section#login form {
 
 section#register form {
   padding: 50px 30px 20px 30px;
-  margin: 0 auto;
+  margin: 2vh auto;
 }
 
 .closetos {

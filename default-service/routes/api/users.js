@@ -347,7 +347,7 @@ router.get("/conciseInfo/:user", authenticateToken, (req, res) => {
     }
     return res.json({
       name: user.name,
-      profilePictureUrl: user.profile[0]?.profilePictureUrl,
+      profilePictureUrl: user.profile?.profilePictureUrl,
     });
   });
 });
