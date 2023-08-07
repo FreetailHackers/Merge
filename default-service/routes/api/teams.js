@@ -7,17 +7,13 @@ const Chat = require("../../models/Chat");
 
 const authenticateToken = require("../helpers/authentication");
 const addProfiles = require("../helpers/addProfiles");
+const createTeam = require("../helpers/createTeam");
 router.use(authenticateToken);
 
 const dotenv = require("dotenv");
 dotenv.config();
 
 const MAX_TEAM_SIZE = 5;
-
-// @route POST api/team/create
-// @desc Create Team
-// @access Public
-router.post("/create", async (req, res) => createTeam(req, res));
 
 // @route POST api/team/requestMerge
 // @desc Request Team Merge
@@ -69,38 +65,6 @@ router.get("/teamsToSwipe/:user", async (req, res) =>
 router.post("/swipe", authenticateToken, async (req, res) => swipe(req, res));
 
 router.post("/leaveTeam", async (req, res) => leaveTeam(req, res));
-
-/**
- * Create a Team
- *
- * BODY PARAMETER user: user that created the team
- *
- * RETURNS a created team
- */
-async function createTeam(req, res) {
-  const userID = req.body.user;
-  try {
-    const user = await User.findOne({ _id: userID });
-    if (!user) {
-      return res.sendStatus(400);
-    }
-    const team = new Team({
-      users: [userID],
-      leader: userID,
-      mergeRequests: [],
-    });
-    const saved = await team.save();
-    user.team = team._id;
-    await user.save();
-    let teamObj = saved.toObject();
-    await addProfiles(teamObj);
-
-    return res.json(teamObj);
-  } catch (error) {
-    console.error(error);
-    return res.sendStatus(500);
-  }
-}
 
 /**
  * Request to merge your team with another.
@@ -259,7 +223,7 @@ async function cancelRequest(req, res) {
  * BODY PARAMETER filters: filters to list teams for
  */
 async function listTeams(req, res) {
-  let filters = req.body.filters ?? {};
+  let filters = req.query.filters ?? {};
   Team.find(filters)
     .then(async (data) => {
       let foundTeams = [];
@@ -317,7 +281,8 @@ async function getUserTeam(req, res) {
 async function addProfilesAndSanitize(teamObj) {
   await addProfiles(teamObj);
   delete teamObj.mergeRequests;
-  delete teamObj.swipeList;
+  delete teamObj.leftSwipeList;
+  delete teamObj.rightSwipeList;
   delete teamObj.__v;
 }
 
@@ -429,17 +394,11 @@ async function getTeamsToSwipe(req, res) {
     const userFilter =
       req.query.idealSize && req.query.idealSize > 0
         ? { users: { $size: req.query.idealSize } }
-        : {
-            $or: [
-              ...[...Array(MAX_TEAM_SIZE - 1).keys()].map((i) => ({
-                users: { $size: i + 1 },
-              })),
-            ],
-          };
+        : { users: { $not: { $size: MAX_TEAM_SIZE } } };
     let teamList = await Team.find({
       ...userFilter,
       "profile.displayTeamProfile": true,
-      _id: { $nin: [...team.swipeList, team._id] },
+      _id: { $nin: [...team.leftSwipeList, ...team.rightSwipeList, team._id] },
     });
     if (!teamList) {
       console.error("no teams found");
@@ -454,12 +413,16 @@ async function getTeamsToSwipe(req, res) {
         if (team.users.length === 1) {
           const user = await User.findById(team.users[0]);
           const userObj = user.toObject();
-          newTeam.profile = { ...userObj.profile, name: userObj.name };
+          newTeam.profile = {
+            ...userObj.profile,
+            name: userObj.name,
+            githubFinished: !!userObj.profile.github,
+          };
         }
         out.push(newTeam);
       }
     }
-    return res.json({ ready: true, teams: out });
+    return res.json({ ready: true, teams: out.slice(0, 5) });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
@@ -485,9 +448,12 @@ async function swipe(req, res) {
       console.error("Incorrect team ID provided");
       return res.sendStatus(400);
     }
+    const list = `${
+      req.body.decision === "accept-committed" ? "right" : "left"
+    }SwipeList`;
     await Team.updateOne(
       { _id: team._id },
-      { $push: { swipeList: otherTeam._id } },
+      { $push: { [list]: otherTeam._id } },
       { upsert: true }
     );
 
@@ -525,7 +491,7 @@ async function leaveTeam(req, res) {
     team.users = [...team.users.filter((e) => String(e) !== req.user)];
     await team.save();
     const newTeam = await createTeam({ body: { user: req.user } }, res);
-    return newTeam;
+    return res.json(newTeam);
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
@@ -534,7 +500,6 @@ async function leaveTeam(req, res) {
 
 module.exports = {
   router,
-  createTeam,
   requestMerge,
   acceptMerge,
   rejectMerge,

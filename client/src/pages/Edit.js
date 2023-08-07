@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
@@ -19,12 +19,15 @@ import "./Edit.css";
 
 function Edit(props) {
   //frontend for updating
-
-  const [userProfile, setUserProfile] = useState({ ...props.user.profile });
   const [saved, setSaved] = useState(false);
   const [portfolioRegex, setPortfolioRegex] = useState(true);
   const [linkedinRegex, setLinkedinRegex] = useState(true);
-  const baseProfile = { ...props.user.profile };
+  const baseProfile = (user) => ({
+    ...user.profile,
+    name: user.name,
+    githubFinished: !!user.profile.github,
+  });
+  const [userProfile, setUserProfile] = useState(baseProfile(props.user));
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -45,49 +48,35 @@ function Edit(props) {
       }
     }
     const data = {
-      id: props.userID.id,
       update: {
         name: userProfile.name,
         profile: {},
       },
     };
     for (const prop in userProfile) {
-      if (prop !== "name") {
+      if (prop !== "name" && prop !== "githubFinished") {
         data.update.profile[prop] = userProfile[prop];
       }
     }
 
     // data.update.profile.profilePictureUrl = profilePictureUrl;
-    axios
-      .post(process.env.REACT_APP_API_URL + "/api/users/update", data)
-      .then((res) => {
-        setSaved(true);
-        setPortfolioRegex(true);
-        setLinkedinRegex(true);
-        props.setCurrentUser(props.userID, {
-          ...props.user,
-          profile: [userProfile],
-        });
-      });
+    try {
+      await axios.post(
+        process.env.REACT_APP_API_URL + "/api/users/update",
+        data
+      );
+      setSaved(true);
+      setPortfolioRegex(true);
+      setLinkedinRegex(true);
+      props.setUser((prev) => ({
+        ...prev,
+        name: userProfile.name,
+        profile: { ...userProfile },
+      }));
+    } catch (err) {
+      console.log(err);
+    }
   };
-
-  useEffect(() => {
-    axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/" + props.userID.id)
-      .then((res) => {
-        const data = {
-          name: res.data.name,
-        };
-        for (const prop in res.data.profile) {
-          if (prop !== "_id") {
-            data[prop] = res.data.profile[prop];
-          }
-        }
-        data.githubFinished = data.github;
-        setUserProfile(data);
-        // profilePictureUrl: data.profilePictureUrl,
-      });
-  }, [props.userID.id]);
 
   // handleNewProfilePicture = async (file) => {
   //   const fd = new FormData();
@@ -114,7 +103,7 @@ function Edit(props) {
   //         profilePictureUrl: res.data.url,
   //         oversizedFile: false,
   //       });
-  //       props.setCurrentUser(props.userID, {
+  //       props.setUser(props.userID, {
   //         ...props.user,
   //         profilePictureUrl: res.data.url,
   //       });
@@ -126,20 +115,14 @@ function Edit(props) {
 
   const cancelEdit = async (e) => {
     e.preventDefault();
-    props.setCurrentUser(props.userID, {
-      ...props.user,
-      profile: baseProfile,
-      // profilePictureUrl: baseprofilePictureUrl,
-    });
-
-    setProfile(baseProfile);
+    setProfile(baseProfile(props.user));
   };
 
   const setProfile = (key, value) => {
-    setUserProfile({
-      ...userProfile,
+    setUserProfile((prev) => ({
+      ...prev,
       [key]: value,
-    });
+    }));
     setSaved(false);
   };
 
@@ -374,10 +357,9 @@ function Edit(props) {
 }
 
 Edit.propTypes = {
-  auth: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
-  userID: PropTypes.object.isRequired,
-  setCurrentUser: PropTypes.func.isRequired,
+  user: PropTypes.object,
+  userID: PropTypes.string.isRequired,
+  setUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
 };

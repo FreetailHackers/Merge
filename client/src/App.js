@@ -4,11 +4,11 @@ import {
   loginUser,
   registerUser,
   logoutUser,
-  setCurrentUser,
   initializeAuthIfLoggedIn,
 } from "./utils/authActions";
 
-import PropTypes from "prop-types";
+import axios from "axios";
+import io from "socket.io-client";
 
 import Navbar from "./components/Navbar";
 
@@ -20,50 +20,24 @@ import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
 import MyTeam from "./pages/MyTeam";
-import { SocketContext, socket } from "./socket.js";
 
 import { useMediaQuery } from "@mantine/hooks";
 
 import "./Theme.css";
 import "./App.css";
 
-function NavLayout(props) {
-  return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
-      {(props.displaySidebar || props.wideScreen) && (
-        <Navbar
-          auth={props.auth}
-          user={props.auth.user}
-          logoutUser={props.logoutUser}
-          wideScreen={props.wideScreen}
-          flipDisplaySidebar={props.flipDisplaySidebar}
-        />
-      )}
-      {(!props.displaySidebar || props.wideScreen) && <Outlet />}
-    </div>
-  );
-}
-
-NavLayout.propTypes = {
-  auth: PropTypes.object.isRequired,
-  logoutUser: PropTypes.func,
-  displaySidebar: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
-  wideScreen: PropTypes.bool,
-};
-
 const initialUserState = {
-  isAuthenticated: false,
   userID: null,
   user: {},
   loading: true,
+  token: null,
 };
 
 export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
-  const [errors, setErrors] = useState({});
+  const [user, setUser] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
-  const [team, setTeam] = useState(null);
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
@@ -80,131 +54,163 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (!auth.user.admitted && auth.loading && !team) {
-      initializeAuthIfLoggedIn(setAuth, setTeam);
+    if (!auth.userID && auth.loading) {
+      initializeAuthIfLoggedIn(setAuth);
     }
-  }, [auth, team]);
+  }, [auth]);
+
+  const userID = auth?.userID;
+  useEffect(() => {
+    if (userID) {
+      axios
+        .get(process.env.REACT_APP_API_URL + `/api/users/${userID.id}`)
+        .then((res) => {
+          setUser(res.data);
+        });
+    } else {
+      setUser(null);
+    }
+  }, [userID]);
+
+  const token = auth?.token;
+  useEffect(() => {
+    if (token) {
+      const socketVar = io(process.env.REACT_APP_CHAT_URL, {
+        transports: ["websocket"],
+        query: { token },
+      });
+      socketVar.on("connect", () => {
+        setSocket(socketVar);
+      });
+    } else {
+      setSocket((prev) => {
+        if (prev?.connected) {
+          prev.disconnect();
+        }
+        return null;
+      });
+    }
+  }, [token]);
 
   const login = (
     <Login
       auth={auth}
-      errors={errors}
-      isLoading={auth.loading}
-      loginUser={(userData) => loginUser(userData, setAuth, setTeam, setErrors)}
+      loginUser={(userData, setErrors) =>
+        loginUser(userData, setAuth, setErrors)
+      }
     />
   );
 
   return (
-    <SocketContext.Provider value={socket}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={login} />
-          <Route path="/login" element={login} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={login} />
+        <Route path="/login" element={login} />
+        <Route
+          path="/register"
+          element={
+            <Register
+              auth={auth}
+              registerUser={(userData, setErrors) =>
+                registerUser(userData, setAuth, setErrors)
+              }
+            />
+          }
+        />
+        {auth.userID && (
           <Route
-            path="/register"
+            path="/"
             element={
-              <Register
-                auth={auth}
-                errors={errors}
-                registerUser={(userData) =>
-                  registerUser(userData, setAuth, setTeam, setErrors)
-                }
-                isLoading={auth.loading}
-              />
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {(displaySidebar || wideScreen) && (
+                  <Navbar
+                    userID={auth.userID.id}
+                    logoutUser={() => logoutUser(setAuth)}
+                    wideScreen={wideScreen}
+                    flipDisplaySidebar={() => setDisplaySidebar(false)}
+                  />
+                )}
+                {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
+              </div>
             }
-          />
-          {auth.userID && (
+          >
             <Route
-              path="/"
+              path="dashboard"
               element={
-                <NavLayout
-                  auth={auth}
-                  logoutUser={() => logoutUser(setAuth)}
-                  displaySidebar={displaySidebar}
-                  flipDisplaySidebar={() => setDisplaySidebar(false)}
+                <Dashboard
+                  user={user}
                   wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
-            >
-              <Route
-                path="dashboard"
-                element={
-                  <Dashboard
-                    auth={auth}
-                    user={auth.user}
-                    logoutUser={() => logoutUser(setAuth)}
+            />
+            <Route
+              path="swipe"
+              element={
+                <Swipe
+                  userID={auth.userID.id}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                />
+              }
+            />
+            <Route
+              path="edit"
+              element={
+                user ? (
+                  <Edit
+                    user={user}
+                    userID={auth.userID.id}
+                    setUser={setUser}
                     wideScreen={wideScreen}
                     flipDisplaySidebar={() => setDisplaySidebar(true)}
                   />
-                }
-              />
-              <Route
-                path="swipe"
-                element={
-                  <Swipe
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route
+              path="myteam"
+              element={
+                socket?.connected ? (
+                  <MyTeam
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
                     flipDisplaySidebar={() => setDisplaySidebar(true)}
-                    team={team}
-                    setTeam={setTeam}
                   />
-                }
-              />
-              <Route
-                path="edit"
-                element={
-                  <Edit
-                    auth={auth}
-                    user={auth.user}
-                    userID={auth.userID}
-                    setCurrentUser={(userID, newUser) =>
-                      setCurrentUser(userID, setAuth, newUser)
-                    }
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
-                  />
-                }
-              />
-              <Route
-                path="myteam"
-                element={
-                  team !== null ? (
-                    <MyTeam
-                      userID={auth.userID.id}
-                      wideScreen={wideScreen}
-                      flipDisplaySidebar={() => setDisplaySidebar(true)}
-                      team={team}
-                      setTeam={setTeam}
-                    />
-                  ) : (
-                    <div />
-                  )
-                }
-              />
-              <Route
-                path="chat"
-                element={
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route
+              path="chat"
+              element={
+                socket?.connected ? (
                   <Chat
-                    userID={auth.userID && auth.userID.id}
+                    userID={auth.userID.id}
                     wideScreen={wideScreen}
                     flipDisplaySidebar={() => setDisplaySidebar(true)}
-                    blockList={auth.user?.blockList}
+                    blockList={user?.blockList}
                   />
-                }
-              />
-              <Route
-                path="about"
-                element={
-                  <About
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
-                  />
-                }
-              />
-            </Route>
-          )}
-        </Routes>
-      </BrowserRouter>
-    </SocketContext.Provider>
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route
+              path="about"
+              element={
+                <About
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                />
+              }
+            />
+          </Route>
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }

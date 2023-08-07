@@ -20,7 +20,7 @@
 @media all and (orientation:landscape) {
   .about-page {
     width: calc(100vw - 310px);
-    padding:30px;
+    padding: 15px 30px;
   }
 }
 

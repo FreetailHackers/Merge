@@ -50,76 +50,75 @@ io.use((socket, next) => {
   }
 });
 
+function useWithErrorHandling(socket, event, callback) {
+  socket.on(event, (data) => {
+    if (errHandler(data, socket)) {
+      callback(data, socket);
+    }
+  });
+}
+
 io.on("connection", (socket) => {
-  // handles new connection
-
   // handles message posted by client
-  socket.on("new-message", (data) => newMessage(data, socket));
+  useWithErrorHandling(socket, "new-message", newMessage);
 
-  socket.on("join-room", (data) => joinRoom(data, socket));
+  useWithErrorHandling(socket, "join-room", joinRoom);
 
-  socket.on("leave-room", (data) => leaveRoom(data, socket));
+  useWithErrorHandling(socket, "leave-room", leaveRoom);
 
   socket.on("leave-chat-rooms", () => leaveChatRooms(socket));
 
-  socket.on("create-room", (data) => createRoom(data, socket));
+  useWithErrorHandling(socket, "create-room", createRoom);
 
-  socket.on("add-users", (data) => addUsers(data, socket));
+  useWithErrorHandling(socket, "add-users", addUsers);
 
-  socket.on("block-users", (data) => blockUsers(data, socket));
+  useWithErrorHandling(socket, "block-users", blockUsers);
 
-  socket.on("unblock-users", (data) => unblockUsers(data, socket));
+  useWithErrorHandling(socket, "unblock-users", unblockUsers);
 
-  socket.on("rename-chat", (data) => renameChat(data, socket));
+  useWithErrorHandling(socket, "rename-chat", renameChat);
 
-  socket.on("leave-chat", (data) => leaveChat(data, socket));
+  useWithErrorHandling(socket, "leave-chat", leaveChat);
 
-  socket.on("remove-users", (data) => removeUsers(data, socket));
+  useWithErrorHandling(socket, "remove-users", removeUsers);
 
-  socket.on("delete-chat", (data) => deleteChat(data, socket));
+  useWithErrorHandling(socket, "delete-chat", deleteChat);
 
-  socket.on("leave-team", (data) => leaveTeam(data, socket));
+  useWithErrorHandling(socket, "leave-team", leaveTeam);
 
-  socket.on("request-merge", (data) => requestMerge(data, socket));
+  useWithErrorHandling(socket, "request-merge", requestMerge);
 
-  socket.on("accept-merge", (data) => acceptMerge(data, socket));
+  useWithErrorHandling(socket, "accept-merge", acceptMerge);
 
-  socket.on("reject-merge", (data) => rejectMerge(data, socket));
+  useWithErrorHandling(socket, "reject-merge", rejectMerge);
 
-  socket.on("cancel-request", (data) => cancelRequest(data, socket));
+  useWithErrorHandling(socket, "cancel-request", cancelRequest);
 
-  socket.on("update-profile", (data) => updateProfile(data, socket));
+  useWithErrorHandling(socket, "update-profile", updateProfile);
 });
 
 // error handler function
 function errHandler(data, socket) {
   if (!data) {
     console.error("No data provided");
+    return false;
   } else if (!socket) {
     console.error("No socket provided");
+    return false;
   }
-  return;
+  return true;
 }
 
 function newMessage(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.chat).emit("broadcast-message", data);
-  }
+  socket.to(data.chat).emit("broadcast-message", data);
 }
 
 function joinRoom(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.join(data.id);
-  }
+  socket.join(data.id);
 }
 
 function leaveRoom(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.leave(data.id);
-  }
+  socket.leave(data.id);
 }
 
 function leaveChatRooms(socket) {
@@ -131,159 +130,116 @@ function leaveChatRooms(socket) {
 }
 
 async function createRoom(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.join(data._id);
-    const fetched = await io.fetchSockets();
-    let foundSocket = false;
-    for (let fetchedSocket of fetched) {
-      if (data.otherUsers.includes(fetchedSocket.data.mongoID)) {
-        socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
-        foundSocket = true;
-      }
+  socket.join(data._id);
+  const fetched = await io.fetchSockets();
+  let foundSocket = false;
+  for (let fetchedSocket of fetched) {
+    if (data.otherUsers.includes(fetchedSocket.data.mongoID)) {
+      socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
+      foundSocket = true;
     }
-    if (!foundSocket) {
-      console.error("No sockets found for selected users");
-    }
+  }
+  if (!foundSocket) {
+    console.error("No sockets found for selected users");
   }
 }
 
 async function addUsers(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    const fetched = await io.fetchSockets();
-    for (let fetchedSocket of fetched) {
-      if (data.userIDs.includes(fetchedSocket.data.mongoID)) {
-        socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
-      } else if (
-        data.chat.users.includes(fetchedSocket.data.mongoID) &&
-        !data.userIDs.includes(fetchedSocket.data.mongoID) &&
-        socket.id != fetchedSocket.id
-      ) {
-        socket.to(fetchedSocket.id).emit("new-user-added", data.chat);
-      }
+  const fetched = await io.fetchSockets();
+  for (let fetchedSocket of fetched) {
+    if (data.userIDs.includes(fetchedSocket.data.mongoID)) {
+      socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
+    } else if (
+      data.chat.users.includes(fetchedSocket.data.mongoID) &&
+      !data.userIDs.includes(fetchedSocket.data.mongoID) &&
+      socket.id != fetchedSocket.id
+    ) {
+      socket.to(fetchedSocket.id).emit("new-user-added", data.chat);
     }
   }
 }
 
 async function blockUsers(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    const fetched = await io.fetchSockets();
-    for (let fetchedSocket of fetched) {
-      if (data.users.includes(fetchedSocket.data.mongoID)) {
-        socket
-          .to(fetchedSocket.id)
-          .emit("blocked-by", { userID: socket.data.mongoID });
-      }
+  const fetched = await io.fetchSockets();
+  for (let fetchedSocket of fetched) {
+    if (data.users.includes(fetchedSocket.data.mongoID)) {
+      socket
+        .to(fetchedSocket.id)
+        .emit("blocked-by", { userID: socket.data.mongoID });
     }
   }
 }
 
 async function unblockUsers(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    const fetched = await io.fetchSockets();
-    for (let fetchedSocket of fetched) {
-      if (data.users.includes(fetchedSocket.data.mongoID)) {
-        socket
-          .to(fetchedSocket.id)
-          .emit("unblocked-by", { userID: socket.data.mongoID });
-      }
+  const fetched = await io.fetchSockets();
+  for (let fetchedSocket of fetched) {
+    if (data.users.includes(fetchedSocket.data.mongoID)) {
+      socket
+        .to(fetchedSocket.id)
+        .emit("unblocked-by", { userID: socket.data.mongoID });
     }
   }
 }
 
 function renameChat(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.chatID).emit("chat-renamed", data);
-  }
+  socket.to(data.chatID).emit("chat-renamed", data);
 }
 
 function deleteChat(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data._id).emit("chat-deleted", data);
-  }
+  socket.to(data._id).emit("chat-deleted", data);
 }
 
 function leaveChat(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.chatID).emit("user-left", data);
-  }
+  socket.to(data.chatID).emit("user-left", data);
   socket.leave(data.chatID);
 }
 
 async function removeUsers(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    const fetched = await io.in(data.chatID).fetchSockets();
-    for (const fetchedSocket of fetched) {
-      if (data.users.includes(fetchedSocket.data.mongoID)) {
+  const fetched = await io.in(data.chatID).fetchSockets();
+  for (const fetchedSocket of fetched) {
+    if (data.users.includes(fetchedSocket.data.mongoID)) {
+      socket.to(fetchedSocket.id).emit("removed-from", { chatID: data.chatID });
+    } else {
+      for (const user of data.users) {
         socket
           .to(fetchedSocket.id)
-          .emit("removed-from", { chatID: data.chatID });
-      } else {
-        for (const user of data.users) {
-          socket
-            .to(fetchedSocket.id)
-            .emit("user-left", { chatID: data.chatID, user: user });
-        }
+          .emit("user-left", { chatID: data.chatID, user: user });
       }
     }
   }
 }
 
 async function leaveTeam(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.teamID).emit("teammate-left", { userID: data.userID });
-  }
+  socket.to(data.teamID).emit("teammate-left", { userID: data.userID });
 }
 
 async function requestMerge(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    let requestingCopy = { ...data };
-    requestingCopy.requestingTeam = { _id: data.requestingTeam._id };
-    let requestedCopy = { ...data };
-    requestedCopy.requestedTeam = { _id: data.requestedTeam._id };
-    socket.to(data.requestingTeam._id).emit("merge-requested", requestingCopy);
-    socket.to(data.requestedTeam._id).emit("merge-requested", requestedCopy);
-  }
+  let requestingCopy = { ...data };
+  requestingCopy.requestingTeam = { _id: data.requestingTeam._id };
+  let requestedCopy = { ...data };
+  requestedCopy.requestedTeam = { _id: data.requestedTeam._id };
+  socket.to(data.requestingTeam._id).emit("merge-requested", requestingCopy);
+  socket.to(data.requestedTeam._id).emit("merge-requested", requestedCopy);
 }
 
 async function acceptMerge(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.teamID).emit("merge-accepted", { newTeam: data.newTeam });
-  }
+  socket.to(data.teamID).emit("merge-accepted", { newTeam: data.newTeam });
 }
 
 async function rejectMerge(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.requestingTeamID).emit("merge-rejected", data);
-    socket.to(data.rejectingTeamID).emit("merge-rejected", data);
-  }
+  socket.to(data.requestingTeamID).emit("merge-rejected", data);
+  socket.to(data.rejectingTeamID).emit("merge-rejected", data);
 }
 
 async function cancelRequest(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.cancellingTeamID).emit("request-cancelled", data);
-    socket.to(data.requestedTeamID).emit("request-cancelled", data);
-  }
+  socket.to(data.cancellingTeamID).emit("request-cancelled", data);
+  socket.to(data.requestedTeamID).emit("request-cancelled", data);
 }
 
 async function updateProfile(data, socket) {
-  errHandler(data, socket);
-  if (data && socket) {
-    socket.to(data.teamID).emit("profile-updated", data);
-  }
+  socket.to(data.teamID).emit("profile-updated", data);
 }
+
 AWS.config.update({
   accessKeyId: process.env.AWS_ID,
   secretAccessKey: process.env.AWS_SECRET,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import SkillSelector from "../components/SkillSelector";
 import TeamInfoCard from "../components/TeamInfoCard";
 import { categories } from "../data/categories";
-import { SocketContext } from "../socket";
+import { useOutletContext } from "react-router-dom";
 
 // FileInput,
 import {
@@ -22,18 +22,24 @@ import "./Edit.css";
 function MyTeam(props) {
   //frontend for updating
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
-  const socket = useContext(SocketContext);
-  const { userID, team, setTeam } = props;
-  const [teamProfile, setTeamProfile] = useState({ ...team.profile });
+  const socket = useOutletContext();
+  const [team, setTeam] = useState(null);
+  const teamProfile = team?.profile;
+  const { userID } = props;
   const [saved, setSaved] = useState(false);
   const [otherTeams, setOtherTeams] = useState([]);
   const [ingoingMRs, setIngoingMRs] = useState([]);
   const [outgoingMRs, setOutgoingMRs] = useState([]);
   const [showProfile, setShowProfile] = useState(true);
   const [showRequests, setShowRequests] = useState(true);
-  const baseProfile = { ...team.profile };
+  const baseProfile = team?.profile;
 
   useEffect(() => {
+    axios
+      .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID}`)
+      .then((res) => {
+        setTeam(res.data);
+      });
     axios
       .get(
         process.env.REACT_APP_API_URL + "/api/teams/mergeRequestsInfo/" + userID
@@ -42,9 +48,6 @@ function MyTeam(props) {
         setIngoingMRs(res.data.ingoing);
         setOutgoingMRs(res.data.outgoing);
       });
-
-    setTeamProfile({ ...team.profile });
-
     axios.get(process.env.REACT_APP_API_URL + "/api/teams/list").then((res) => {
       setOtherTeams((prev) => {
         if (prev.length > 0) {
@@ -53,17 +56,17 @@ function MyTeam(props) {
         return prev;
       });
     });
-  }, [userID, team, setTeam]);
+  }, [userID]);
 
   const connected = socket?.connected;
 
   useEffect(() => {
-    if (socket && connected) {
+    if (connected && team) {
       socket.emit("join-room", { id: team._id });
     }
 
     return () => {
-      if (socket && connected) {
+      if (connected && team) {
         socket.emit("leave-room", { id: team._id });
       }
     };
@@ -142,35 +145,37 @@ function MyTeam(props) {
   const handleSubmit = async (event) => {
     event.persist();
     event.preventDefault();
-
-    axios
-      .post(process.env.REACT_APP_API_URL + "/api/teams/updateProfile", {
+    await axios.post(
+      process.env.REACT_APP_API_URL + "/api/teams/updateProfile",
+      {
         newProfile: { ...teamProfile },
-      })
-      .then((res) => {
-        socket.emit("update-profile", {
-          teamID: team._id,
-          profile: teamProfile,
-        });
-        setTeam((prev) => ({ ...prev, profile: teamProfile }));
-        setSaved(true);
-      });
+      }
+    );
+    socket.emit("update-profile", {
+      teamID: team._id,
+      profile: teamProfile,
+    });
+    setTeam((prev) => ({ ...prev, profile: teamProfile }));
+    setSaved(true);
   };
 
   const cancelEdit = async (e) => {
     e.preventDefault();
     setTeam((prev) => ({
       ...prev,
-      profile: baseProfile,
+      profile: { ...baseProfile },
     }));
 
-    setProfile(baseProfile);
+    setProfile({ ...baseProfile });
   };
 
   const setProfile = (key, value) => {
-    setTeamProfile((prev) => ({
+    setTeam((prev) => ({
       ...prev,
-      [key]: value,
+      profile: {
+        ...prev.profile,
+        [key]: value,
+      },
     }));
     setSaved(false);
   };
@@ -249,6 +254,10 @@ function MyTeam(props) {
 
   function canMerge(team1, team2) {
     return team1.users.length + team2.users.length <= MAX_TEAM_SIZE;
+  }
+
+  if (!team || !team.profile) {
+    return <div></div>;
   }
 
   return (
@@ -494,8 +503,6 @@ MyTeam.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
-  team: PropTypes.object,
-  setTeam: PropTypes.func,
 };
 
 export default MyTeam;

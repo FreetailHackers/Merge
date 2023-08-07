@@ -1,82 +1,70 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Message from "./Message";
 import "./ChatWindow.css";
 import PropTypes from "prop-types";
 import ChatSettings from "./ChatSettings";
 
-const defaultState = {
-  newMessage: "",
-  reportPressed: false,
-  editingTitle: false,
-  titleInput: "",
-};
+function ChatWindow(props) {
+  const [newMessage, setNewMessage] = useState("");
+  const [reportPressed, setReportPressed] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [titleInput, setTitleInput] = useState(props.title);
+  const [lockScroll, setLockScroll] = useState(true);
 
-class ChatWindow extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { ...defaultState };
-  }
-
-  componentDidMount() {
-    this.props.getMessages();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (
-      prevProps.chat &&
-      this.props.chat &&
-      prevProps.chat._id !== this.props.chat._id
-    ) {
-      this.setState({ ...defaultState, titleInput: this.props.chat.name });
-      this.props.getMessages();
+  const messageCount = props.messages.length;
+  useEffect(() => {
+    const scrollBox = document.getElementById("chatScrollBox");
+    if (lockScroll) {
+      scrollBox.scrollTo(0, scrollBox.scrollHeight);
     }
-    if (
-      prevProps.messages &&
-      this.props.messages &&
-      prevProps.messages[prevProps.messages.length - 1] !==
-        this.props.messages[this.props.messages.length - 1]
-    ) {
-      document
-        .getElementById("chatScrollBox")
-        .scrollTo(0, document.getElementById("chatScrollBox").scrollHeight);
-    }
-  }
+  }, [lockScroll, messageCount]);
 
-  onKeyDown = (e) => {
+  useEffect(() => {
+    const scrollBox = document.getElementById("chatScrollBox");
+    const handleScroll = (e) => {
+      setLockScroll(
+        scrollBox.scrollTop + 10 >=
+          scrollBox.scrollHeight - scrollBox.offsetHeight
+      );
+    };
+    scrollBox.addEventListener("scroll", handleScroll);
+    return () => {
+      scrollBox.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const onKeyDown = (e) => {
     if (e.key.toLowerCase() === "enter") {
-      this.props.sendMessage(e.target.value);
-      this.setState({
-        newMessage: "",
-      });
+      props.sendMessage(e.target.value);
+      setNewMessage("");
     }
   };
 
-  titleOnKeyDown = (e) => {
+  const titleOnKeyDown = (e) => {
     const key = e.key.toLowerCase();
     if (key === "escape") {
-      this.setState({
-        editingTitle: false,
-        titleInput: this.props.title ?? "",
-      });
+      setEditingTitle(false);
+      setTitleInput(props.title ?? "");
     } else if (key === "enter") {
-      this.setState({ editingTitle: false });
-      this.props.setTitle(this.state.titleInput);
+      setEditingTitle(false);
+      props.setTitle(titleInput);
     }
   };
 
-  sendMessageButton = () => {
-    let message = this.state.newMessage;
+  const sendMessageButton = () => {
+    let message = newMessage;
     if (message === "") return;
-    this.props.sendMessage(message);
-    this.setState({ newMessage: "" });
+    props.sendMessage(message);
+    setNewMessage("");
   };
 
-  showReport = () => {
-    this.setState({ reportPressed: true, editingTitle: false });
+  const showReport = () => {
+    setEditingTitle(false);
+    setReportPressed(true);
   };
 
-  submitReport = async (
+  const submitReport = async (
     kicking,
     blocking,
     unblocking,
@@ -85,53 +73,48 @@ class ChatWindow extends Component {
   ) => {
     if (reporting.length > 0) {
       const contents = document.getElementById("reason").value;
-      for (const user of reporting) {
-        axios.post(
-          process.env.REACT_APP_API_URL + "/api/users/" + user + "/report",
-          {
-            contents: contents,
-            reporter: this.props.selfID,
-            chatID: this.props.chat._id,
-          }
-        );
-      }
+      axios.post(process.env.REACT_APP_API_URL + "/api/users/report", {
+        contents: contents,
+        reported: reporting,
+        chatID: props.chat._id,
+      });
       document.getElementById("reason").value = "";
     }
     if (blocking.length > 0 || unblocking.length > 0) {
-      await this.props.blockUnblockUsers(blocking, unblocking);
+      await props.blockUnblockUsers(blocking, unblocking);
     }
 
-    if (this.props.selfID === this.props.chat.owner) {
+    if (props.selfID === props.chat.owner) {
       if (leavingDeleting) {
-        this.props.deleteChat();
+        props.deleteChat();
       } else if (kicking.length > 0) {
-        await this.props.kickUsers(kicking, this.props.chat._id);
+        await props.kickUsers(kicking, props.chat._id);
       }
     } else if (leavingDeleting) {
-      this.props.leaveChat();
+      props.leaveChat();
     }
-    this.setState({ reportPressed: false });
+    setReportPressed(false);
   };
 
-  render = () => (
+  return (
     <div className="chatWindow">
       <div className="chatWindowHeader">
-        {!this.props.wideScreen && (
+        {!props.wideScreen && (
           <div className="windowToggleHolder">
             <button
               className="toggleSidebar"
-              onClick={this.props.flipDisplaySidebar}
+              onClick={props.flipDisplaySidebar}
             >
               ←
             </button>
           </div>
         )}
         <div className="chatWindowTitle">
-          {this.state.editingTitle ? (
+          {editingTitle ? (
             <input
-              value={this.state.titleInput}
-              onChange={(e) => this.setState({ titleInput: e.target.value })}
-              onKeyDown={this.titleOnKeyDown}
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
+              onKeyDown={titleOnKeyDown}
               placeholder="New Chat Title"
               autoComplete="off"
             ></input>
@@ -139,16 +122,16 @@ class ChatWindow extends Component {
             <h3
               className="chatTitle"
               onClick={() => {
-                if (!this.state.reportPressed) {
-                  this.setState({ editingTitle: true });
+                if (!reportPressed) {
+                  setEditingTitle(true);
                 }
               }}
             >
-              {this.props.title
-                ? this.props.title
+              {props.title
+                ? props.title
                 : String(
-                    this.props.chat.users.map(
-                      (id) => `${this.props.chat.profiles[id].name}`
+                    props.chat.users.map(
+                      (id) => `${props.chat.profiles[id].name}`
                     )
                   ).replaceAll(",", ", ")}
             </h3>
@@ -158,24 +141,24 @@ class ChatWindow extends Component {
           className="themeButton"
           type="button"
           id="block"
-          onClick={this.showReport}
+          onClick={showReport}
         >
           Settings
         </button>
       </div>
       <div id="chatScrollBox" className="chatScrollBox">
-        {this.props.messages
-          .filter((m) => !this.props.blockedByMe.includes(m.author))
+        {props.messages
+          .filter((m) => !props.blockedByMe.includes(m.author))
           .map((message, index) => {
             const msgDate = new Date(message.timestamp);
             const nowDate = new Date();
             return (
               <Message
-                key={message._id}
-                fromSelf={message.author === this.props.selfID}
+                key={index}
+                fromSelf={message.author === props.selfID}
                 content={message.contents}
-                image={this.props.chat.profiles[message.author].profilePicture}
-                name={this.props.chat.profiles[message.author].name}
+                image={props.chat.profiles[message.author].profilePictureUrl}
+                name={props.chat.profiles[message.author].name}
                 timestamp={
                   (msgDate.getDate() !== nowDate.getDate() ||
                   msgDate.getMonth() !== nowDate.getMonth() ||
@@ -189,40 +172,40 @@ class ChatWindow extends Component {
                 }
                 mergeTop={
                   index > 0 &&
-                  message.author === this.props.messages[index - 1].author
+                  message.author === props.messages[index - 1].author
                 }
                 mergeBottom={
-                  index < this.props.messages.length - 1 &&
-                  message.author === this.props.messages[index + 1].author
+                  index < props.messages.length - 1 &&
+                  message.author === props.messages[index + 1].author
                 }
               />
             );
           })}
       </div>
-      {this.state.reportPressed && (
+      {reportPressed && (
         <ChatSettings
-          exit={() => this.setState({ reportPressed: false })}
-          submitReport={this.submitReport}
-          chat={this.props.chat}
-          selfID={this.props.selfID}
-          blockedByMe={this.props.blockedByMe}
+          exit={() => setReportPressed(false)}
+          submitReport={submitReport}
+          chat={props.chat}
+          selfID={props.selfID}
+          blockedByMe={props.blockedByMe}
           otherUsers={
-            this.props.otherUsers &&
-            this.props.otherUsers.filter(
-              (user) => !this.props.chat.users.includes(user._id)
+            props.otherUsers &&
+            props.otherUsers.filter(
+              (user) => !props.chat.users.includes(user._id)
             )
           }
-          addUsers={this.props.addUsers}
+          addUsers={props.addUsers}
           title={
-            this.props.title
-              ? this.props.title
+            props.title
+              ? props.title
               : String(
-                  this.props.chat.users.map(
-                    (id) => `${this.props.chat.profiles[id].name}`
+                  props.chat.users.map(
+                    (id) => `${props.chat.profiles[id].name}`
                   )
                 ).replaceAll(",", ", ")
           }
-          wideScreen={this.props.wideScreen}
+          wideScreen={props.wideScreen}
         />
       )}
       <div className="newMessageBox">
@@ -231,25 +214,25 @@ class ChatWindow extends Component {
           autoComplete="off"
           name="newMessage"
           type="text"
-          value={this.state.newMessage}
+          value={newMessage}
           placeholder="Aa"
           onChange={(e) => {
             if (e.target.value.length > 1500) {
-              this.setState({ newMessage: e.target.value.slice(0, 1500) });
+              setNewMessage(e.target.value.slice(0, 1500));
             } else {
-              this.setState({ newMessage: e.target.value });
+              setNewMessage(e.target.value);
             }
           }}
-          onKeyDown={this.onKeyDown}
+          onKeyDown={onKeyDown}
         />
         <p
           onClick={() => {
-            this.props.sendMessage("❤️");
+            props.sendMessage("❤️");
           }}
         >
           ❤️
         </p>
-        <p onClick={this.sendMessageButton}>➡️</p>
+        <p onClick={sendMessageButton}>➡️</p>
       </div>
     </div>
   );
@@ -258,12 +241,11 @@ class ChatWindow extends Component {
 ChatWindow.propTypes = {
   chat: PropTypes.object.isRequired,
   sendMessage: PropTypes.func.isRequired,
-  profiles: PropTypes.array,
-  title: PropTypes.string.isRequired,
   messages: PropTypes.arrayOf(PropTypes.object),
-  getMessages: PropTypes.func,
   otherUsers: PropTypes.arrayOf(PropTypes.object),
   addUsers: PropTypes.func.isRequired,
+  key: PropTypes.string,
+  title: PropTypes.string,
   setTitle: PropTypes.func.isRequired,
   selfID: PropTypes.string.isRequired,
   leaveChat: PropTypes.func,

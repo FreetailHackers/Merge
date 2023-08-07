@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import "./Dashboard.css";
 
 function Dashboard(props) {
-  const name = props.user.name;
+  const name = props.user?.name;
 
   return (
     <section id="dashboard">
@@ -65,9 +65,7 @@ function Dashboard(props) {
 }
 
 Dashboard.propTypes = {
-  auth: PropTypes.object.isRequired,
-  logoutUser: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired,
+  user: PropTypes.object,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
 };

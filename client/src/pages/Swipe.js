@@ -13,7 +13,9 @@ import { useNavigate } from "react-router-dom";
 function Swipe(props) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [teamToShow, setTeamToShow] = useState(null);
+  const [teamsToShow, setTeamsToShow] = useState([]);
+  const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
+
   const [idealSize, setIdealSize] = useState(0);
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
@@ -33,7 +35,7 @@ function Swipe(props) {
           props.userID
       );
       if (res.data.ready) {
-        setTeamToShow(res.data.teams[0] ?? null);
+        setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
       setLoading(false);
@@ -54,7 +56,7 @@ function Swipe(props) {
         },
       }
     );
-    setTeamToShow(res.data.teams[0] ?? null);
+    setTeamsToShow(res.data.teams);
     setLoading(false);
     setProfileState((prev) => ({
       ...prev,
@@ -70,15 +72,20 @@ function Swipe(props) {
         decision,
       })
       .then((res) => {
-        props.setTeam((prev) => ({
-          ...prev,
-          swipeList: [...prev.swipeList, teamToShow._id],
-        }));
         if (decision === "accept-committed") {
           navigate("/chat");
         } else {
           setTimeout(() => {
-            getTeamToShow();
+            if (teamsToShow.length === 1) {
+              getTeamToShow();
+            } else {
+              setTeamsToShow((prev) => [...prev.slice(1)]);
+              setProfileState((prev) => ({
+                ...prev,
+                profileAngle: 0,
+                profileSide: "neutral",
+              }));
+            }
           }, 175);
         }
       });
@@ -278,8 +285,6 @@ Swipe.propTypes = {
   navigate: PropTypes.func,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
-  team: PropTypes.object,
-  setTeam: PropTypes.func,
 };
 
 export default Swipe;
