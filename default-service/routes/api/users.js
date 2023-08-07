@@ -11,6 +11,7 @@ const fetch = require("node-fetch");
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
 const authenticateToken = require("../helpers/authentication");
+const createTeam = require("../helpers/createTeam");
 
 // Load User model
 const User = require("../../models/User");
@@ -31,23 +32,60 @@ const s3 = new AWS.S3({
 // @desc Register user
 // @access Public
 router.post("/register", async (req, res) => register_func(req, res));
-// @route POST api/users/list
-// @desc Get a list of all users, within a specified starting and ending range
+// @route POST api/users/login
+// @desc Login to the application
 // @access Public
 router.post("/login", async (req, res) => login(req, res));
+
+router.get("/validate", authenticateToken, (req, res) => {
+  return res.json({ user: req.user });
+});
 
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
 router.post("/update", authenticateToken, async (req, res) => update(req, res));
 
-// @route POST api/users/update
-// @desc Update the profile information of a sepcific user
+// @route POST api/users/list
+// @desc Get a list of all users, within a specified starting and ending range
 // @access Public
 router.get("/list", authenticateToken, async (req, res) => list_func(req, res));
 
-// @route POST api/users/list
-// @desc Update the profile information of a sepcific user
+// @route GET api/users/:user
+// @desc Returns a user's profile
+// @access Public
+router.get("/:user", authenticateToken, async (req, res) => getUser(req, res));
+
+// @route GET api/users/conciseInfo/:user
+// @desc Get the name and profile picture of a user.
+// @access Public
+router.get("/conciseInfo/:user", authenticateToken, async (req, res) =>
+  conciseInfo(req, res)
+);
+
+// @route POST api/users/:user/report
+// @desc Report a user
+// @access Public
+router.post("/report", authenticateToken, async (req, res) =>
+  reportUsers(req, res)
+);
+
+// @route POST api/users/:user/block
+// @desc Block a user
+// @access Public
+router.post("/:user/block", authenticateToken, async (req, res) =>
+  blockUser(req, res)
+);
+
+// @route POST api/users/:user/unblock
+// @desc Unblock a user
+// @access Public
+router.post("/:user/unblock", authenticateToken, async (req, res) =>
+  unblockUser(req, res)
+);
+
+// @route POST api/users/profile-picture
+// @desc Update the profile picture of a specific user
 // @access Public
 router.post("/profile-picture", async (req, res) => {
   const form = new formidable.IncomingForm();
@@ -103,7 +141,7 @@ async function list_func(req, res) {
     .catch((err) => console.log(err));
 }
 
-function login(req, res) {
+async function login(req, res) {
   // Form validation
   const { errors, isValid } = validateLoginInput(req.body);
 
@@ -116,46 +154,38 @@ function login(req, res) {
   const email = req.body.email;
   const password = req.body.password;
 
-  // Find user by email
-  User.findOne({ email })
-    .then((user) => {
-      // Check if user exists
-      if (!user) {
-        return res.json({ email: "Email not found", isValid: false });
-      }
-      // Check password
-      bcrypt.compare(password, user.password).then((isMatch) => {
-        if (isMatch) {
-          // User matched
-          // Create JWT Payload
-          const payload = {
-            id: user.id,
-            name: user.name,
-          };
-
-          // Sign token
-          jwt.sign(
-            payload,
-            process.env.SECRETORKEY,
-            {
-              expiresIn: 31556926, // 1 year in seconds
-            },
-            (err, token) => {
-              res.json({
-                success: true,
-                token: "Bearer " + token,
-              });
-            }
-          );
-        } else {
-          return res.json({ password: "Password incorrect" });
-        }
-      });
-    })
-    .catch((err) => console.log(err));
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    // Check if user exists
+    if (!user) {
+      return res.json({ email: "Email not found", isValid: false });
+    }
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.json({ password: "Password incorrect" });
+    }
+    // User matched, Create JWT Payload
+    const payload = {
+      id: user.id,
+      name: user.name,
+    };
+    // Sign token
+    const token = await jwt.sign(payload, process.env.SECRETORKEY, {
+      expiresIn: 31556926, // 1 year in seconds
+    });
+    return res.json({
+      success: true,
+      token: "Bearer " + token,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
 }
 
-function register_func(req, res) {
+async function register_func(req, res) {
   // Form validation
   let { errors, isValid } = validateRegisterInput(req.body);
 
@@ -164,57 +194,42 @@ function register_func(req, res) {
     errors.isValid = false;
     return res.json(errors);
   }
-
-  User.findOne({ email: req.body.email }).then((user) => {
-    if (user) {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
       return res.json({ email: "Email already exists", isValid: false });
-    } else {
-      var newUser = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        profile: {
-          profilePictureUrl:
-            "https://ui-avatars.com/api/?name=" + req.body.name,
-        },
-      });
-      // Hash password before saving in database
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then((user) => {
-              const payload = {
-                id: user._id,
-                name: user.name,
-              };
-              // Sign token
-              jwt.sign(
-                payload,
-                process.env.SECRETORKEY,
-                {
-                  expiresIn: 31556926, // 1 year in seconds
-                },
-                (err, token) => {
-                  res.json({
-                    success: true,
-                    token: "Bearer " + token,
-                    user: {
-                      status: {
-                        admitted: true,
-                      },
-                    },
-                  });
-                }
-              );
-            })
-            .catch((err) => console.log(err));
-        });
-      });
     }
-  });
+    let newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      profile: {
+        profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
+      },
+    });
+    // Hash password before saving in database
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newUser.password, salt);
+    newUser.password = hash;
+    const savedUser = await newUser.save();
+    const payload = {
+      id: savedUser._id,
+      name: savedUser.name,
+    };
+    // Sign token
+    const token = await jwt.sign(payload, process.env.SECRETORKEY, {
+      expiresIn: 31556926, // 1 year in seconds
+    });
+    await createTeam({ body: { user: savedUser._id } }, res);
+    res.json({
+      success: true,
+      token: "Bearer " + token,
+      admitted: true,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
 }
 
 async function s3Upload(file_name, files, res) {
@@ -270,10 +285,6 @@ async function update(req, res) {
     upsert: true,
   };
 
-  const id = req.body?.id;
-  if (req.user !== id) {
-    return res.sendStatus(403);
-  }
   //Clear all old s3 files
   //await clear_old_pictures(req);
   if (profile.name?.length > 1000) {
@@ -287,28 +298,16 @@ async function update(req, res) {
   // Find user by email
   // User.findByIdAndUpdate( id, {$set: profile}, options).then(data => {
   // Look at mongoose docs
-  User.updateOne({ _id: id }, { $set: profile }, options)
-    .then(() => {
-      res.json({
-        success: true,
-      });
-    })
-    .catch((err) => console.log(err));
-  //return res.json({success: false})
+  try {
+    await User.updateOne({ _id: req.user }, { $set: profile }, options);
+    return res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    return res.json({ success: false });
+  }
 }
 
-router.get("/validate", authenticateToken, (req, res) => {
-  return res.json(req.user);
-});
-
-/**
- * Get all information on file for a user.
- *
- * PATH PARAMETER user: ObjectId of User
- *
- * RETURNS a User Object
- */
-router.get("/:user", (req, res) => {
+async function getUser(req, res) {
   User.findById(req.params.user, (err, user) => {
     if (err) {
       return res.sendStatus(400);
@@ -325,16 +324,9 @@ router.get("/:user", (req, res) => {
     }
     return res.json(user);
   });
-});
+}
 
-/**
- * Get the name and profile picture of a user.
- *
- * PATH PARAMETER user: ObjectId of User
- *
- * RETURNS an Object
- */
-router.get("/conciseInfo/:user", authenticateToken, (req, res) => {
+async function conciseInfo(req, res) {
   if (!req.user) {
     return res.sendStatus(403);
   }
@@ -350,90 +342,69 @@ router.get("/conciseInfo/:user", authenticateToken, (req, res) => {
       profilePictureUrl: user.profile?.profilePictureUrl,
     });
   });
-});
+}
 
-/**
- * Report a user.
- *
- * PATH PARAMETER user: ObjectId of User
- *
- * RETURNS the Report Object
- */
-router.post("/:user/report", (req, res) => {
-  User.findById(req.params.user, (err, user) => {
-    if (err) {
-      return res.sendStatus(400);
-    }
-    if (!user) {
-      return res.sendStatus(404);
-    }
-    var newReport = new Report({
+async function reportUsers(req, res) {
+  try {
+    const newReport = new Report({
       contents: req.body.contents,
-      reported: req.params.user,
-      reporter: req.body.reporter,
+      reported: [],
+      reporter: req.user,
       chatOrigin: req.body.chatID,
     });
-    newReport
-      .save()
-      .then((saved) => res.json(saved))
-      .catch(() => res.sendStatus(400));
-  });
-});
-
-/**
- * Block a user.
- *
- * PATH PARAMETER user: ObjectId of User
- *
- */
-router.post("/:user/block", (req, res) => {
-  User.findById(req.params.user, (err, user) => {
-    if (err) {
-      return res.sendStatus(400);
+    for (const userID of req.body.reported) {
+      const user = await User.findById(userID);
+      if (user) {
+        newReport.reported.push(userID);
+      }
     }
+    if (newReport.reported.length === 0) {
+      return res.sendStatus(404);
+    }
+    const saved = await newReport.save();
+    return res.json(saved);
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(400);
+  }
+}
+
+async function blockUser(req, res) {
+  try {
+    const user = await User.findById(req.params.user);
     if (!user) {
       return res.sendStatus(404);
     }
-    User.updateOne(
-      { _id: req.body.userID },
+    await User.updateOne(
+      { _id: req.user },
       { $push: { blockList: req.params.user } },
       { upsert: true }
-    )
-      .then(() => {
-        res.json({
-          success: true,
-        });
-      })
-      .catch(() => res.sendStatus(400));
-  });
-});
+    );
+    return res.json({
+      success: true,
+    });
+  } catch (err) {
+    res.sendStatus(500);
+  }
+}
 
-/**
- * Unblock a user.
- *
- * PATH PARAMETER user: ObjectId of User
- *
- */
-router.post("/:user/unblock", (req, res) => {
-  User.findById(req.params.user, (err, user) => {
-    if (err) {
-      return res.sendStatus(400);
-    }
+async function unblockUser(req, res) {
+  try {
+    const user = User.findById(req.params.user);
     if (!user) {
       return res.sendStatus(404);
     }
-    User.updateOne(
-      { _id: req.body.userID },
+    await User.updateOne(
+      { _id: req.user },
       { $pull: { blockList: req.params.user } }
-    )
-      .then(() => {
-        res.json({
-          success: true,
-        });
-      })
-      .catch(() => res.sendStatus(400));
-  });
-});
+    );
+    return res.json({
+      success: true,
+    });
+  } catch (err) {
+    return res.sendStatus(500);
+  }
+}
 
 module.exports = {
   router,
@@ -442,4 +413,9 @@ module.exports = {
   update,
   list_func,
   s3Upload,
+  getUser,
+  conciseInfo,
+  reportUsers,
+  blockUser,
+  unblockUser,
 };

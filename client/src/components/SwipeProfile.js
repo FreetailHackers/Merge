@@ -37,10 +37,10 @@ const SwipeProfile = (props) => {
           ))}
       </div>
 
-      {props.isAlone && props.profile.github && props.githubFinished ? (
+      {props.isAlone && props.profile.github && props.profile.githubFinished ? (
         <GithubCard
           username={props.profile.github}
-          change={props.githubFinished}
+          change={props.profile.githubFinished}
         />
       ) : null}
       {props.isAlone && props.profile.linkedin ? (
@@ -64,7 +64,6 @@ SwipeProfile.propTypes = {
   onMouseDown: PropTypes.func,
   onMouseUp: PropTypes.func,
   onMouseMove: PropTypes.func,
-  githubFinished: PropTypes.bool,
 };
 
 export default SwipeProfile;

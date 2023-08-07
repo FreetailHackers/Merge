@@ -12,90 +12,73 @@ const setAxiosHeaderAuthToken = (token) => {
 };
 
 // Register - create user in database and get token
-export const registerUser = (userData, setAuth, setTeam, setErrors) => {
+export const registerUser = async (userData, setAuth, setErrors) => {
   setAuth((prev) => ({ ...prev, loading: true }));
-  axios
-    .post(process.env.REACT_APP_API_URL + "/api/users/register", userData)
-    .then((res) => {
-      if (!res.data.isValid) {
-        if (res.data.name) throw new Error(res.data.name);
-        else if (res.data.email) throw new Error(res.data.email);
-        else if (res.data.password) throw new Error(res.data.password);
-        else if (res.data.password2) throw new Error(res.data.password2);
-      }
-      // Set token to localStorage
-      const { token, user } = res.data;
-
-      // Am I admitted?
-      if (!user.status) {
-        // Get outta here!
-        throw new Error("User is not admitted");
-      }
-
-      localStorage.setItem("jwtToken", token);
-
-      // Set token to Auth header
-      setAxiosHeaderAuthToken(token);
-      // Decode token to get user data
-      const userID = jwt_decode(token);
-      axios
-        .post(process.env.REACT_APP_API_URL + "/api/teams/create", {
-          user: userID.id,
-        })
-        .then((res2) => setTeam(res2.data));
-
-      // Set current user
-      setCurrentUser(userID, setAuth);
-    })
-    .catch((err) => {
-      logoutUser(setAuth);
-      setAuth((prev) => ({ ...prev, loading: false }));
-      setErrors({ status: err.message });
-    });
+  try {
+    const res = await axios.post(
+      process.env.REACT_APP_API_URL + "/api/users/register",
+      userData
+    );
+    if (!res.data.isValid) {
+      if (res.data.name) throw new Error(res.data.name);
+      else if (res.data.email) throw new Error(res.data.email);
+      else if (res.data.password) throw new Error(res.data.password);
+      else if (res.data.password2) throw new Error(res.data.password2);
+    }
+    const { token, admitted } = res.data;
+    if (!admitted) {
+      throw new Error("User is not admitted");
+    }
+    // Set token to localStorage
+    localStorage.setItem("jwtToken", token);
+    setAxiosHeaderAuthToken(token);
+    // Decode token to get user data
+    const userID = jwt_decode(token);
+    // Load user data into React state
+    setCurrentUser(userID, setAuth, token);
+  } catch (err) {
+    logoutUser(setAuth);
+    setErrors({ status: err.message });
+  }
 };
 
 // Login - get user token
-export const loginUser = async (userData, setAuth, setTeam, setErrors) => {
+export const loginUser = async (userData, setAuth, setErrors) => {
   setAuth((prev) => ({ ...prev, loading: true }));
-  await axios
-    .post(process.env.REACT_APP_API_URL + "/api/users/login", userData)
-    .then((res) => {
-      if (!res.data.isValid) {
-        if (res.data.email) {
-          throw new Error(res.data.email);
-        } else if (res.data.password) {
-          throw new Error(res.data.password);
-        }
+  try {
+    const res = await axios.post(
+      process.env.REACT_APP_API_URL + "/api/users/login",
+      userData
+    );
+    if (!res.data.isValid) {
+      if (res.data.email) {
+        throw new Error(res.data.email);
+      } else if (res.data.password) {
+        throw new Error(res.data.password);
       }
-      // Set token to localStorage
-      const { token } = res.data;
-      localStorage.setItem("jwtToken", token);
-      // Set token to Auth header
-      setAxiosHeaderAuthToken(token);
-      // Decode token to get user data
-      const userID = jwt_decode(token);
-      // Set current user
-      initializeProfiles(setAuth, setTeam, userID);
-    })
-    .catch((err) => {
-      console.log(err);
-      logoutUser(setAuth);
-      setAuth((prev) => ({ ...prev, loading: false }));
-      setErrors({ status: err.message });
-    });
+    }
+    // Set token to Auth header and localStorage
+    const { token } = res.data;
+    localStorage.setItem("jwtToken", token);
+    setAxiosHeaderAuthToken(token);
+    // Decode token to get user data
+    const userID = jwt_decode(token);
+    // Load user data into React state
+    setCurrentUser(userID, setAuth, token);
+  } catch (err) {
+    console.log(err);
+    logoutUser(setAuth);
+    setErrors({ status: err.message });
+  }
 };
 
 // Set logged in user
-export const setCurrentUser = (userID, setAuth, newUser = null) => {
+const setCurrentUser = (userID, setAuth, token = null) => {
   setAuth((prev) => ({
     ...prev,
-    isAuthenticated: !!userID,
     userID,
-    user: newUser
-      ? { ...newUser }
-      : {
-          status: { admitted: true },
-        },
+    loading: false,
+    token,
   }));
 };
 
@@ -115,43 +98,26 @@ function isTokenExpired(token) {
   return exp < timeInSeconds;
 }
 
-function initializeProfiles(setAuth, setTeam, userID) {
-  axios
-    .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
-    .then((res2) => setTeam(res2.data));
-  axios
-    .get(process.env.REACT_APP_API_URL + `/api/users/${userID.id}`)
-    .then((res) => {
-      setCurrentUser(userID, setAuth, res.data);
-    });
-}
-
-export function initializeAuthIfLoggedIn(setAuth, setTeam) {
+export async function initializeAuthIfLoggedIn(setAuth) {
   if (localStorage.jwtToken && localStorage.jwtToken !== "undefined") {
     const token = localStorage.jwtToken;
-    setAxiosHeaderAuthToken(token);
-    axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/validate")
-      .then((res) => {
-        const userID = jwt_decode(token);
-        initializeProfiles(setAuth, setTeam, userID);
-      })
-      .catch((err) => {
-        logoutUser(setAuth);
-        window.location.href = "./login";
-      });
-
-    if (isTokenExpired(token)) {
+    try {
+      if (isTokenExpired(token)) {
+        throw new Error("Token is expired");
+      }
+      setAxiosHeaderAuthToken(token);
+      await axios.get(process.env.REACT_APP_API_URL + "/api/users/validate");
+      const userID = jwt_decode(token);
+      setCurrentUser(userID, setAuth, token);
+    } catch (err) {
       logoutUser(setAuth);
       window.location.href = "./login";
     }
   } else {
     setAuth((prev) => ({ ...prev, loading: false }));
     if (
-      !(
-        window.location.pathname === "/login" ||
-        window.location.pathname === "/register"
-      )
+      window.location.pathname !== "/login" &&
+      window.location.pathname !== "/register"
     ) {
       window.location.href = "./login";
     }

@@ -49,7 +49,11 @@ const TeamSchema = new Schema({
       required: false,
     },
   },
-  swipeList: {
+  leftSwipeList: {
+    type: [ObjectId],
+    required: false,
+  },
+  rightSwipeList: {
     type: [ObjectId],
     required: false,
   },

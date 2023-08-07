@@ -6,10 +6,12 @@ const ReportSchema = new Schema({
     type: String,
     required: true,
   },
-  reported: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
+  reported: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+  ],
   reporter: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

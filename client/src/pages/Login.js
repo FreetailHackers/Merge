@@ -7,11 +7,11 @@ import "./Login.css";
 function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const errors = props.errors;
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.auth.isAuthenticated) {
+    if (props.auth.userID) {
       navigate("/dashboard");
     }
   }, [props, navigate]);
@@ -24,7 +24,7 @@ function Login(props) {
       password: password,
     };
     //checking database to see if credentials exist
-    props.loginUser(userData);
+    props.loginUser(userData, setErrors);
   };
 
   const onRegister = (e) => {
@@ -113,7 +113,6 @@ function Login(props) {
 Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
 };
 
 export default Login;

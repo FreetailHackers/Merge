@@ -16,14 +16,14 @@ function ChatSettings(props) {
   const [reporting, setReporting] = useState([]);
   const [blocking, setBlocking] = useState([]);
   const [unblocking, setUnblocking] = useState([]);
-  const [leavingDeleting, setLeavingDeleting] = useState("");
+  const [leavingDeleting, setLeavingDeleting] = useState(false);
 
   const anyAction =
     kicking.length > 0 ||
     reporting.length > 0 ||
     blocking.length > 0 ||
     unblocking.length > 0 ||
-    leavingDeleting === "confirmed";
+    leavingDeleting;
 
   const chatOwner = props.chat.owner === props.selfID;
 
@@ -167,16 +167,16 @@ function ChatSettings(props) {
           )}
         </div>
 
-        <div className="userRow">
+        <div className="leaveRow">
           {leavingDeleting && (
             <button
               className="themeButton"
-              onClick={() => setLeavingDeleting("")}
+              onClick={() => setLeavingDeleting(false)}
             >
               Cancel
             </button>
           )}
-          {leavingDeleting === "confirmed" ? (
+          {leavingDeleting ? (
             <p style={{ color: "#900" }} className="redText">
               {chatOwner ? "Deleting" : "Leaving"} Chat
             </p>
@@ -185,15 +185,9 @@ function ChatSettings(props) {
               className="themeButton"
               type="button"
               id="delete"
-              onClick={
-                !leavingDeleting
-                  ? () => setLeavingDeleting("pondering")
-                  : () => setLeavingDeleting("confirmed")
-              }
+              onClick={() => setLeavingDeleting(true)}
             >
-              {leavingDeleting
-                ? `Confirm ${chatOwner ? "Deleting" : "Leaving"}?`
-                : `${chatOwner ? "Delete" : "Leave"} Chat`}
+              {`${chatOwner ? "Delete" : "Leave"} Chat`}
             </button>
           )}
         </div>

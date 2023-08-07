@@ -9,12 +9,12 @@ function Register(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const errors = props.errors;
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.auth.isAuthenticated) {
+    if (props.auth.userID) {
       navigate("/edit");
     }
   }, [props, navigate]);
@@ -28,7 +28,7 @@ function Register(props) {
       password2: password2,
     };
     //checking database to see if credentials exist
-    props.registerUser(userData);
+    props.registerUser(userData, setErrors);
   };
 
   function termsOfService() {
@@ -154,7 +154,6 @@ function Register(props) {
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
-  errors: PropTypes.object.isRequired,
 };
 
 export default Register;

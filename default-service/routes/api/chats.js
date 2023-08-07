@@ -19,43 +19,34 @@
 
 const express = require("express");
 const router = express.Router();
-
 const Chat = require("../../models/Chat");
 const Message = require("../../models/Message");
 const User = require("../../models/User");
 const authenticateToken = require("../helpers/authentication");
+router.use(authenticateToken);
+
 const addProfiles = require("../helpers/addProfiles");
 
-router.get("/", authenticateToken, async (req, res) =>
-  get_default_function(req, res)
-);
-router.get("/:chat/messages", authenticateToken, async (req, res) =>
+router.get("/", async (req, res) => get_default_function(req, res));
+router.get("/:chat/messages", async (req, res) =>
   get_messages_function(req, res)
 );
-router.post("/:chat/messages", authenticateToken, async (req, res) =>
+router.post("/:chat/messages", async (req, res) =>
   post_messages_function(req, res)
 );
-router.post("/:chat/add", authenticateToken, async (req, res) =>
-  post_add_function(req, res)
-);
-router.post("/:chat/remove", authenticateToken, async (req, res) =>
+router.post("/:chat/add", async (req, res) => post_add_function(req, res));
+router.post("/:chat/remove", async (req, res) =>
   post_remove_function(req, res)
 );
-router.post("/:chat/leave", authenticateToken, async (req, res) =>
-  post_leave_function(req, res)
-);
-router.post("/:chat/rename", authenticateToken, async (req, res) =>
+router.post("/:chat/leave", async (req, res) => post_leave_function(req, res));
+router.post("/:chat/rename", async (req, res) =>
   post_rename_function(req, res)
 );
-router.post("/new", authenticateToken, async (req, res) =>
-  post_new_function(req, res)
-);
-router.post("/:chat/delete", authenticateToken, async (req, res) =>
+router.post("/new", async (req, res) => post_new_function(req, res));
+router.post("/:chat/delete", async (req, res) =>
   post_delete_function(req, res)
 );
-router.post("/:chat/read", authenticateToken, async (req, res) =>
-  post_read_function(req, res)
-);
+router.post("/:chat/read", async (req, res) => post_read_function(req, res));
 
 /**
  * Find all chats that the logged-in user is a member of.
@@ -390,7 +381,7 @@ async function post_read_function(req, res) {
  * RETURNS an Array of Objects
  */
 
-router.get("/reachableUsers", authenticateToken, (req, res) => {
+router.get("/reachableUsers", (req, res) => {
   if (!req.user) {
     return res.sendStatus(403);
   }

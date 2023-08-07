@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatWindow from "../components/ChatWindow";
 import ChatMissing from "../components/ChatsMissing";
 import PropTypes from "prop-types";
+import { useOutletContext } from "react-router-dom";
 import "./Chat.css";
-import { SocketContext } from "../socket";
 
 function Chat(props) {
   const [chats, setChats] = useState([]);
-  const socket = useContext(SocketContext);
+  const socket = useOutletContext();
 
   const updateChat = (id, newValue) => {
     setChats((prev) => {
@@ -31,30 +31,26 @@ function Chat(props) {
   const connected = socket?.connected;
   useEffect(() => {
     async function setupAPICalls() {
-      await axios
-        .get(process.env.REACT_APP_API_URL + "/api/chats/reachableUsers")
-        .then((res) => {
-          setOtherUsers(res.data);
-        });
-      await axios
-        .get(process.env.REACT_APP_API_URL + "/api/chats")
-        .then(async (res) => {
-          let chatList = res.data;
-          for (const chat of chatList) {
-            // join websocket room
-            socket.emit("join-room", { id: chat._id });
-            chat.seen = chat.readBy.includes(userID);
-          }
-          setChats(chatList);
-        });
+      let res = await axios.get(
+        process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
+      );
+      setOtherUsers(res.data);
+      res = await axios.get(process.env.REACT_APP_API_URL + "/api/chats");
+      let chatList = res.data;
+      for (const chat of chatList) {
+        // join websocket room
+        socket.emit("join-room", { id: chat._id });
+        chat.seen = chat.readBy.includes(userID);
+      }
+      setChats(chatList);
     }
 
-    if (socket && connected) {
+    if (connected) {
       setupAPICalls();
     }
 
     return () => {
-      if (socket && connected) {
+      if (connected) {
         socket.emit("leave-chat-rooms");
       }
     };
@@ -122,15 +118,10 @@ function Chat(props) {
     };
 
     const unblockedWS = async (data) => {
-      axios
-        .get(
-          process.env.REACT_APP_API_URL +
-            "/api/users/conciseInfo/" +
-            data.userID
-        )
-        .then((res) =>
-          setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }])
-        );
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${data.userID}`
+      );
+      setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }]);
     };
 
     const kickedWS = (data) => {
@@ -182,49 +173,43 @@ function Chat(props) {
   }, [socket, userID]);
 
   async function createChat(users) {
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/new`, {
+    const res = await axios.post(
+      process.env.REACT_APP_API_URL + `/api/chats/new`,
+      {
         otherUsers: users,
-      })
-      .then(async (res) => {
-        let chat = res.data;
-        chat.seen = true;
-        chat.lastMessage = null;
-        socket.emit("create-room", {
-          _id: chat._id,
-          otherUsers: users,
-          chat: chat,
-        });
-        setChats((prev) => [...prev, chat]);
-        setSelectedChat(chat._id);
-      });
+      }
+    );
+    let chat = res.data;
+    chat.seen = true;
+    chat.lastMessage = null;
+    socket.emit("create-room", {
+      _id: chat._id,
+      otherUsers: users,
+      chat: chat,
+    });
+    setChats((prev) => [...prev, chat]);
+    setSelectedChat(chat._id);
   }
 
-  function getMessages() {
-    let chat = chats[activeChatIndex];
-    axios
-      .get(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`)
-      .then(async (res) => {
-        chat.seen = true;
-        const messageList = res.data;
-        // fill in missing profiles (needed if someone leaves the chat)
-        const authors = [
-          ...new Set(messageList.map((message) => message.author)),
-        ];
-        for (const author of authors) {
-          if (!(author in chat.profiles)) {
-            await axios
-              .get(
-                process.env.REACT_APP_API_URL +
-                  "/api/users/conciseInfo/" +
-                  author
-              )
-              .then((res2) => (chat.profiles[author] = res2.data));
-          }
-        }
-        updateChat(selectedChat, chat);
-        setMessages(res.data);
-      });
+  async function getMessages(chatID) {
+    let chat = chats[chats.findIndex((e) => e._id === chatID)];
+    const res = await axios.get(
+      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/messages`
+    );
+    chat.seen = true;
+    const messageList = res.data;
+    // fill in missing profiles (needed if someone leaves the chat)
+    const authors = [...new Set(messageList.map((message) => message.author))];
+    for (const author of authors) {
+      if (!(author in chat.profiles)) {
+        const res2 = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${author}`
+        );
+        chat.profiles[author] = res2.data;
+      }
+    }
+    updateChat(chatID, chat);
+    setMessages(res.data);
   }
 
   function sendMessage(contents) {
@@ -315,8 +300,7 @@ function Chat(props) {
   async function blockUnblockUsers(blocking, unblocking) {
     for (const user of blocking) {
       await axios.post(
-        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
-        { userID: userID }
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block"
       );
     }
     if (blocking.length > 0) {
@@ -324,23 +308,21 @@ function Chat(props) {
     }
     for (const user of unblocking) {
       await axios.post(
-        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock",
-        { userID: userID }
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock"
       );
     }
     if (unblocking.length > 0) {
       socket.emit("unblock-users", { users: unblocking });
     }
-    await axios
-      .get(process.env.REACT_APP_API_URL + "/api/chats/reachableUsers")
-      .then((res) => {
-        setOtherUsers(res.data);
-        setBlockedByMe((prev) => [
-          ...[...new Set([...prev, ...blocking])].filter(
-            (u) => !unblocking.includes(u)
-          ),
-        ]);
-      });
+    const res = await axios.get(
+      process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
+    );
+    setOtherUsers(res.data);
+    setBlockedByMe((prev) => [
+      ...[...new Set([...prev, ...blocking])].filter(
+        (u) => !unblocking.includes(u)
+      ),
+    ]);
   }
 
   async function kickUsers(users, chatID) {
@@ -365,6 +347,7 @@ function Chat(props) {
           changeChat={(id) => {
             setDisplayWindow(true);
             setSelectedChat(id);
+            getMessages(id);
           }}
           selectedChat={selectedChat}
           createChat={createChat}
@@ -386,7 +369,7 @@ function Chat(props) {
             messages={messages.filter(
               (message) => message.chat === selectedChat
             )}
-            getMessages={getMessages}
+            key={selectedChat._id}
             sendMessage={sendMessage}
             selfID={userID}
             addUsers={addUsers}

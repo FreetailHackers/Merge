@@ -295,8 +295,8 @@ describe("Profile Picture Route Tests", () => {
 describe("update router tests", () => {
   test("Basic Update Router Tests", async () => {
     const req = {
+      user: "1",
       body: {
-        id: "1",
         update: {
           profile: {
             school: "ut",
@@ -326,7 +326,7 @@ describe("update router tests", () => {
       })
       .promise.mockResolvedValueOnce("THIS WORKED");
     await users.update(req, res);
-    expect(res.object).toEqual(403);
+    expect(res.object).toEqual({ success: true });
   });
 });
 describe("List users ", () => {

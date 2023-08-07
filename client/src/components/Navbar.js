@@ -7,16 +7,14 @@ import "./Navbar.css";
 const Navbar = (props) => {
   const navigate = useNavigate();
   useEffect(() => {
-    if (!props.auth.userID) {
+    if (!props.userID) {
       navigate("/login");
     }
-  }, [props.auth, navigate]);
-
-  if (!props.user) return null;
+  }, [props.userID, navigate]);
 
   const onLogoutClick = (e) => {
-    props.flipDisplaySidebar();
     e.preventDefault();
+    props.flipDisplaySidebar();
     props.logoutUser();
     navigate("/login");
   };
@@ -48,7 +46,6 @@ const Navbar = (props) => {
           My Team
         </NavLink>
         {/*<NavLink to="/database">User List</NavLink>*/}
-        {props.user.admin ? <NavLink to="/admin">Admin</NavLink> : null}
         <NavLink to="/about" onClick={props.flipDisplaySidebar}>
           About
         </NavLink>
@@ -61,8 +58,7 @@ const Navbar = (props) => {
 };
 
 Navbar.propTypes = {
-  auth: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired,
+  userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
