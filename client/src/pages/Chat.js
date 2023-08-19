@@ -6,6 +6,23 @@ import ChatMissing from "../components/ChatsMissing";
 import PropTypes from "prop-types";
 import { useOutletContext } from "react-router-dom";
 import "./Chat.css";
+import {
+  createRoom,
+  newMessage,
+  listenForNewMessages,
+  readMessage,
+  //addUser,
+  //removeUsers,
+  //// blockUsers,
+  //// unblockUsers,
+  //renameRoom,
+  //leaveRoom,
+  //deleteRoom,
+  listenForRoomAdditions,
+  //listenForUserAdditions,
+  //listenForUserRemovals,
+  //listenForNameChanges,
+} from "../utils/firebase";
 
 function Chat(props) {
   const [chats, setChats] = useState([]);
@@ -35,14 +52,6 @@ function Chat(props) {
         process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
       );
       setOtherUsers(res.data);
-      res = await axios.get(process.env.REACT_APP_API_URL + "/api/chats");
-      let chatList = res.data;
-      for (const chat of chatList) {
-        // join websocket room
-        socket.emit("join-room", { id: chat._id });
-        chat.seen = chat.readBy.includes(userID);
-      }
-      setChats(chatList);
     }
 
     if (connected) {
@@ -60,9 +69,8 @@ function Chat(props) {
     const broadcastMessageWS = (data) => {
       setMessages((prev) => [...prev, data]);
       if (data.chat === selectedChat) {
-        axios.post(
-          process.env.REACT_APP_API_URL + `/api/chats/${data.chat}/read`
-        );
+        console.log(data)
+        readMessage(data, userID); 
       }
       setChats((prev) => {
         let chatIndex = prev.map((e) => e._id).indexOf(data.chat);
@@ -81,17 +89,14 @@ function Chat(props) {
       });
     };
 
-    socket.on("broadcast-message", broadcastMessageWS);
-
-    return () => {
-      socket.off("broadcast-message", broadcastMessageWS);
-    };
+    if (selectedChat !== null) {
+      listenForNewMessages({ roomId: selectedChat, userId: userID}, broadcastMessageWS);
+    }
   }, [socket, selectedChat, blockedByMe]);
 
   useEffect(() => {
     const addedWS = async (chat) => {
       chat.seen = false;
-      socket.emit("join-room", { id: chat._id });
       setChats((prev) => [...prev, chat]);
     };
 
@@ -129,7 +134,7 @@ function Chat(props) {
       setChats((prev) => [...prev.filter((e) => e._id !== data.chatID)]);
     };
 
-    socket.on("added-to-room", addedWS);
+    listenForRoomAdditions(userID, addedWS);
     socket.on("new-user-added", newUserWS);
     socket.on("chat-renamed", renamedWS);
     socket.on("chat-deleted", deletedWS);
@@ -138,7 +143,6 @@ function Chat(props) {
     socket.on("removed-from", kickedWS);
 
     return () => {
-      socket.off("added-to-room", addedWS);
       socket.off("new-user-added", newUserWS);
       socket.off("chat-renamed", renamedWS);
       socket.off("chat-deleted", deletedWS);
@@ -173,21 +177,22 @@ function Chat(props) {
   }, [socket, userID]);
 
   async function createChat(users) {
-    const res = await axios.post(
-      process.env.REACT_APP_API_URL + `/api/chats/new`,
-      {
-        otherUsers: users,
-      }
-    );
-    let chat = res.data;
+    let chat = {
+      users: [userID, ...users],
+      profiles: {}
+    };
+
+    for (const userId of chat.users) {
+      const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${userId}`
+        );
+
+      chat.profiles[userId] = res.data;
+    }
+
     chat.seen = true;
     chat.lastMessage = null;
-    socket.emit("create-room", {
-      _id: chat._id,
-      otherUsers: users,
-      chat: chat,
-    });
-    setChats((prev) => [...prev, chat]);
+    createRoom(chat); 
     setSelectedChat(chat._id);
   }
 
@@ -209,7 +214,6 @@ function Chat(props) {
       }
     }
     updateChat(chatID, chat);
-    setMessages(res.data);
   }
 
   function sendMessage(contents) {
@@ -219,22 +223,10 @@ function Chat(props) {
       author: userID,
       contents: contents,
       chat: chat._id,
+      recipients: chat.users,
       timestamp: new Date().toISOString(),
     };
-    setMessages((prev) => [...prev, message]);
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/messages`, {
-        contents,
-      })
-      .then((res) => {
-        // Update the last message of the chat and move it to the top
-        socket.emit("new-message", message);
-        chat.lastMessage = res.data;
-        setChats((prev) => [
-          chat,
-          ...prev.filter((e) => e._id !== selectedChat),
-        ]);
-      });
+    newMessage(message);
   }
 
   function addUsers(newUserIDs) {
