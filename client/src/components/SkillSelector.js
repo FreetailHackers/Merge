@@ -4,7 +4,13 @@ import { MultiSelect } from "@mantine/core";
 import { skills } from "../data/skills";
 
 const SkillSelector = (props) => {
-  const [data, setData] = useState(skills);
+  const skillValues = skills.map((e) => e.value);
+  const [data, setData] = useState([
+    ...skills,
+    ...props.skills
+      .filter((e) => !skillValues.includes(e))
+      .map((e) => ({ value: e, label: e })),
+  ]);
 
   return (
     <MultiSelect

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import ChatSidebar from "../components/ChatSidebar";
-import ChatWindow from "../components/ChatWindow";
-import ChatMissing from "../components/ChatsMissing";
+import ChatSidebar from "../components/chat/ChatSidebar";
+import ChatWindow from "../components/chat/ChatWindow";
+import ChatMissing from "../components/chat/ChatsMissing";
 import PropTypes from "prop-types";
 import { useOutletContext } from "react-router-dom";
 import "./Chat.css";

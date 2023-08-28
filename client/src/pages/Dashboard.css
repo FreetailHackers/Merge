@@ -80,7 +80,6 @@
   }
 }
 
-
 @media all and (orientation:landscape) {
   .team-image, .team-image .background, .team-image .main, .team-image .secondary {
     width: 500px;
