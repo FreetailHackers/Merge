@@ -74,8 +74,8 @@ function About(props) {
         better.
       </p>
       <i>
-        From left to right: Maansi (honorary teammate), Orion, Ayush P, Ayush B,
-        Pranay, Ben G, Adi, Daniel
+        From left to right: Maansi, Orion, Ayush P, Ayush B, Pranay, Ben G, Adi,
+        Daniel
       </i>
       <img
         src={groupPhoto}

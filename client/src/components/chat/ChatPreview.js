@@ -1,5 +1,5 @@
 import React from "react";
-import howLongAgo from "../utils/howLongAgo";
+import howLongAgo from "../../utils/howLongAgo";
 import PropTypes from "prop-types";
 
 const ChatPreview = ({

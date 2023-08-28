@@ -95,6 +95,8 @@ io.on("connection", (socket) => {
   useWithErrorHandling(socket, "cancel-request", cancelRequest);
 
   useWithErrorHandling(socket, "update-profile", updateProfile);
+
+  useWithErrorHandling(socket, "update-membership", updateMembership);
 });
 
 // error handler function
@@ -223,7 +225,8 @@ async function requestMerge(data, socket) {
 }
 
 async function acceptMerge(data, socket) {
-  socket.to(data.teamID).emit("merge-accepted", { newTeam: data.newTeam });
+  socket.to(data.absorbedTeamID).emit("merge-accepted", data);
+  socket.to(data.newTeam._id).emit("merge-accepted", data);
 }
 
 async function rejectMerge(data, socket) {
@@ -238,6 +241,10 @@ async function cancelRequest(data, socket) {
 
 async function updateProfile(data, socket) {
   socket.to(data.teamID).emit("profile-updated", data);
+}
+
+async function updateMembership(data, socket) {
+  socket.to(data.teamID).emit("membership-updated");
 }
 
 AWS.config.update({

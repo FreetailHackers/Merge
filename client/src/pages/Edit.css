@@ -127,7 +127,7 @@
   margin-bottom: 10px;
 }
 
-.teamRequests, .teamRequests > div {
+.teamRequests, .teamRequests > div, .centerCol {
   width: 100%;
   align-items: center;
 
@@ -155,6 +155,7 @@
 .hideDiv {
   width: 100%;
   justify-content: center;
+  margin-top: 10px;
 }
 
 .profile-child .swipe-profile {
@@ -177,4 +178,26 @@
 .mrColumn {
   align-items: center;
 
+}
+
+.myTeam .themeButton {
+  font-size: 1em;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.selectedButton {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}
+
+.manageTeamButton {
+  border: none;
+  padding: 5px;
+  border-radius: 20px;
+  margin-left: 12px;
+}
+
+.selectedManageButton {
+  background-color: var(--primary-transparent);
 }

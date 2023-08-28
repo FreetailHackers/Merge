@@ -15,9 +15,13 @@ const SwipeProfile = (props) => {
         props.borderColor
       }-side`}
       onMouseDown={props.onMouseDown}
+      onTouchStart={props.onMouseDown}
       onMouseUp={props.onMouseUp}
+      onTouchEnd={props.onMouseUp}
       onMouseMove={props.onMouseMove}
+      onTouchMove={props.onMouseMove}
       onMouseLeave={props.onMouseUp}
+      onTouchCancel={props.onMouseUp}
       style={{
         left: `${relativePosition[0]}px`,
         top: `${relativePosition[1]}px`,
