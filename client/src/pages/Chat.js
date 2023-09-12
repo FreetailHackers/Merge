@@ -11,17 +11,18 @@ import {
   newMessage,
   listenForNewMessages,
   readMessage,
-  //addUser,
-  //removeUsers,
+  addUser,
+  removeUsers,
   //// blockUsers,
   //// unblockUsers,
   //renameRoom,
-  //leaveRoom,
-  //deleteRoom,
+  leaveRoom,
+  deleteRoom,
   listenForRoomAdditions,
-  //listenForUserAdditions,
-  //listenForUserRemovals,
-  //listenForNameChanges,
+  listenForRoomDeletions,
+  listenForUserAdditions,
+  listenForUserRemovals,
+  listenForNameChanges,
 } from "../utils/firebase";
 
 function Chat(props) {
@@ -65,12 +66,11 @@ function Chat(props) {
     };
   }, [socket, connected, userID]);
 
-  useEffect(() => {
+  useEffect(()=> {
     const broadcastMessageWS = (data) => {
       setMessages((prev) => [...prev, data]);
       if (data.chat === selectedChat) {
-        console.log(data)
-        readMessage(data, userID); 
+        readMessage(data.chat, userID); 
       }
       setChats((prev) => {
         let chatIndex = prev.map((e) => e._id).indexOf(data.chat);
@@ -82,29 +82,34 @@ function Chat(props) {
           chat.lastMessage = data;
         }
         return [
-          chat,
           ...prev.slice(0, chatIndex),
+          chat,
           ...prev.slice(chatIndex + 1, prev.length),
         ];
       });
     };
 
-    if (selectedChat !== null) {
-      listenForNewMessages({ roomId: selectedChat, userId: userID}, broadcastMessageWS);
-    }
-  }, [socket, selectedChat, blockedByMe]);
-
-  useEffect(() => {
-    const addedWS = async (chat) => {
-      chat.seen = false;
-      setChats((prev) => [...prev, chat]);
+    const userAddWS = async (userId) => {
+      // FIXME: Concurrency issues?
+      const chat = chats.find((e) => e._id === selectedChat);
+      if (chat.users.indexOf(userId) === -1) {
+        chat.users.push(userId);
+      }
+      updateChat(selectedChat, chat);
     };
-
-    const newUserWS = async (chat) => {
-      updateChat(chat._id, chat);
+    
+    const userRemWS = async (userId) => {
+      // FIXME: Concurrency issues?
+      const chat = chats.find((e) => e._id === selectedChat);
+      const idx = chat.users.indexOf(userId)
+      if (idx > 0) {
+        chat.users.splice(idx, 1);
+      }
+      updateChat(selectedChat, chat);
     };
-
+    
     const renamedWS = (data) => {
+      return;
       setChats((prev) => {
         let index = prev.map((e) => e._id).indexOf(data.chatID);
         let newArr = [...prev];
@@ -113,7 +118,36 @@ function Chat(props) {
       });
     };
 
-    const deletedWS = (deletedChat) => {
+    setChats((prev) => {
+      if(selectedChat === null) return prev;
+        let chatIndex = prev.map((e) => e._id).indexOf(selectedChat);
+        const chat = prev[chatIndex];
+        chat.seen = true;
+        return [
+          ...prev.slice(0, chatIndex),
+          chat,
+          ...prev.slice(chatIndex + 1, prev.length),
+        ];
+      });
+
+    setMessages([])
+    var lfnmCleanup = listenForNewMessages({ roomId: selectedChat, userId: userID}, broadcastMessageWS);
+    var lfuaCleanup = listenForUserAdditions(selectedChat, userAddWS)
+    var lfurCleanup = listenForUserRemovals(selectedChat, userRemWS)
+    var lfncCleanup = listenForNameChanges(selectedChat, renamedWS)
+    return () => {
+      lfnmCleanup();
+      lfuaCleanup();
+      lfurCleanup();
+      lfncCleanup();
+    }
+  }, [selectedChat])
+
+  useEffect(() => {
+    const addedWS = async (chat) => {
+      setChats((prev) => [...prev, chat]);
+     };
+       const deletedWS = (deletedChat) => {
       setSelectedChat((prev) => (prev === deletedChat._id ? null : prev));
       setChats((prev) => [...prev.filter((e) => e._id !== deletedChat._id)]);
     };
@@ -129,26 +163,15 @@ function Chat(props) {
       setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }]);
     };
 
-    const kickedWS = (data) => {
-      setSelectedChat((prev) => (prev === data.chatID ? null : prev));
-      setChats((prev) => [...prev.filter((e) => e._id !== data.chatID)]);
-    };
-
-    listenForRoomAdditions(userID, addedWS);
-    socket.on("new-user-added", newUserWS);
-    socket.on("chat-renamed", renamedWS);
-    socket.on("chat-deleted", deletedWS);
+    var lfraCleanup = listenForRoomAdditions(userID, addedWS);
+    var lfrdCleanup = listenForRoomDeletions(userID, deletedWS);
     socket.on("blocked-by", blockedWS);
     socket.on("unblocked-by", unblockedWS);
-    socket.on("removed-from", kickedWS);
-
     return () => {
-      socket.off("new-user-added", newUserWS);
-      socket.off("chat-renamed", renamedWS);
-      socket.off("chat-deleted", deletedWS);
+      lfraCleanup();
+      lfrdCleanup();
       socket.off("blocked-by", blockedWS);
       socket.off("unblocked-by", unblockedWS);
-      socket.off("removed-from", kickedWS);
     };
   }, [socket]);
 
@@ -196,26 +219,6 @@ function Chat(props) {
     setSelectedChat(chat._id);
   }
 
-  async function getMessages(chatID) {
-    let chat = chats[chats.findIndex((e) => e._id === chatID)];
-    const res = await axios.get(
-      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/messages`
-    );
-    chat.seen = true;
-    const messageList = res.data;
-    // fill in missing profiles (needed if someone leaves the chat)
-    const authors = [...new Set(messageList.map((message) => message.author))];
-    for (const author of authors) {
-      if (!(author in chat.profiles)) {
-        const res2 = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${author}`
-        );
-        chat.profiles[author] = res2.data;
-      }
-    }
-    updateChat(chatID, chat);
-  }
-
   function sendMessage(contents) {
     if (contents === "") return;
     const chat = chats[activeChatIndex];
@@ -231,19 +234,7 @@ function Chat(props) {
 
   function addUsers(newUserIDs) {
     const chat = chats[activeChatIndex];
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/add`, {
-        users: newUserIDs,
-      })
-      .then((res) => {
-        let newChat = {
-          ...res.data,
-          lastMessage: chat.lastMessage,
-          seen: chat.seen,
-        };
-        updateChat(chat._id, newChat);
-        socket.emit("add-users", { userIDs: newUserIDs, chat: newChat });
-      });
+    addUser({ roomId: chat._id, users: newUserIDs});
   }
 
   function setTitle(newTitle) {
@@ -264,29 +255,12 @@ function Chat(props) {
 
   function deleteChat() {
     const deletedChat = { ...chats[activeChatIndex] };
-    axios
-      .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`
-      )
-      .then(() => {
-        socket.emit("delete-chat", deletedChat);
-        setSelectedChat(null);
-        setChats((prev) => [...prev.filter((e) => e._id !== deletedChat._id)]);
-      });
+    deleteRoom(deletedChat._id);
   }
 
   function leaveChat() {
     const leftChat = { ...chats[activeChatIndex] };
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${leftChat._id}/leave`)
-      .then(() => {
-        socket.emit("leave-chat", {
-          chatID: leftChat._id,
-          user: userID,
-        });
-        setSelectedChat(null);
-        setChats((prev) => [...prev.filter((e) => e._id !== leftChat._id)]);
-      });
+    leaveRoom({ _id: leftChat._id, userId: userID});
   }
 
   async function blockUnblockUsers(blocking, unblocking) {
@@ -318,17 +292,7 @@ function Chat(props) {
   }
 
   async function kickUsers(users, chatID) {
-    await axios.post(
-      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
-      { users }
-    );
-    socket.emit("remove-users", {
-      chatID: chatID,
-      users: users,
-    });
-    let chat = chats[activeChatIndex];
-    chat.users = [...chat.users.filter((e) => !users.includes(e))];
-    updateChat(selectedChat, chat);
+    removeUsers(chatID, users); 
   }
 
   return (
@@ -339,7 +303,6 @@ function Chat(props) {
           changeChat={(id) => {
             setDisplayWindow(true);
             setSelectedChat(id);
-            getMessages(id);
           }}
           selectedChat={selectedChat}
           createChat={createChat}

@@ -1,0 +1,10 @@
+version: '3'
+services:
+  mongo:
+    image: 'mongo:4'
+    ports:
+      - 27017:27017
+  redis:
+    image: 'redis:4.0.11'
+    ports:
+      - 6379:6379

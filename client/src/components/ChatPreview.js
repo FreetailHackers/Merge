@@ -1,18 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import howLongAgo from "../utils/howLongAgo";
 import PropTypes from "prop-types";
+import {
+  listenForNewMessages,
+} from "../utils/firebase";
+
 
 const ChatPreview = ({
+  id,
   title,
-  lastMessage,
-  lastMessageDate,
+  _lastMessage,
+  _lastMessageDate,
   profiles,
   seen,
   onClick,
   active,
   chatRequest,
   createdByYou,
-}) => (
+}) => { 
+
+
+  const [lastMessage, setLastMessage] = useState("");
+  const [lastMessageDate, setLastMessageDate] = useState("");
+  
+  useEffect(()=>{
+    setLastMessage(_lastMessage)
+    setLastMessageDate(_lastMessageDate)
+    var cleanup = listenForNewMessages({ roomId: id }, (result)=>{
+      setLastMessage(result.contents)
+      setLastMessageDate(result.timestamp)
+    });
+    return () => {
+      cleanup();
+    }
+  }, [active] )
+
+  return (
   <div
     className={
       "chatPreview" +
@@ -107,12 +130,13 @@ const ChatPreview = ({
       )}
     </div>
   </div>
-);
+)};
 
 ChatPreview.propTypes = {
+  id: PropTypes.string,
   users: PropTypes.array,
-  lastMessage: PropTypes.string,
-  lastMessageDate: PropTypes.string,
+  _lastMessage: PropTypes.string,
+  _lastMessageDate: PropTypes.string,
   seen: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,

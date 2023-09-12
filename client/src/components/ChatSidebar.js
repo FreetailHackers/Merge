@@ -7,6 +7,7 @@ import { MultiSelect } from "@mantine/core";
 function ChatSidebar(props) {
   const [newChatInput, setNewChatInput] = useState([]);
   const [creatingNewChat, setCreatingNewChat] = useState(false);
+
   return (
     <div className="chatSidebar">
       <div className="chatSidebarTop">
@@ -79,6 +80,7 @@ function ChatSidebar(props) {
       {props.chats.map((chat, i) => (
         <ChatPreview
           key={i}
+          id={chat._id}
           active={chat._id === props.selectedChat}
           title={
             chat.name
@@ -89,8 +91,8 @@ function ChatSidebar(props) {
           }
           createdByYou={chat.owner === props.selfID}
           chatRequest={chat.lastMessage === null}
-          lastMessage={chat.lastMessage?.contents}
-          lastMessageDate={chat.lastMessage?.timestamp}
+          _lastMessage={chat.lastMessage?.contents}
+          _lastMessageDate={chat.lastMessage?.timestamp.toString()}
           profiles={chat.users.map((user) => chat.profiles[user])}
           seen={chat.seen}
           onClick={() => props.changeChat(chat._id)}
