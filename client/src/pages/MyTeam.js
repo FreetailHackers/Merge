@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import TeamList from "../components/myteam/TeamList";
+import UserList from "../components/myteam/UserList";
 import TeamProfile from "../components/myteam/TeamProfile";
 import Membership from "../components/myteam/Membership";
 import { useOutletContext } from "react-router-dom";
@@ -219,6 +220,7 @@ function MyTeam(props) {
           setSection={setSection}
         />
       )}
+      {section === "User List" && <UserList userID={userID} />}
     </div>
   );
 }

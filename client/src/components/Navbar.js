@@ -45,7 +45,6 @@ const Navbar = (props) => {
         <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
           My Team
         </NavLink>
-        {/*<NavLink to="/database">User List</NavLink>*/}
         <NavLink to="/about" onClick={props.flipDisplaySidebar}>
           About
         </NavLink>

@@ -75,8 +75,22 @@ input {
   align-items: center;
 }
 
+
 .fsCenter {
-  width: calc(100% - 290px);
   height: 100%;
   align-items: center;
 }
+
+
+@media all and (orientation:landscape) {
+  .fsCenter {
+    width: calc(100vw - 250px);
+  }
+}
+
+@media all and (orientation:portrait) {
+  .fsCenter {
+    width: 100vw;
+  }
+}
+
