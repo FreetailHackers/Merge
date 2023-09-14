@@ -3,18 +3,28 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import TeamInfoCard from "./TeamInfoCard";
 import { useOutletContext } from "react-router-dom";
+import SkillSelector from "../SkillSelector";
+import Collapsible from "../Collapsible";
+import { UserToParagraph } from "../UserToParagraph";
+import { Pagination } from "../Pagination";
+import { useNavigate } from "react-router-dom";
+import { TextInput, NativeSelect, NumberInput } from "@mantine/core";
 
 function TeamList(props) {
-  const { ingoingMRs, outgoingMRs, team, userID } = props;
+  const { ingoingMRs, outgoingMRs, userID } = props;
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
   const [otherTeams, setOtherTeams] = useState([]);
   const socket = useOutletContext();
+  const [nameFilter, setNameFilter] = useState("");
+  const [competitiveness, setCompetitiveness] = useState("");
+  const [skillFilter, setSkillFilter] = useState([]);
+  const [desiredSkillFilter, setDesiredSkillFilter] = useState([]);
+  const [sizeFilter, setSizeFilter] = useState(0);
+  const [memberFilter, setMemberFilter] = useState("");
+  const [page, setPage] = useState(0);
+  const [pages, setPages] = useState(0);
 
-  function findTeams() {
-    axios.get(process.env.REACT_APP_API_URL + "/api/teams/list").then((res) => {
-      setOtherTeams(res.data.filter((e) => !e.users.includes(userID)));
-    });
-  }
+  const navigate = useNavigate();
 
   function requestMerge(otherTeam) {
     axios
@@ -27,7 +37,7 @@ function TeamList(props) {
         let mrObj = res.data;
         mrObj.requestedTeam = otherTeam;
         props.setOutgoingMRs((prev) => [...prev, mrObj]);
-        mrObj.requestingTeam = team;
+        mrObj.requestingTeam = props.team;
         socket.emit("request-merge", mrObj);
       });
   }
@@ -37,7 +47,7 @@ function TeamList(props) {
   }
 
   function acceptRequest(teamID) {
-    const oldTeamID = team._id;
+    const oldTeamID = props.team._id;
     axios
       .post(process.env.REACT_APP_API_URL + `/api/teams/acceptMerge/${teamID}`)
       .then((res) => {
@@ -57,7 +67,7 @@ function TeamList(props) {
         ]);
         socket.emit("reject-merge", {
           requestingTeamID: teamID,
-          rejectingTeamID: team._id,
+          rejectingTeamID: props.team._id,
         });
       });
   }
@@ -72,17 +82,61 @@ function TeamList(props) {
           ...prev.filter((e) => e.requestedTeam._id !== teamID),
         ]);
         socket.emit("cancel-request", {
-          cancellingTeamID: team._id,
+          cancellingTeamID: props.team._id,
           requestedTeamID: teamID,
         });
       });
   }
 
   useEffect(() => {
-    axios.get(process.env.REACT_APP_API_URL + "/api/teams/list").then((res) => {
-      setOtherTeams(res.data.filter((e) => !e.users.includes(userID)));
-    });
-  }, [userID]);
+    async function getTeamsFromAPI() {
+      try {
+        const queryParamters = {
+          page,
+          filters: {
+            ...(nameFilter && { name: nameFilter }),
+            ...(memberFilter && { memberName: memberFilter }),
+            ...(sizeFilter > 0 && { size: sizeFilter }),
+            ...(skillFilter?.length > 0 && { skills: skillFilter }),
+            ...(desiredSkillFilter?.length > 0 && {
+              desiredSkills: desiredSkillFilter,
+            }),
+            ...(competitiveness?.length > 0 && { competitiveness }),
+          },
+        };
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/teams/list`,
+          { params: queryParamters }
+        );
+        if (res.data) {
+          setOtherTeams(res.data.list);
+          setPages(res.data.pages ?? 0);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getTeamsFromAPI();
+  }, [
+    competitiveness,
+    nameFilter,
+    skillFilter,
+    page,
+    memberFilter,
+    sizeFilter,
+    desiredSkillFilter,
+  ]);
+
+  async function messageTeam(team) {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/chats/new`, {
+        otherUsers: team.users,
+      });
+      navigate("/chat");
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div className="flexColumn centerCol">
@@ -90,7 +144,7 @@ function TeamList(props) {
         <h3>Requests</h3>
         <div className="merge-requests">
           <div className="mrColumn flexColumn">
-            <h4>Ingoing</h4>
+            {props.ingoingMRs?.length > 0 && <h4>Ingoing</h4>}
             {props.ingoingMRs &&
               props.ingoingMRs.map((request, index) => (
                 <TeamInfoCard
@@ -106,12 +160,12 @@ function TeamList(props) {
                       func: () => rejectRequest(request.requestingTeam._id),
                     },
                   ]}
-                  showButtons={team.leader === userID}
+                  showButtons={props.team.leader === userID}
                 />
               ))}
           </div>
           <div className="mrColumn flexColumn">
-            <h4>Outgoing</h4>
+            {props.outgoingMRs?.length > 0 && <h4>Outgoing</h4>}
             {props.outgoingMRs &&
               props.outgoingMRs.map((request, index) => (
                 <TeamInfoCard
@@ -123,32 +177,99 @@ function TeamList(props) {
                       func: () => cancelRequest(request.requestedTeam._id),
                     },
                   ]}
-                  showButtons={team.leader === userID}
+                  showButtons={props.team.leader === userID}
                 />
               ))}
           </div>
         </div>
       </div>
       <h3>Grow your Team</h3>
-      <button onClick={findTeams}>Refresh</button>
 
       <div className="flexColumn centerCol">
-        {otherTeams &&
-          otherTeams.map((e, i) => (
-            <TeamInfoCard
-              key={i}
-              team={e}
-              showButtons={
+        <div className="flexRow filterList">
+          <TextInput
+            label="Name"
+            onBlur={(e) => setNameFilter(e.target.value)}
+            className="question"
+          />
+          <SkillSelector
+            setSkills={(value) => setSkillFilter(value)}
+            skills={skillFilter}
+            optional={true}
+          />
+          <NativeSelect
+            label="Competitveness"
+            data={[
+              { value: "", label: "Any" },
+              { value: "learn", label: "Here to learn and have fun" },
+              { value: "win", label: "Here to win" },
+            ]}
+            value={competitiveness}
+            onChange={(value) => setCompetitiveness(value.target.value)}
+            className="question"
+          />
+          <NumberInput
+            defaultValue={0}
+            label="Team Size (0 for any)"
+            min={0}
+            max={process.env.REACT_APP_MAX_TEAM_SIZE}
+            step={1}
+            value={sizeFilter}
+            onChange={(value) => setSizeFilter(value)}
+            className="question"
+          />
+          <TextInput
+            label="Member name"
+            onBlur={(e) => setMemberFilter(e.target.value)}
+            className="question"
+          />
+          <SkillSelector
+            setSkills={(value) => setDesiredSkillFilter(value)}
+            skills={desiredSkillFilter}
+            optional={true}
+            label="Desired Skills"
+          />
+        </div>
+        {otherTeams.map((team, index) => {
+          const teamObj = {
+            leader: team.profiles[team.leader].name,
+            users: team.users.map((e) => team.profiles[e].name),
+            ...team.profile,
+          };
+          return (
+            <Collapsible
+              key={index}
+              title={team.profile.name ?? `${teamObj.leader}'s team`}
+            >
+              {team._id !== props.team._id &&
                 ![
                   ...outgoingMRs.map((req) => req.requestedTeam._id),
                   ...ingoingMRs.map((req) => req.requestingTeam._id),
-                ].includes(e._id) && canMerge(e, team)
-              }
-              buttons={[
-                { text: "Request to Merge", func: () => requestMerge(e) },
-              ]}
-            />
-          ))}
+                ].includes(team._id) &&
+                canMerge(team, props.team) && (
+                  <button
+                    className="chat-button"
+                    onClick={() => requestMerge(team)}
+                  >
+                    Request to Merge
+                  </button>
+                )}
+              {team._id !== props.team._id && (
+                <button
+                  className="chat-button"
+                  onClick={() => messageTeam(team)}
+                >
+                  Message
+                </button>
+              )}
+              <UserToParagraph
+                user={teamObj}
+                hideKeys={["_id", "name", "displayTeamProfile"]}
+              />
+            </Collapsible>
+          );
+        })}
+        <Pagination page={page} setPage={setPage} pages={pages} />
       </div>
     </div>
   );

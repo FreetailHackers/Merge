@@ -72,9 +72,23 @@
   color: var(--text-on-tertiary);
   float: right;
   padding: 10px;
+  margin-left: 10px;
   font-family: var(--font-body);
   font-size: 1.2em;
   border-radius: 8px;
   border: none;
   cursor: pointer;
+}
+
+.filterList {
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+
+.filterList .question {
+  width: calc(max(175px, 15vw));
+  margin-left: 5px;
+  margin-right: 5px;
 }
