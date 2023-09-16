@@ -1,6 +1,5 @@
 import React from "react";
 
-import "./About.css";
 import groupPhoto from "../assets/images/group-photo.jpg";
 import PropTypes from "prop-types";
 

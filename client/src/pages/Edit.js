@@ -15,8 +15,6 @@ import {
   NativeSelect,
 } from "@mantine/core";
 
-import "./Edit.css";
-
 function Edit(props) {
   //frontend for updating
   const [saved, setSaved] = useState(false);

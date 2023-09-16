@@ -7,8 +7,6 @@ import TeamProfile from "../components/myteam/TeamProfile";
 import Membership from "../components/myteam/Membership";
 import { useOutletContext } from "react-router-dom";
 
-import "./Edit.css";
-
 function MyTeam(props) {
   //frontend for updating
   const socket = useOutletContext();

@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import "./PortfolioCard.css";
-
 class PortfolioCard extends Component {
   constructor() {
     super();

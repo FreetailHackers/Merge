@@ -23,7 +23,6 @@ import MyTeam from "./pages/MyTeam";
 
 import { useMediaQuery } from "@mantine/hooks";
 
-import "./Theme.css";
 import "./App.css";
 
 const initialUserState = {

@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import GithubCard from "./GithubCard";
-import "./SwipeProfile.css";
 import LinkedInCard from "./LinkedInCard";
 import PortfolioCard from "./PortfolioCard";
 

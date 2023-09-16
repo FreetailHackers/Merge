@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
-import "./Login.css";
-
 function Login(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
