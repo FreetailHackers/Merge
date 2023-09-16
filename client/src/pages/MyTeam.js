@@ -6,6 +6,7 @@ import UserList from "../components/myteam/UserList";
 import TeamProfile from "../components/myteam/TeamProfile";
 import Membership from "../components/myteam/Membership";
 import { useOutletContext } from "react-router-dom";
+import toggleBars from "../assets/images/toggle-bars.png";
 
 function MyTeam(props) {
   //frontend for updating
@@ -152,7 +153,7 @@ function MyTeam(props) {
             className="toggleSidebar toggleCenter"
             onClick={props.flipDisplaySidebar}
           >
-            ≡
+            <img src={toggleBars} alt="toggle bars" />
           </button>
         </div>
       )}

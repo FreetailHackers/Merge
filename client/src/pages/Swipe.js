@@ -4,8 +4,9 @@ import axios from "axios";
 
 import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
-import arrowLeft from "../assets/images/arrow-left.png";
-import arrowRight from "../assets/images/arrow-right.png";
+import yes from "../assets/images/yes.png";
+import no from "../assets/images/no.png";
+import toggleBars from "../assets/images/toggle-bars.png";
 
 import { useNavigate } from "react-router-dom";
 
@@ -117,27 +118,32 @@ function Swipe(props) {
     }
   };
 
-  const mouseDownOnProfile = (e) => {
-    e.preventDefault();
+  const mouseDownOnProfile = (e, isMobile) => {
+    if (!isMobile) e.preventDefault();
     if (profileState.profileSide.indexOf("committed") !== -1) return;
+    const x = isMobile ? e.touches[0].pageX : e.clientX;
+    const y = isMobile ? e.touches[0].pageY : e.clientY;
 
     setProfileState({
       cursorDown: true,
-      mouseDownPosition: [e.clientX, e.clientY],
+      mouseDownPosition: [x, y],
       profilePosition: [0, 0],
       profileAngle: 0,
       profileSide: "neutral",
     });
   };
 
-  const mouseMoveOnProfile = (e) => {
-    e.preventDefault();
+  const mouseMoveOnProfile = (e, isMobile) => {
+    if (!isMobile) e.preventDefault();
     if (profileState.profileSide.indexOf("committed") !== -1) return;
+
+    const x = isMobile ? e.touches[0].pageX : e.clientX;
+    const y = isMobile ? e.touches[0].pageY : e.clientY;
 
     if (profileState.cursorDown) {
       const position = [
-        e.clientX - profileState.mouseDownPosition[0],
-        e.clientY - profileState.mouseDownPosition[1],
+        x - profileState.mouseDownPosition[0],
+        y - profileState.mouseDownPosition[1],
       ];
 
       const rotateAmount = 4;
@@ -172,9 +178,12 @@ function Swipe(props) {
   };
 
   const mouseUpOnProfile = (e) => {
-    e.preventDefault();
+    //if (props.wideScreen) e.preventDefault();
     if (profileState.profileSide.indexOf("committed") !== -1) return;
-    if (profileState.profileSide === "neutral" || e.type !== "mouseup") {
+    if (
+      profileState.profileSide === "neutral" ||
+      (e.type !== "mouseup" && e.type !== "touchend")
+    ) {
       setProfileState({ ...defaultProfileState });
     } else {
       const decision = profileState.profileSide + "-committed";
@@ -188,7 +197,7 @@ function Swipe(props) {
   };
 
   return (
-    <div className="flexColumn fsCenter" id="swipeContainer">
+    <div id="swipeContainer">
       <section id={"swipe-profile"}>
         {!props.wideScreen && (
           <div className="toggleHolder">
@@ -196,7 +205,7 @@ function Swipe(props) {
               className="toggleSidebar toggleCenter"
               onClick={props.flipDisplaySidebar}
             >
-              ≡
+              <img src={toggleBars} alt="toggle bars" />
             </button>
           </div>
         )}
@@ -221,14 +230,14 @@ function Swipe(props) {
             <div className="arrows" onClick={mouseDownOnArrows}>
               <input
                 type="image"
-                src={arrowLeft}
+                src={no}
                 alt="Arrow Left"
                 className="arrow left"
                 id="left"
               />
               <input
                 type="image"
-                src={arrowRight}
+                src={yes}
                 alt="Arrow Right"
                 className="arrow right"
                 id="right"
@@ -255,7 +264,7 @@ function Swipe(props) {
         )}
       </section>
       {containsRequired && (
-        <div className="flexColumn" style={{ alignItems: "center" }}>
+        <div id="ts-container">
           <input
             type="range"
             autoComplete="off"
@@ -271,8 +280,13 @@ function Swipe(props) {
               <option value={e} key={e} label={`${e}`} />
             ))}
           </datalist>
-          <p>Searching for teams of size {idealSize > 0 ? idealSize : "any"}</p>
-          <button onClick={getTeamToShow}>Refresh</button>
+          <p>
+            Searching for teams of size{" "}
+            <strong>{idealSize > 0 ? idealSize : "any"}</strong>
+          </p>
+          <button onClick={getTeamToShow} className="refreshBtn">
+            Refresh
+          </button>
         </div>
       )}
     </div>

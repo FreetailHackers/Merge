@@ -2,6 +2,7 @@ import React from "react";
 
 import groupPhoto from "../assets/images/group-photo.jpg";
 import PropTypes from "prop-types";
+import toggleBars from "../assets/images/toggle-bars.png";
 
 function About(props) {
   return (
@@ -9,11 +10,11 @@ function About(props) {
       {!props.wideScreen && (
         <div className="toggleHolder">
           <button
-            style={{ marginLeft: 20 }}
+            style={{ marginLeft: 10 }}
             className="toggleSidebar toggleCenter"
             onClick={props.flipDisplaySidebar}
           >
-            ≡
+            <img src={toggleBars} alt="toggle bars" />
           </button>
         </div>
       )}

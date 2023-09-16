@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import toggleBars from "../assets/images/toggle-bars.png";
 
 function Dashboard(props) {
   const name = props.user?.name;
@@ -12,7 +13,7 @@ function Dashboard(props) {
             className="toggleSidebar toggleCenter"
             onClick={props.flipDisplaySidebar}
           >
-            ≡
+            <img src={toggleBars} alt="toggle bars" />
           </button>
         </div>
       )}
