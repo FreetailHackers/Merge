@@ -22,11 +22,11 @@ nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
 
 .flexRow, .github-card > a, .linkedin-card > a, .portfolio-card > a, .chat,
 .toggleHolder, .buttonHolder, .innerButtonHolder, .userRow, .leaveRow, .chatWindowHeader {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
-.arrows, .dash, .team-image .primary, .teamRequests, .teamRequests > div, 
+.dash, .team-image .primary, .teamRequests, .teamRequests > div, 
 .centerCol, .mrButtons, .merge-requests, .hideDiv, section#login form label, 
 section#register form label, section#login form button, section#register form button, 
 .chatPreview h4, .buttonHolder, .reportFloatingWindowHeader, .reportWindowUserSelect, 
@@ -142,7 +142,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
 @media all and (orientation:portrait) {
   #navbar-spacing {
-    height: calc(100vh - 20px);
+    height: calc(100 * var(--vh, 1vh) - 20px);
   }
 
   #navbar {
@@ -178,6 +178,11 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: 100%;
   }
 
+  #swipeContainer {
+    height: calc(100 * var(--vh, 1vh));
+    padding: 0;
+  }
+
   .profile-container {
     width: calc(100vw - 40px);
   }
@@ -209,7 +214,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   #navbar-spacing {
     width: 250px;
     padding: 20px 0;
-    height: calc(100vh - 40px)
+    height: calc(100 * var(--vh, 1vh) - 40px)
   }
 
   #navbar {
@@ -268,6 +273,13 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .reportFloatingWindow, .profile-child, .mrColumn {
     width: 50%;
   }
+
+  #swipeContainer {
+    width: calc(90vw - 250px);
+    padding: calc(5 * var(--vh, 1vh)) 5vw;
+    height: calc(90 * var(--vh, 1vh));
+  }
+
 }  
 
 /* App.css */
@@ -321,6 +333,12 @@ input {
   height: 20px;
   font-size: 20px;
   padding: 0px;
+}
+
+.toggleSidebar img {
+  max-height: 100%;
+  padding-left: 5px;
+  padding-top: 5px;
 }
 
 .toggleCenter {
@@ -501,8 +519,38 @@ nav#navbar a.active {
 
 /* SwipeProfile.css */
 
-#swipe-profile .swipe-profile {
-  margin: 50px auto;
+#swipe-profile {
+  display: flex;
+  flex-direction: column;
+  height: calc(80 * var(--vh, 1vh));
+  align-items: center;
+  justify-content: center;
+}
+
+#ts-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5%;
+  /* border: 1px solid blue; */
+}
+
+#ts-container p {
+  margin: 0;
+}
+
+.refreshBtn {
+  background-color: #EC53B0;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-top: 10px;
 }
 
 .swipe-profile {
@@ -512,14 +560,14 @@ nav#navbar a.active {
   background: #fff;
   box-shadow: -10px -20px 50px var(--primary-transparent),
     10px 20px 50px var(--secondary-transparent);
-
   border-radius: 20px;
-
+  max-height: 70%;
   position: relative;
   filter: grayscale(0);
-
+  overflow: scroll;
   transition: left 0.5s, top 0.5s, transform 0.5s, border 0.4s, box-shadow 0.3s,
     opacity 0.8s, filter 0.8s;
+  
 }
 
 .swipe-profile h3 {
@@ -583,14 +631,15 @@ nav#navbar a.active {
 }
 
 .arrows {
+  height: 10%;
   display: flex;
   margin: 0 auto;
   justify-content: space-between;
 }
 
 .arrow {
-  width: 75px;
-  height: 75px;
+  width: auto;
+  height: 100%;
   padding-bottom: 15px;
 }
 
@@ -641,8 +690,7 @@ nav#navbar a.active {
 }
 
 .chat {
-  width: calc(100vw - 250px);
-  height: calc(100 * var(--vh));
+  height: calc(100 * var(--vh, 1vh));
 }
 
 /* Dashboard.css */
@@ -653,13 +701,24 @@ nav#navbar a.active {
 }
 
 .toggleHolder {
+  position: absolute;
+  top: 0;
   width: 100vw;
   align-items: center;
   justify-content: flex-start;
 }
 
+#swipeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+
 .dash {
-  height: calc(100 * var(--vh));
+  height: calc(100 * var(--vh, 1vh));
   align-items: center;
   justify-content: flex-start;
 }
@@ -912,7 +971,7 @@ section#login,
 section#register {
   display: flex;
   width: 100vw;
-  height: calc(100 * var(--vh));
+  height: calc(100 * var(--vh, 1vh));
   overflow: scroll;
   background-image: var(--login-background);
   background-size: cover;
@@ -954,7 +1013,7 @@ section#register form,
     flex-direction: column;
   }
   section#login form, .about {
-    margin-top: 2vh;
+    margin-top: calc(2 * var(--vh, 1vh));
   }
 }
 
@@ -1023,7 +1082,7 @@ section#login form {
 
 section#register form {
   padding: 50px 30px 20px 30px;
-  margin: 2vh auto;
+  margin: calc(2 * var(--vh, 1vh)) auto;
 }
 
 .closetos {
@@ -1079,9 +1138,12 @@ section#register form span.error {
 
 /* ChatSidebar.css */
 
+.buttonHolder {
+  padding-top: 10px;
+}
+
 .chatSidebar {
-  height: calc(100vh - 30px);
-  padding: 15px 10px;
+  height: calc(100 * var(--vh, 1vh) - 30px);
   border-right: 1px #ddd solid;
   overflow-y: auto;
 }
@@ -1188,6 +1250,7 @@ section#register form span.error {
 }
 
 .innerButtonHolder {
+  padding-top: 5px;
   width: calc(100% - 15px);
   justify-content: center;
 }
@@ -1198,7 +1261,7 @@ section#register form span.error {
   flex-grow: 1;
   align-items: center;
   justify-content: center;
-  height: 50vh;
+  height: calc(50 * var(--vh, 1vh));
 }
 
 .chatsMissingWindow h1 {
@@ -1211,7 +1274,7 @@ section#register form span.error {
 
 .chatWindow {
   justify-content: flex-end;
-  height: calc(100 * var(--vh));
+  height: calc(100 * var(--vh, 1vh));
 }
 
 .hidden {
@@ -1446,5 +1509,16 @@ h3 {
 
 .chatWindowHeader .toggleSidebar {
   margin: 0
+}
+
+input[type="range"] {
+  accent-color: #EC53B0;
+  background: white;
+  border-radius: 5px;
+}
+
+input[type=range]::-webkid-slider-runnable-track {
+  -webkit-appearance: none;
+  background: #0E21A0;
 }
 
