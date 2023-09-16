@@ -5,7 +5,6 @@ import ChatWindow from "../components/chat/ChatWindow";
 import ChatMissing from "../components/chat/ChatsMissing";
 import PropTypes from "prop-types";
 import { useOutletContext } from "react-router-dom";
-import "./Chat.css";
 
 function Chat(props) {
   const [chats, setChats] = useState([]);

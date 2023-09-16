@@ -6,7 +6,6 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import arrowLeft from "../assets/images/arrow-left.png";
 import arrowRight from "../assets/images/arrow-right.png";
-import "./Dashboard.css";
 
 import { useNavigate } from "react-router-dom";
 

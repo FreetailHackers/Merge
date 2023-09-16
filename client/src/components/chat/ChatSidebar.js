@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ChatPreview from "./ChatPreview";
-import "./ChatSidebar.css";
 import PropTypes from "prop-types";
 import { MultiSelect } from "@mantine/core";
 

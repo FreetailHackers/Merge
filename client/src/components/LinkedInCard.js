@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import "./LinkedInCard.css";
-
 class LinkedInCard extends Component {
   constructor() {
     super();

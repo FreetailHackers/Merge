@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { TextInput, NativeSelect } from "@mantine/core";
 import PropTypes from "prop-types";
-import "../../pages/Database.css";
 import SkillSelector from "../SkillSelector";
 import Collapsible from "../Collapsible";
 import { UserToParagraph } from "../UserToParagraph";
