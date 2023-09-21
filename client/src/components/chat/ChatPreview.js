@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import howLongAgo from "../../utils/howLongAgo";
 import PropTypes from "prop-types";
-import { listenForNewMessages, listenForRoomRename } from "../utils/firebase";
+import { listenForNewMessages, listenForRoomRename } from "../../utils/firebase";
 
 const ChatPreview = ({
   id,
