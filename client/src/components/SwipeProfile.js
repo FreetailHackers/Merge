@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
 import GithubCard from "./GithubCard";
-import "./SwipeProfile.css";
 import LinkedInCard from "./LinkedInCard";
 import PortfolioCard from "./PortfolioCard";
 
@@ -14,10 +13,14 @@ const SwipeProfile = (props) => {
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
         props.borderColor
       }-side`}
-      onMouseDown={props.onMouseDown}
+      onMouseDown={(e) => props.onMouseDown(e, false)}
+      onTouchStart={(e) => props.onMouseDown(e, true)}
       onMouseUp={props.onMouseUp}
-      onMouseMove={props.onMouseMove}
+      onTouchEnd={props.onMouseUp}
+      onMouseMove={(e) => props.onMouseMove(e, false)}
+      onTouchMove={(e) => props.onMouseMove(e, true)}
       onMouseLeave={props.onMouseUp}
+      onTouchCancel={props.onMouseUp}
       style={{
         left: `${relativePosition[0]}px`,
         top: `${relativePosition[1]}px`,

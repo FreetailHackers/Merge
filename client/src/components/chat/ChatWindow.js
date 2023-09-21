@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Message from "./Message";
-import "./ChatWindow.css";
 import PropTypes from "prop-types";
 import ChatSettings from "./ChatSettings";
 

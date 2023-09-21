@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-
-import "./Navbar.css";
+import toggleBars from "../assets/images/toggle-bars-white.png";
 
 const Navbar = (props) => {
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ const Navbar = (props) => {
             className="toggle toggleSidebar"
             onClick={props.flipDisplaySidebar}
           >
-            ≡
+            <img src={toggleBars} alt="toggle bars" />
           </button>
         )}
         <Link to="/dashboard" onClick={props.flipDisplaySidebar}>
@@ -45,7 +44,6 @@ const Navbar = (props) => {
         <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
           My Team
         </NavLink>
-        {/*<NavLink to="/database">User List</NavLink>*/}
         <NavLink to="/about" onClick={props.flipDisplaySidebar}>
           About
         </NavLink>

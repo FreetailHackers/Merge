@@ -1,6 +1,4 @@
 import React from "react";
-import "./ChatsMissing.css";
-import "../pages/Dashboard.css";
 import PropTypes from "prop-types";
 
 function ChatMissing(props) {

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import ChatPreview from "./ChatPreview";
-import "./ChatSidebar.css";
 import PropTypes from "prop-types";
 import { MultiSelect } from "@mantine/core";
+import toggleBars from "../../assets/images/toggle-bars.png";
 
 function ChatSidebar(props) {
   const [newChatInput, setNewChatInput] = useState([]);
@@ -21,7 +21,7 @@ function ChatSidebar(props) {
                 className="toggleSidebar"
                 onClick={props.flipDisplaySidebar}
               >
-                ≡
+                <img src={toggleBars} alt="toggle bars" />
               </button>
             </div>
           )}

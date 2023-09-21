@@ -1,9 +1,294 @@
+/* Keeping this file to store all CSS within */
+
+/* grouping repeated lines */
+
+nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background, 
+.team-image .primary, .team-image .secondary, .headerDatabase, .selectedButton, section#login,
+section#register, section#login form button, section#register form button {
+  background-color: var(--primary);
+}
+
+nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase, 
+.selectedButton, section#login form button, section#register form button, 
+.closetos, .message.rightSide .messageContent {
+  color: var(--text-on-primary);
+}
+
+.flexColumn, .about-page, #dashboard, .dash, .profile-child, .myTeam, .chatSidebarTop, 
+.chatsMissingWindow, .chatWindow, .reportWindowUserSelect, .chatScrollBox, .userAddition {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow, .github-card > a, .linkedin-card > a, .portfolio-card > a, .chat,
+.toggleHolder, .buttonHolder, .innerButtonHolder, .userRow, .leaveRow, .chatWindowHeader {
+  display: flex;
+  flex-direction: row;
+}
+
+.dash, .team-image .primary, .teamRequests, .teamRequests > div, 
+.centerCol, .mrButtons, .merge-requests, .hideDiv, section#login form label, 
+section#register form label, section#login form button, section#register form button, 
+.chatPreview h4, .buttonHolder, .reportFloatingWindowHeader, .reportWindowUserSelect, 
+.chatWindowHeader, .chatWindowHeader input, .chatScrollBox, .userAddition {
+  width: 100%;
+}
+
+.github-card .githubLogo, .linkedin-card .linkedinLogo, 
+.portfolio-card .portfolioLogo {
+  width: 50px;
+  height: 50px;
+  color: #0000;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.github-card > a, .linkedin-card > a, .portfolio-card > a {
+  align-items: top;
+  text-decoration: none;
+}
+
+.themeButton, #dashboard, .dash, .headerTitle, .pagination, 
+.newMessageBox p {
+  text-align: center;
+}
+
+.github-card h5, .github-card p, .linkedin-card h5, .linkedin-card p, 
+.portfolio-card h5, .portfolio-card p {
+  color: #000;
+}
+
+hr, .toggleSidebar, .themeButton, .chat-button, #settings button.action, .manageTeamButton, section#login form button,
+section#register form button, .exitButton, .actionButton, .newMessageBox input{
+  border: none;
+}
+
+.toggleSidebar, .swipe-profile, .themeButton, .headerDatabase,
+.pagination a, .chat-button, #settings button.action,
+section#login form button, section#register form button, .closetos,
+.chatPreview, .exitButton, .actionButton, .newMessageBox p {
+  cursor: pointer;
+}
+
+input, .github-card, .linkedin-card, .portfolio-card, .themeButton,
+.chat-button, #settings, section#login form input, section#register form input,
+section#login form button, section#register form button, .closetos 
+.exitButton, .newMessageBox, .messageContent {
+  padding: 10px;
+}
+
+input, .portfolio-card p, .headerDatabase, .myTeam .themeButton,
+section#login form button, section#register form button, .closetos,
+.chatPreview h4, .newChatButton, .chatWindowHeader .themeButton, input {
+  font-size: 1em;
+}
+
+.github-card p, .linkedin-card h5, .linkedin-card p, .portfolio-card h5,
+.portfolio-card p, .newMessageBox p, .messageImage, .messageName {
+  margin: 0 10px;
+}
+
+.chatSidebarTop .toggleSidebar, .toggleCenter,
+.chatsMissingWindow .toggleSidebar, .reportFloatingWindow,
+.chatWindowHeader, .chatWindowHeader .toggleSidebar {
+  background-color: white;
+}
+
+nav#navbar a, .forms, .headerDatabase,
+#settings a, .reportFloatingWindow, .reportFloatingWindow textarea {
+  display: block;
+}
+
+body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
+.exitButton, .userRowActions div {
+  margin: 0;
+}
+
+.github-card img.githubImage, .chatPreview .smallDivider,
+.chatPreview .unreadBubble, .newMessageBox p, .messageImage{
+  border-radius: 50%;
+}
+
+.github-card > a, .linkedin-card > a, nav#navbar a, 
+.portfolio-card > a, #settings a {
+  text-decoration: none;
+}
+
+.github-card, .linkedin-card, .portfolio-card {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  box-shadow: 0 0 0 #0000;
+  transition: box-shadow 0.3s;
+}
+
+.github-card:hover, .linkedin-card:hover, .portfolio-card:hover {
+  box-shadow: 0 3px 10px #0002;
+}
+
+.pagination a, .pagination span, .filterInput, #settings label,
+#settings button.action, section#login form, section#register form,
+.about, .terms strong, section#login form label, section#register form label,
+.chatPreview p span.messagePreview, .chatPreview h4, .chatPreview .smallDivider,
+.newMessageBox p, h3, .chatWindowHeader .windowToggleHolder {
+  display: inline-block;
+}
+
+.chat .themeButton, .chatWindowHeader h3 {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* media queries */
+
+@media all and (orientation:portrait) {
+  #navbar-spacing {
+    height: calc(100 * var(--vh, 1vh) - 20px);
+  }
+
+  #navbar {
+    padding: 0 0 20px;
+  }
+
+  .about-page {
+    width: calc(100vw - 60px);
+  }
+
+  .about-page, .profile-container {
+    padding: 0 20px;
+  }
+
+  .chatSidebar, .chatWindow, .chat, #navbar-spacing, #navbar, fsCenter {
+    width: 100vw;
+  }
+
+  .team-image, .team-image .background, .team-image .main, 
+  .team-image .secondary {
+    width: 300px;
+  }
+
+  .team-image .primary, .team-image, .team-image .background, 
+  .team-image .main, .team-image .secondary {
+    height: 300px;
+  }
+  .forms {
+    margin-top: 0;
+  }
+
+  #swipeContainer, .mrColumn, .profile-child {
+    width: 100%;
+  }
+
+  #swipeContainer {
+    height: calc(100 * var(--vh, 1vh));
+    padding: 0;
+  }
+
+  .profile-container {
+    width: calc(100vw - 40px);
+  }
+  .merge-requests, .profile-container {
+    flex-direction: column;
+  }
+
+  .profile-child, .buttonHolder {
+    align-items: flex-start;
+  }
+
+  .buttonHolder {
+    height: 100%;
+  }
+  .sidebarToggleHolder {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .reportFloatingWindow {
+    left: 0%;
+    width: 98%;
+    height: 98%;
+    top: 0%;
+  }
+}
+
+@media all and (orientation:landscape) {
+  #navbar-spacing {
+    width: 250px;
+    padding: 20px 0;
+    height: calc(100 * var(--vh, 1vh) - 40px)
+  }
+
+  #navbar {
+    width: 250px;
+  }
+
+  .about-page {
+    width: calc(100vw - 310px);
+    padding: 15px 30px;
+  }
+
+  .chatSidebar {
+    width: 300px;
+  }
+  .chatWindow {
+    width: calc(100vw - 550px);
+  }
+  .chat, .fsCenter {
+    width: calc(100vw - 250px);
+  }
+
+  .team-image, .team-image .background, 
+  .team-image .main, .team-image .secondary {
+    width: 500px;
+  }
+
+  .team-image .primary, .team-image, .team-image .background, 
+  .team-image .main, .team-image .secondary {
+    height: 500px;
+  }
+
+  .profile-container {
+    padding: 20px;
+  }
+  .profile-child {
+    align-items: center;
+  }
+  .merge-requests, .profile-container {
+    flex-direction: row;
+  }
+  .mrColumn {
+    height: 100%;
+  }
+  .profile-container, .myTeam {
+    width: calc(100vw - 290px);
+  }
+
+  .buttonHolder {
+    justify-content: center;
+  }
+
+  .reportFloatingWindow {
+    top: 20%;
+  }
+
+  .reportFloatingWindow, .profile-child, .mrColumn {
+    width: 50%;
+  }
+
+  #swipeContainer {
+    width: calc(90vw - 250px);
+    padding: calc(5 * var(--vh, 1vh)) 5vw;
+    height: calc(90 * var(--vh, 1vh));
+  }
+
+}  
+
+/* App.css */
+
 .App {
   display: flex;
 }
 
 hr {
-  border: none;
   background-color: #ddd;
   height: 1px;
   margin: 20px 0;
@@ -11,7 +296,6 @@ hr {
 
 .logo {
   height: 100px;
-
   background-image: var(--logo-color);
   background-size: contain;
   background-repeat: no-repeat;
@@ -27,10 +311,8 @@ section {
 }
 
 input {
-  padding: 10px;
   border: 1px #ddd solid;
   border-radius: 0;
-  font-size: 1em;
 }
 
 .spin-animation {
@@ -49,32 +331,1203 @@ input {
 
 .toggleSidebar {
   height: 20px;
-  border: none;
-  cursor: pointer;
   font-size: 20px;
   padding: 0px;
 }
 
+<<<<<<< HEAD
 .toggleCenter {
   background-color: white;
   color: black;
   display: inline;
 }
 
+=======
+.toggleSidebar img {
+  max-height: 100%;
+  padding-left: 5px;
+  padding-top: 5px;
+}
+
+.toggleCenter {
+  color: black;
+  display: inline;
+}
+
+>>>>>>> main
 .flexColumn {
-  display: flex;
-  flex-direction: column;
   justify-content: flex-start;
 }
 
 .flexRow {
-  display: flex;
-  flex-direction: row;
   align-items: center;
 }
 
+
 .fsCenter {
-  width: calc(100% - 290px);
   height: 100%;
   align-items: center;
 }
+
+/* index.css */
+
+body {
+  padding: 0;
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* Theme.css  */
+
+:root {
+  --primary: #e76482;
+  --primary-transparent: #e7648230;
+  --primary-less-transparent: #e7648250;
+  --secondary: #473899;
+  --secondary-transparent: #47389930;
+  --secondary-less-transparent: #47389950;
+  --tertiary: #4c82cc;
+  --tertiary-transparent: #4c82cc55;
+
+  --accept: var(
+    --tertiary
+  ); /* this should be close to green/blue, for "accept" buttons, etc */
+  --reject: var(
+    --primary
+  ); /* this should be close to red, for "cancel" buttons, etc */
+
+  --text-on-primary: #fff;
+  --text-on-secondary: #fff;
+  --text-on-tertiary: #fff;
+
+  --text-on-accept: var(--text-on-tertiary);
+  --text-on-reject: var(--text-on-primary);
+
+  --login-background: url("./assets/images/background.png");
+
+  --logo-color: url("./assets/images/logo/color.png");
+  --logo-white: url("./assets/images/logo/white.png");
+
+  --font-body: "Lato", sans-serif;
+  --font-header: "Montserrat", sans-serif;
+}
+
+/* GithubCard.css */
+
+.github-card img.githubImage {
+  width: 80px;
+  height: 80px;
+  left: 0;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+}
+
+.github-card h5 {
+  font-size: 1.4em;
+  margin: 10px 10px 0 10px;
+}
+
+.github-card p {
+  font-size: 0.8em;
+}
+
+.github-card p.ligher {
+  color: #aaa;
+}
+
+.github-card .githubLogo {
+  margin-top: 14px;
+  background-image: url("../src/assets/images/GitHub-Mark-120px-plus.png");
+}
+
+/* LinkedInCar.css */
+
+.linkedin-card {
+  margin-top: 10px;
+}
+
+.linkedin-card h5 {
+  font-size: 2em;
+}
+
+.linkedin-card p {
+  font-size: 0.8em;
+}
+
+.linkedin-card .linkedinLogo {
+  margin-top: 10px;
+  background-image: url("../src/assets/images/Linkedin-logo.png");
+}
+
+/* Navbar.css */
+
+nav#navbar {
+  position: fixed;
+  overflow-y: auto;
+  height: calc(100vh);
+  z-index: 1;
+}
+
+.toggle {
+  color: white;
+}
+
+nav#navbar a {
+  width: calc(100% - 50px);
+  padding: 20px;
+  border-left: #fff0 10px solid;
+  border-bottom: #fff3 1px solid;
+
+  text-decoration: none;
+  font-size: 1.2em;
+}
+
+nav#navbar a:first-of-type {
+  border-bottom: none;
+}
+
+nav#navbar a:nth-of-type(2) {
+  margin-top: 40px;
+}
+
+nav#navbar a:hover {
+  border-left: #ffffff19 10px solid;
+
+  background-color: #ffffff09;
+}
+
+nav#navbar a.active {
+  border-left: #fff3 10px solid;
+
+  background-color: #fff2;
+}
+
+/* PortfolioCard.css */
+
+.portfolio-card {
+  margin-top: 10px;
+}
+
+.portfolio-card h5 {
+  font-size: 2em;
+}
+
+.portfolio-card .portfolioLogo {
+  margin-top: 3px;
+  background-image: url("../src/assets/images/Portfolio-logo.svg");
+}
+
+/* SwipeProfile.css */
+
+#swipe-profile {
+  display: flex;
+  flex-direction: column;
+  height: calc(80 * var(--vh, 1vh));
+  align-items: center;
+  justify-content: center;
+}
+
+#ts-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5%;
+  /* border: 1px solid blue; */
+}
+
+#ts-container p {
+  margin: 0;
+}
+
+.refreshBtn {
+  background-color: #EC53B0;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-top: 10px;
+}
+
+.swipe-profile {
+  min-width: 300px;
+  width: 50%;
+  padding: 20px;
+  background: #fff;
+  box-shadow: -10px -20px 50px var(--primary-transparent),
+    10px 20px 50px var(--secondary-transparent);
+  border-radius: 20px;
+  max-height: 70%;
+  position: relative;
+  filter: grayscale(0);
+  overflow: scroll;
+  transition: left 0.5s, top 0.5s, transform 0.5s, border 0.4s, box-shadow 0.3s,
+    opacity 0.8s, filter 0.8s;
+  
+}
+
+.swipe-profile h3 {
+  font-size: 3.5em;
+  font-weight: normal;
+  word-wrap: break-word;
+}
+
+.swipe-profile h4 {
+  margin: 10px 0;
+  font-size: 2em;
+  font-weight: normal;
+  word-wrap: break-word;
+}
+
+.swipe-profile.dragged {
+  transition: box-shadow 0.3s, opacity 0.8s, filter 0.8s;
+}
+
+.swipe-profile.accept-side {
+  box-shadow: -10px -20px 80px var(--primary-less-transparent),
+    10px 20px 80px var(--secondary-less-transparent);
+  background: rgb(50, 205, 50);
+  transition: background 0.3s;
+}
+
+.swipe-profile.accept-side img {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.swipe-profile.reject-side {
+  box-shadow: 0px 0px 50px var(--primary-transparent);
+  background: rgb(255, 0, 0);
+  transition: background 0.3s;
+}
+
+.swipe-profile.reject-side img {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.swipe-profile.reject-committed-side {
+  left: -100vw !important;
+  background: rgb(255, 0, 0);
+}
+
+.swipe-profile.accept-committed-side {
+  left: 100vw !important;
+  background: rgb(50, 205, 50);
+}
+
+.swipe-profile p {
+  white-space: pre-line;
+}
+
+.swipe-profile img {
+  position: relative;
+  width: 80%;
+  left: 30px;
+}
+
+.arrows {
+  height: 10%;
+  display: flex;
+  margin: 0 auto;
+  justify-content: space-between;
+}
+
+.arrow {
+  width: auto;
+  height: 100%;
+  padding-bottom: 15px;
+}
+
+.left {
+  float: left;
+  margin: 0 10vw;
+  border: 0;
+}
+
+/* .left:hover {
+   background: rgb(50,205,50);
+   transition: background 0.3s;
+} */
+
+.right {
+  float: right;
+  margin: 0 10vw;
+  border: 0;
+}
+
+/* .right:hover {
+   background: rgb(255,0,0);
+   transition: background 0.3s;
+} */
+
+/* About.css */
+
+.about-page {
+  justify-content: center;
+  align-items: center;
+  line-height: 1.5rem;
+  font-size: 18px;
+  text-indent: 2rem;
+}
+
+.about-page i {
+  padding-top: 30px 0;
+}
+
+/* Chat.css */
+
+.themeButton {
+  border-radius: 15px;
+}
+
+.themeButton:hover {
+  background-color: var(--secondary);
+}
+
+.chat {
+  height: calc(100 * var(--vh, 1vh));
+}
+
+/* Dashboard.css */
+
+#dashboard {
+  align-items: center;
+  justify-content: center;
+}
+
+.toggleHolder {
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#swipeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+
+.dash {
+  height: calc(100 * var(--vh, 1vh));
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.forms {
+  margin: 0 auto;
+}
+
+.team-image {
+  position: relative;
+  margin: 0 auto;
+}
+
+.team-image div {
+  position: absolute;
+}
+
+.team-image .background {
+  opacity: 0.2;
+  -webkit-mask-image: url("../src/assets/images/dashboard-image/background.svg");
+  mask-image: url("../src/assets/images/dashboard-image/background.svg");
+}
+
+.team-image .main {
+  background-image: url("../src/assets/images/dashboard-image/team.svg");
+}
+
+.team-image .primary {
+  opacity: 1;
+  -webkit-mask-image: url("../src/assets/images/dashboard-image/primary.svg");
+  mask-image: url("../src/assets/images/dashboard-image/primary.svg");
+}
+
+.team-image .secondary {
+  opacity: 1;
+  -webkit-mask-image: url("../src/assets/images/dashboard-image/secondary.svg");
+  mask-image: url("../src/assets/images/dashboard-image/secondary.svg");
+}
+
+/* Database.css */
+
+.headerDatabase {
+  border: solid 1px #f2f2f2;
+  padding: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: calc(100% - 30px);
+  text-align: left;
+}
+
+.contentDatabase {
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-bottom: 20px;
+
+  border: solid 1px #f2f2f2;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+
+  padding: 5px;
+
+  white-space: pre-line;
+}
+
+.headerTitle {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.pagination a,
+.pagination span {
+  margin: 0 5px;
+  min-width: 20px;
+}
+
+.pagination a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.pagination div {
+  display: inline;
+}
+
+.filterInput input {
+  margin: 4px 12px;
+  width: 150px;
+}
+
+.filterInput {
+  margin-left: 12px;
+}
+
+.chat-button {
+  background-color: var(--tertiary);
+  color: var(--text-on-tertiary);
+  float: right;
+  font-family: var(--font-body);
+  font-size: 1.2em;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.filterList {
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filterList .question {
+  width: calc(max(175px, 15vw));
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* Edit.css */
+
+#settings {
+  font-size: 1.1em;
+  width: calc(100% - 20px);
+}
+
+#settings button.action {
+  width: 140px;
+  height: 50px;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding-bottom: 5px;
+
+  font-family: var(--font-body);
+  font-size: 1.2em;
+
+  outline: none;
+  border-radius: 0;
+
+  transform: scale(1);
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+#settings button#save:disabled {
+  transform: scale(1);
+  opacity: 0.5;
+}
+
+#settings button#save {
+  background-color: var(--accept);
+  color: var(--text-on-accept);
+}
+
+#settings button#cancel {
+  border: var(--reject) 2px solid;
+  background-color: #fff;
+}
+
+#settings a {
+  text-decoration: none;
+  color: var(--reject);
+}
+
+#settings .action:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.myTeam {
+  align-items: flex-start;
+}
+
+.profile-container {
+  display: flex;
+}
+
+.mantine-radio-group-label {
+  font-size: 14px;
+}
+
+.mantine-Checkbox-root {
+  margin-top: 20px;
+}
+
+.profileContainer .question {
+  margin-bottom: 10px;
+}
+
+.teamRequests, .teamRequests > div, .centerCol {
+  align-items: center;
+}
+
+.mergeRequest {
+  background-color: var(--tertiary-transparent);
+  padding: 5px;
+  border-radius: 10px;
+  align-items: center;
+  width: 60%;
+  margin-top: 10px;
+}
+
+.myTeam p, h3, .merge-requests h4, .reportFloatingWindow p {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+.mrButtons {
+  justify-content: space-evenly;
+}
+
+.hideDiv {
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.profile-child .swipe-profile {
+  margin: auto auto;
+}
+
+.myTeam .flexColumn, .myTeam .hideDivClosed {
+  margin-bottom: 20px;
+}
+
+.merge-requests {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.mrColumn {
+  align-items: center;
+
+}
+
+.myTeam .themeButton {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.manageTeamButton {
+  padding: 5px;
+  border-radius: 20px;
+  margin-left: 12px;
+}
+
+.selectedManageButton {
+  background-color: var(--primary-transparent);
+}
+
+/* Login.css */
+
+section#login,
+section#register {
+  display: flex;
+  width: 100vw;
+  height: calc(100 * var(--vh, 1vh));
+  overflow: scroll;
+  background-image: var(--login-background);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  align-items: center;
+}
+
+section#login form,
+section#register form,
+.about {
+  width: min(400px, 85vw);
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 15px 8px 8px rgba(0, 0, 0, 0.55);
+
+}
+
+.terms {
+  position: absolute;
+  padding: 25px;
+  left: 50%;
+  top: 50%;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  display: none;
+  background-color: #fff;
+  box-shadow: 0px 0px 50vw 15vw rgba(0, 0, 0, 0.7);
+  border-radius:10px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media all and (orientation: portrait) {
+  .terms {
+    width: 70vw;
+  }
+  .container {
+    flex-direction: column;
+  }
+  section#login form, .about {
+    margin-top: calc(2 * var(--vh, 1vh));
+  }
+}
+
+@media all and (orientation: landscape) {
+  .terms {
+    width: 35vw;
+  }
+  .container {
+    flex-direction: row;
+  }
+
+  section#login form {
+    margin-left: auto;
+    margin-right: 5vw;
+    margin-bottom: 0;
+    margin-top: 200px;
+  }
+  .about {
+    margin-right: auto;
+    margin-left: 5vw;
+    margin-top: 0;
+    margin-bottom: 200px;
+  }
+
+}
+
+.terms strong {
+  position: relative;
+  font-size: 24px;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.terms ol {
+  width: 90%;
+  padding-top: 10px;
+  text-align: left;
+  font-size: 18px;
+  line-height:30px;
+}
+
+.container {
+  width: 95%;
+  margin: auto;
+  display: flex;
+  height: 100%;
+  align-items: center;
+}
+
+.about {
+  font-size: 22px;
+  padding: 10px 30px 30px 30px;
+}
+
+p#ToS {
+  font-size: 16px;
+  color: red;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section#login form {
+  padding: 50px 30px 30px 30px;
+}
+
+section#register form {
+  padding: 50px 30px 20px 30px;
+  margin: calc(2 * var(--vh, 1vh)) auto;
+}
+
+.closetos {
+  position: relative;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 40%;
+}
+
+section#login form label,
+section#register form label {
+  margin: 20px 0 8px 0;
+  font-weight: bold;
+}
+
+section#login form label:first-of-type
+section#regiser form label:first-of-type {
+  margin-top: 0;
+}
+
+section#login form input,
+section#register form input {
+  width: calc(100% - 22px);
+  border: 1px #ddd solid;
+  border-radius: 0;
+}
+
+section#login form button,
+section#register form button {
+  margin: 15px 0 0 0;
+}
+
+section#login form button,
+section#register form button,
+.closetos {
+  font-weight: bold;
+  border-radius: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+section#login form button:hover,
+section#register form button:hover,
+.closetos:hover {
+  background-color: var(--secondary);
+  color: var(--text-on-secondary);
+}
+
+section#login form span.error
+section#register form span.error {
+  color: rgb(228, 83, 83);
+}
+
+/* ChatSidebar.css */
+
+.buttonHolder {
+  padding-top: 10px;
+}
+
+.chatSidebar {
+  height: calc(100 * var(--vh, 1vh) - 30px);
+  border-right: 1px #ddd solid;
+  overflow-y: auto;
+}
+
+.chatPreview {
+  padding: 15px 5px;
+  border-radius: 12px;
+  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background 0.1s;
+}
+
+.chatPreview:hover,
+.chatPreview.active {
+  background: #eee;
+}
+
+.chatPreview div.text {
+  width: calc(100% - 80px);
+  overflow: hidden;
+}
+
+.chatPreview h4,
+.chatPreview p {
+  font-weight: normal;
+}
+
+
+.chatPreview p {
+  color: #888;
+  margin-top: 3px;
+  font-size: 0.85em;
+}
+
+.chatPreview p span.messagePreview,
+.chatPreview h4 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.chatPreview.unread p,
+.chatPreview.unread h4 {
+  font-weight: bold;
+}
+
+.chatPreview.unread p {
+  color: #333;
+}
+
+.chatPreview .smallDivider {
+  width: 3px;
+  height: 3px;
+  margin: 0 4px;
+  vertical-align: middle;
+  background: #888;
+  border-radius: 50%;
+}
+
+.chatPreview.unread .smallDivider {
+  background: #000;
+}
+
+.chatPreview.chatrequest {
+  background: rgb(198, 211, 253);
+}
+
+.chatPicture {
+  margin-right: 10px;
+  margin-left: 5px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  width: 45px;
+  height: 45px;
+}
+
+.chatPreview .unreadBubble {
+  width: 12px;
+  height: 12px;
+  margin-left: 5px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: inline-block
+}
+
+.newChatButton {
+  width: 100px;
+}
+
+.chatSidebarTop {
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.chatSidebarTop div {
+   margin-top: 0;
+   margin-bottom: 0;
+}
+
+.innerButtonHolder {
+  padding-top: 5px;
+  width: calc(100% - 15px);
+  justify-content: center;
+}
+
+/* ChatsMissing.css */
+
+.chatsMissingWindow {
+  flex-grow: 1;
+  align-items: center;
+  justify-content: center;
+  height: calc(50 * var(--vh, 1vh));
+}
+
+.chatsMissingWindow h1 {
+  font-size: 1.5em;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ChatWindow.css */
+
+.chatWindow {
+  justify-content: flex-end;
+  height: calc(100 * var(--vh, 1vh));
+}
+
+.hidden {
+  display: none;
+}
+
+.reportFloatingWindow {
+  position: fixed;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 1%;
+  overflow-y: scroll;
+}
+
+.reportFloatingWindow .mantine-MultiSelect-root {
+  margin: 0 auto;
+  width: 50%;
+}
+
+.reportFloatingWindow textarea {
+  width: 95%;
+  height: 30%;
+  resize: none;
+  margin: 20px auto 0;
+}
+
+.reportFloatingWindowHeader {
+  display: flex;
+  margin: 5px 10px 0 5px;
+}
+
+.exitButton {
+  float: left;
+  background: #ddd;  
+  border-radius: 15px;
+}
+
+.exitButton, .reportFloatingWindow .themeButton, .redText {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.userRow p {
+  margin-left: 0;
+  margin-right: auto
+}
+
+.actionButton {
+  width: 35px;
+  height: 25px;
+  border-radius: 15px;
+  margin-left: 12px;
+  margin-right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#submit {
+  position: relative;
+  margin: 2% 5% 0 0;
+  float: right;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.reportWindowUserSelect {
+  align-items: center;
+}
+
+.userRow, .leaveRow {
+  margin-top: 15px;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+}
+
+.userRowActions {
+  display: flex;
+  gap: 5px;
+  width: 140px;
+  justify-content: space-evenly;
+}
+
+/* New message box */
+
+.newMessageBox {
+  height: 40px;
+  width: calc(100% - 20px);
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.newMessageBox input {
+  background: #eee;
+  border-radius: 999px;
+  flex-grow: 1;
+  vertical-align: middle;
+}
+
+.newMessageBox input:focus {
+  outline: none;
+}
+
+.newMessageBox p {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+  vertical-align: middle;
+  font-size: 25px;
+  border-radius: 50%;
+  transition: background 0.1s;
+}
+
+.newMessageBox p:hover {
+  background: #eee;
+}
+
+/* Messages */
+
+.message {
+  max-width: 60%;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.message.rightSide {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.message.mergeBottom {
+  margin: 0 60px 2px 60px;
+}
+
+.messageImage {
+  width: 39px;
+  min-width: 39px;
+  height: 39px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.messageName, .messageTimestamp {
+  color: #888;
+  font-size: 0.8em;
+}
+
+.messageContent {
+  flex-grow: 1;
+  border-radius: 20px;
+  background: #eee;
+}
+
+.messageTimestamp {
+  margin: 6px 4px 2px 4px;
+}
+
+.message.rightSide .messageContent {
+  background: var(--primary);
+  text-align: left;
+}
+
+.message.mergeBottom:not(.rightSide) .messageContent {
+  border-bottom-left-radius: 4px;
+}
+
+.message.mergeTop:not(.rightSide) .messageContent {
+  border-top-left-radius: 4px;
+}
+
+.message.mergeBottom.rightSide .messageContent {
+  border-bottom-right-radius: 4px;
+}
+
+.message.mergeTop.rightSide .messageContent {
+  border-top-right-radius: 4px;
+}
+
+/*action buttons*/
+
+.chatWindowHeader {
+  border: 1px #eee solid;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.chatWindowHeader .themeButton {
+  min-width: 85px;
+  margin-right: 16px;
+}
+
+.chatWindowTitle {
+  min-width: 30%;
+  max-width: 50%;
+  display: flex;
+  justify-content: flex-start;
+  margin-right: auto;
+}
+
+h3 {
+  padding: 5px;
+}
+
+.chatTitle:hover {
+  background-color: #eee;
+}
+
+.chatScrollBox {
+  margin-top: 0;
+  padding-top: 10px;
+  margin-bottom: auto;
+  overflow: scroll;
+}
+
+.userAddition {
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.chatWindowHeader .windowToggleHolder {
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
+.chatWindowHeader .toggleSidebar {
+  margin: 0
+}
+
+input[type="range"] {
+  accent-color: #EC53B0;
+  background: white;
+  border-radius: 5px;
+}
+
+input[type=range]::-webkid-slider-runnable-track {
+  -webkit-appearance: none;
+  background: #0E21A0;
+}
+

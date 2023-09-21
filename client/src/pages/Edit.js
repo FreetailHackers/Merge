@@ -4,6 +4,7 @@ import axios from "axios";
 import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
 import SkillSelector from "../components/SkillSelector";
+import toggleBars from "../assets/images/toggle-bars.png";
 
 // FileInput,
 import {
@@ -14,8 +15,6 @@ import {
   Textarea,
   NativeSelect,
 } from "@mantine/core";
-
-import "./Edit.css";
 
 function Edit(props) {
   //frontend for updating
@@ -130,12 +129,12 @@ function Edit(props) {
     <div className="profile-container">
       <div className="profile-child">
         {!props.wideScreen && (
-          <div className="toggleHolder">
+          <div className="toggleHolder" style={{ marginLeft: -20 }}>
             <button
               className="toggleSidebar toggleCenter"
               onClick={props.flipDisplaySidebar}
             >
-              ≡
+              <img src={toggleBars} alt="toggle bars" />
             </button>
           </div>
         )}

@@ -1,41 +1,30 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { BsArrowsCollapse, BsArrowsExpand } from "react-icons/bs";
 import PropTypes from "prop-types";
 
-class Collapsible extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-    };
-    this.togglePanel = () => {
-      this.setState({ open: !this.state.open });
-    };
-  }
+function Collapsible(props) {
+  const [open, setOpen] = useState(false);
 
-  componentDidUpdate() {}
-
-  render() {
-    return (
-      <div>
-        <button onClick={this.togglePanel} className="headerDatabase">
-          <span
-            style={{
-              width: 40,
-              display: "inline-block",
-              verticalAlign: "middle",
-            }}
-          >
-            {this.state.open ? <BsArrowsCollapse /> : <BsArrowsExpand />}
-          </span>
-          {this.props.title}
-        </button>
-        {this.state.open ? (
-          <div className="contentDatabase">{this.props.children}</div>
-        ) : null}
-      </div>
-    );
-  }
+  return (
+    <div style={{ width: "100%" }}>
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        className="headerDatabase"
+      >
+        <span
+          style={{
+            width: 40,
+            display: "inline-block",
+            verticalAlign: "middle",
+          }}
+        >
+          {open ? <BsArrowsCollapse /> : <BsArrowsExpand />}
+        </span>
+        {props.title}
+      </button>
+      {open ? <div className="contentDatabase">{props.children}</div> : null}
+    </div>
+  );
 }
 
 Collapsible.propTypes = {

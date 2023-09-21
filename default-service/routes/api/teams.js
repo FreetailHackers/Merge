@@ -62,9 +62,13 @@ router.get("/teamsToSwipe/:user", async (req, res) =>
   getTeamsToSwipe(req, res)
 );
 
-router.post("/swipe", authenticateToken, async (req, res) => swipe(req, res));
+router.post("/swipe", async (req, res) => swipe(req, res));
 
 router.post("/leaveTeam", async (req, res) => leaveTeam(req, res));
+
+router.post("/updateMembership", async (req, res) =>
+  updateMembership(req, res)
+);
 
 /**
  * Request to merge your team with another.
@@ -117,10 +121,7 @@ async function acceptMerge(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
     let myTeam = await Team.findOne({ users: { $in: [req.user] } });
-    if (!otherTeam || !myTeam) {
-      return res.sendStatus(400);
-    }
-    if (req.user != myTeam.leader) {
+    if (!otherTeam || !myTeam || req.user != myTeam.leader) {
       return res.sendStatus(400);
     }
     const index = myTeam.mergeRequests.findIndex(
@@ -132,29 +133,30 @@ async function acceptMerge(req, res) {
     if (otherTeam.users.length + myTeam.users.length > MAX_TEAM_SIZE) {
       return res.sendStatus(400);
     }
-    let saved = null;
-    if (otherTeam.users.length >= myTeam.users.length) {
-      // other team absords your team
-      for (const userID of myTeam.users) {
-        let user = await User.findOne({ _id: userID });
-        user.team = otherTeam._id;
-        await user.save();
-        otherTeam.users.push(userID);
-      }
-      await Team.deleteOne({ _id: myTeam._id });
-      saved = await otherTeam.save();
-    } else {
-      // you absorb other team
-      for (const userID of otherTeam.users) {
-        let user = await User.findOne({ _id: userID });
-        user.team = myTeam._id;
-        await user.save();
-        myTeam.users.push(userID);
-      }
-      await Team.deleteOne({ _id: otherTeam._id });
-      myTeam.mergeRequests.splice(index, 1);
-      saved = await myTeam.save();
+    const absorbed = otherTeam.users.length >= myTeam.users.length;
+    let absorbingTeam = absorbed ? otherTeam : myTeam;
+    let absorbedTeam = absorbed ? myTeam : otherTeam;
+    for (const userID of absorbedTeam.users) {
+      let user = await User.findOne({ _id: userID });
+      user.team = absorbingTeam._id;
+      await user.save();
+      absorbingTeam.users.push(userID);
     }
+    await Team.deleteOne({ _id: absorbedTeam._id });
+    if (!absorbed) {
+      myTeam.mergeRequests.splice(index, 1);
+    }
+    const saved = await absorbingTeam.save();
+    await Team.updateMany(
+      {},
+      {
+        $pull: {
+          leftSwipeList: absorbedTeam._id,
+          rightSwipeList: absorbedTeam._id,
+          mergeRequests: { requestingTeam: absorbedTeam._id },
+        },
+      }
+    );
     let newTeam = saved.toObject();
     await addProfiles(newTeam);
     return res.json(newTeam);
@@ -223,22 +225,59 @@ async function cancelRequest(req, res) {
  * BODY PARAMETER filters: filters to list teams for
  */
 async function listTeams(req, res) {
-  let filters = req.query.filters ?? {};
-  Team.find(filters)
-    .then(async (data) => {
-      let foundTeams = [];
-      for (let teamItem of data) {
-        let team = teamItem.toObject();
-        delete team.mergeRequests;
-        await addProfilesAndSanitize(team);
-        foundTeams.push(team);
-      }
-      return res.json(foundTeams);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.sendStatus(500);
+  let filters =
+    req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
+  if (filters.name) {
+    filters["profile.name"] = { $regex: filters.name, $options: "i" };
+    delete filters.name;
+  }
+  if (filters.skills) {
+    filters["profile.skills"] = { $all: [...filters.skills] };
+    delete filters.skills;
+  }
+  if (filters.desiredSkills) {
+    filters["profile.wantedSkills"] = { $all: [...filters.desiredSkills] };
+    delete filters.desiredSkills;
+  }
+  if (filters.competitiveness) {
+    filters["profile.competitiveness"] = filters.competitiveness;
+    delete filters.competitiveness;
+  }
+  if (filters.size) {
+    filters.users = { $size: filters.size };
+    delete filters.size;
+  }
+  var options = {
+    skip: parseInt(req.query.page ?? 0) * 10,
+    limit: 10,
+  };
+  try {
+    if (filters.memberName) {
+      const users = await User.find({
+        name: { $regex: filters.memberName, $options: "i" },
+      });
+      const userIDs = [...users.map((e) => e._id)];
+      filters.users = { ...filters.users, $in: userIDs };
+      delete filters.memberName;
+    }
+    const itemCount = await Team.countDocuments(filters);
+    const pages = Math.ceil(itemCount / 10);
+    const data = await Team.find(filters, {}, options);
+    let foundTeams = [];
+    for (let teamItem of data) {
+      let team = teamItem.toObject();
+      delete team.mergeRequests;
+      await addProfilesAndSanitize(team);
+      foundTeams.push(team);
+    }
+    return res.json({
+      list: foundTeams,
+      pages,
     });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
 }
 
 /**
@@ -296,10 +335,12 @@ async function getUserTeamMRs(req, res) {
     let ingoingRequests = [];
     for (const mr of teamObj.mergeRequests) {
       const otherTeam = await Team.findById(mr.requestingTeam);
-      let otherTeamObj = otherTeam.toObject();
-      await addProfilesAndSanitize(otherTeamObj);
-      let obj = { ...mr, requestingTeam: otherTeamObj };
-      ingoingRequests.push(obj);
+      if (otherTeam) {
+        let otherTeamObj = otherTeam.toObject();
+        await addProfilesAndSanitize(otherTeamObj);
+        let obj = { ...mr, requestingTeam: otherTeamObj };
+        ingoingRequests.push(obj);
+      }
     }
     const invitedTeams = await Team.find({
       mergeRequests: { $elemMatch: { requestingTeam: team._id } },
@@ -480,7 +521,7 @@ async function leaveTeam(req, res) {
   try {
     const team = await Team.findOne({ users: { $in: [req.user] } });
     if (!team) {
-      return res.sendStatus(404);
+      throw new Error("User not in a team!");
     }
     if (team.users.length === 1 || req.user === String(team.leader)) {
       return res.sendStatus(400);
@@ -492,6 +533,44 @@ async function leaveTeam(req, res) {
     await team.save();
     const newTeam = await createTeam({ body: { user: req.user } }, res);
     return res.json(newTeam);
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+}
+
+async function updateMembership(req, res) {
+  try {
+    const team = await Team.findOne({ users: { $in: [req.user] } });
+    if (!team) {
+      throw new Error("User not in a team!");
+    }
+    if (
+      req.user !== String(team.leader) ||
+      req.body.kickedUsers?.includes(req.user) ||
+      (req.body.newLeader && req.body.kickedUsers?.includes(req.body.newLeader))
+    ) {
+      return res.sendStatus(400);
+    }
+    if (req.body.newLeader) {
+      team.leader = req.body.newLeader;
+      await team.save();
+    }
+    if (req.body.kickedUsers?.length > 0) {
+      for (const kickedUserID of req.body.kickedUsers) {
+        const kickedUser = await User.findById(kickedUserID);
+        if (!kickedUser) {
+          return res.sendStatus(404);
+        }
+        team.users = [...team.users.filter((e) => String(e) !== kickedUserID)];
+        await team.save();
+        await createTeam({ body: { user: kickedUserID } }, res);
+      }
+    }
+    let teamObj = team.toObject();
+    //delete teamObj.mergeRequests;
+    await addProfiles(teamObj);
+    return res.json(teamObj);
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

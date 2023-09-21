@@ -1,19 +1,24 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { startCase } from "lodash";
+import { startCase, isArray } from "lodash";
 
-export const UserToParagraphFragment = (user, key) => (
-  <span key={key}>
-    <b>{startCase(key)}</b>: {user[key]}
-    <br />
-  </span>
-);
-
-export const UserToParagraph = ({ user, keys }) => (
-  <p>{keys.map((key) => UserToParagraphFragment(user, key))}</p>
+export const UserToParagraph = ({ user, hideKeys }) => (
+  <p>
+    {Object.keys(user)
+      .filter((key) => !hideKeys || !hideKeys.includes(key))
+      .map((key) => (
+        <span key={key}>
+          <b>{startCase(key)}</b>:{" "}
+          {isArray(user[key])
+            ? user[key].toString().replaceAll(",", ", ")
+            : user[key]}
+          <br />
+        </span>
+      ))}
+  </p>
 );
 
 UserToParagraph.propTypes = {
-  user: PropTypes.array.isRequired,
-  keys: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
+  hideKeys: PropTypes.array,
 };

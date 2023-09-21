@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -105,40 +104,42 @@ router.get("/github/user", async (req, res) => {
 });
 
 async function list_func(req, res) {
-  const id = req.query.id;
-  if (req.user !== id) {
-    return res.sendStatus(403);
-  }
-
   // Parse query parameters
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
 
-  if (filters._id) {
-    filters._id = mongoose.Types.ObjectId(filters._id);
+  if (filters.name) {
+    filters.name = { $regex: filters.name, $options: "i" };
+  }
+  if (filters.skills) {
+    filters["profile.skills"] = { $all: [...filters.skills] };
+    delete filters.skills;
+  }
+  if (filters.competitiveness) {
+    filters["profile.competitiveness"] = filters.competitiveness;
+    delete filters.competitiveness;
   }
   var options = {
-    skip: Math.max(0, parseInt(req.query.start)),
-    limit: Math.max(0, parseInt(req.query.limit)),
+    skip: parseInt(req.query.page ?? 0) * 10,
+    limit: 10,
   };
-  User.find(filters, {}, options)
-    .then((data) => {
-      // We probably don't want to send over everyone's PII...
-      for (let user of data) {
-        user.email = undefined;
-        user.password = undefined;
-      }
-      var result = data;
-      if (req.query.dateSent) {
-        result = {
-          dateSent: req.query.dateSent,
-          list: data,
-        };
-      }
-
-      return res.json(result);
-    })
-    .catch((err) => console.log(err));
+  try {
+    const itemCount = await User.countDocuments(filters);
+    const pages = Math.ceil(itemCount / 10);
+    const data = await User.find(filters, {}, options);
+    for (let user of data) {
+      user.email = undefined;
+      user.password = undefined;
+    }
+    var result = {
+      list: data,
+      pages,
+    };
+    return res.json(result);
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
 }
 
 async function login(req, res) {

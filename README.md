@@ -10,11 +10,11 @@ Contributions welcome!
 - [Express](http://expressjs.com/) and [Node](https://nodejs.org/en/) for the backend
 - [MongoDB](https://www.mongodb.com/) for the database
 - [Mongoose](https://mongoosejs.com), an ODM to represent our mongodb based on our defined schema.
-- [Redux](https://redux.js.org/basics/usagewithreact) for state management between React components
 - [Socket.IO](https://socket.io) to enable realtime chat between users
 - [Redis](https://redis.io) to allow multiple instances of the chat server to talk to each other, ensuring chat doesn't break when we deploy to prod.
 
 ## Installation
+
 - [Redis](https://redis.io/docs/getting-started/installation/)
 - [Mongodb](https://www.mongodb.com/docs/manual/administration/install-community/)
 - [Mongodb Compass](https://www.mongodb.com/try/download/compass) to easily view and manipulate your local database
@@ -31,12 +31,12 @@ You need to also install redis and mongo and start them as a service. On MacOS t
 and on Linux it is done with systemctl.
 
 ```bash
+cd default-service
 # Install dependencies for server & client
 npm install && npm run client-install
 
 
 # Run client & api server & chat server with concurrently
-cd default-service
 npm run dev
 
 ```

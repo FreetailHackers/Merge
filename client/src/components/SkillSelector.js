@@ -4,7 +4,13 @@ import { MultiSelect } from "@mantine/core";
 import { skills } from "../data/skills";
 
 const SkillSelector = (props) => {
-  const [data, setData] = useState(skills);
+  const skillValues = skills.map((e) => e.value);
+  const [data, setData] = useState([
+    ...skills,
+    ...props.skills
+      .filter((e) => !skillValues.includes(e))
+      .map((e) => ({ value: e, label: e })),
+  ]);
 
   return (
     <MultiSelect
@@ -24,8 +30,8 @@ const SkillSelector = (props) => {
       value={props.skills}
       onChange={(value) => props.setSkills(value)}
       className="question"
-      error={props.skills?.length === 0 ? "Required" : ""}
-      required
+      error={!props.optional && props.skills?.length === 0 ? "Required" : ""}
+      required={!props.optional}
     />
   );
 };
@@ -34,6 +40,7 @@ SkillSelector.propTypes = {
   skills: PropTypes.array,
   setSkills: PropTypes.func,
   label: PropTypes.string,
+  optional: PropTypes.bool,
 };
 
 export default SkillSelector;
