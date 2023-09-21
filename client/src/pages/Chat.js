@@ -4,8 +4,7 @@ import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatWindow from "../components/chat/ChatWindow";
 import ChatMissing from "../components/chat/ChatsMissing";
 import PropTypes from "prop-types";
-<<<<<<< HEAD
-import "./Chat.css";
+import { useOutletContext } from "react-router-dom";
 import {
   createRoom,
   newMessage,
@@ -25,7 +24,6 @@ import {
   listenForUserAdditions,
   listenForUserRemovals,
 } from "../utils/firebase";
-import { useOutletContext } from "react-router-dom";
 
 function Chat(props) {
   const [chats, setChats] = useState([]);
