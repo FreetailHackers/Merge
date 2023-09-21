@@ -19,16 +19,16 @@ import {
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyCqGLV18p4txbbVVT9jXtz9XPh_lhlySLU",
-  authDomain: "mergechat-nickorlow.firebaseapp.com",
-  databaseURL: "https://mergechat-nickorlow-default-rtdb.firebaseio.com",
-  projectId: "mergechat-nickorlow",
-  storageBucket: "mergechat-nickorlow.appspot.com",
-  messagingSenderId: "675031887967",
-  appId: "1:675031887967:web:f5db58898f9c10e74d6bea",
-  measurementId: "G-MJRQDJR6K6"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,  
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
- 
+
 initializeApp(firebaseConfig);
 setLogLevel("silent");
 const db = getDatabase();
@@ -49,26 +49,27 @@ const db = getDatabase();
 // DONE: Listen for a user being removed from a chat
 
 // #4:
-// TODO: Delete a chat
-// TODO: Listen for a chat being deleted
+// Delete a chat
+// Listen for a chat being deleted
 
 // #5:
-// TODO: Leave a chat
-// TODO: Listen for a user leaving a chat
+// Leave a chat
+// Listen for a user leaving a chat
 
 // #6:
-// TODO: Block a user from a chat
-// TODO: Listen for a user being blocked from a chat
+// Block a user from a chat
+// Listen for a user being blocked from a chat
 
 // #7:
-// TODO: Unblock a user from a chat
-// TODO: Listen for a user being unblocked from a chat
+// Unblock a user from a chat
+// Listen for a user being unblocked from a chat
 
 // TODO: Ensure people can swipe and create chats
+// Not sure what this meant?
 
 // Functions to interact with the Firebase Realtime Database
 const createRoom = (data) => {
-  let record = { ...data }
+  let record = { ...data };
   record.created = serverTimestamp();
   record.users = data.users.reduce((result, userId) => {
     return { ...result, [userId]: true };
@@ -92,20 +93,27 @@ const listenForRoomAdditions = (userId, callback) => {
 
     // change users from being keys to an array
     results.users = Object.keys(results.users);
-    results.readBy = Object.keys(results.readBy).map((x)=>{ return results.readBy[x] ? x : "" })
-    const resp = await (await fetch("https://mergechat-nickorlow-default-rtdb.firebaseio.com/messages/"+chatSnapshot.key+".json?limitToLast=1&orderBy=%22timestamp%22")).json();
-    const key = Object.keys(resp)[0];
-      const message = {
-        _id: key,
-        ...resp[key],
-      };
-    message.author = Object.keys(message.author);
+    results.readBy = Object.keys(results.readBy).map((x) => {
+      return results.readBy[x] ? x : "";
+    });
+    const resp = await (
+      await fetch(
+        firebaseConfig.databaseURL + "/messages/" +
+          chatSnapshot.key +
+          ".json?limitToLast=1&orderBy=%22timestamp%22"
+      )
+    ).json();
+    if (resp !== null) {
+      const key = Object.keys(resp)[0];
+      const message = { _id: key, ...resp[key] };
+      message.author = Object.keys(message.author);
       message.timestamp = new Date(message.timestamp);
       message.chat = chatSnapshot.key;
       message.recipients = Object.keys(message.recipients);
       results.lastMessage = message;
-    results.seen = results.readBy.indexOf(userId) != -1
-    console.log(results)
+      results.seen = results.readBy.indexOf(userId) != -1;
+    }
+    console.log(results);
     callback(results);
   });
   return () => off(roomsRef, "child_added");
@@ -128,7 +136,6 @@ const listenForRoomDeletions = (userId, callback) => {
   return () => off(roomsRef, "child_removed");
 };
 
-
 const newMessage = (data) => {
   const updates = {};
   for (let recipient of data.recipients) {
@@ -138,6 +145,14 @@ const newMessage = (data) => {
   updates[`chats/${data.chat}/readBy/${data.author}`] = true;
   push(ref(db, `messages/${data.chat}`), data);
   update(ref(db), updates);
+};
+
+const listenForRoomRename = (data, callback) => {
+  const messagesRef = query(ref(db, `chats/${data.roomId}/name`));
+  onValue(messagesRef, (snapshot) => {
+    callback({ newName: snapshot.val(), chatID: data.roomId });
+  });
+  return () => off(messagesRef, "value");
 };
 
 const listenForNewMessages = (data, callback) => {
@@ -188,27 +203,36 @@ const listenForUserRemovals = (roomId, callback) => {
 };
 
 const blockUsers = (roomId, userIds) => {
+  console.log(userIds);
   userIds.forEach((userId) => {
-    db.ref(`chats/${roomId}/blockedUsers`).child(userId).set(true);
+    const blocked = {};
+    blocked[userId] = true;
+    update(ref(db, `chats/${roomId}/blockedUsers`), blocked);
   });
 };
 
 const unblockUsers = (roomId, userIds) => {
   userIds.forEach((userId) => {
-    db.ref(`chats/${roomId}/blockedUsers`).child(userId).remove();
+    remove(ref(db, `chats/${roomId}/blockedUsers/${userId}`));
   });
+};
+
+const listenForBlockAndUnblock = (roomId, callback) => {
+  const chatRef = ref(db, `chats/${roomId}/name/blockedUsers`);
+  onChildAdded(chatRef, (snapshot) => {
+    callback({ userID: snapshot.val(), type: "block" });
+  });
+  onChildRemoved(chatRef, (snapshot) => {
+    callback({ userID: snapshot.val(), type: "unblock" });
+  });
+  return () => {
+    off(chatRef, "child_added");
+    off(chatRef, "child_removed");
+  };
 };
 
 const renameRoom = (data) => {
   update(ref(db, `chats/${data.chatId}`), { name: data.name });
-};
-
-const listenForNameChanges = (roomId, callback) => {
-  const chatRef = ref(db, `chats/${roomId}/name`);
-  onValue(chatRef, (snapshot) => {
-    callback(snapshot.val());
-  });
-  return () => off(chatRef, "value");
 };
 
 const leaveRoom = (data) => {
@@ -231,6 +255,7 @@ export {
   createRoom,
   listenForRoomAdditions,
   listenForRoomDeletions,
+  listenForRoomRename,
   newMessage,
   listenForNewMessages,
   readMessage,
@@ -239,10 +264,9 @@ export {
   listenForUserRemovals,
   blockUsers,
   unblockUsers,
+  listenForBlockAndUnblock,
   renameRoom,
-  listenForNameChanges,
   leaveRoom,
   removeUsers,
   deleteRoom,
 };
-

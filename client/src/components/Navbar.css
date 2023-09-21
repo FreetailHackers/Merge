@@ -4,7 +4,6 @@ nav#navbar {
   height: calc(100vh);
   z-index: 1;
   background-color: var(--primary);
-
 }
 
 .toggle {
@@ -16,31 +15,28 @@ nav#navbar {
   background-color: var(--primary);
 }
 
-@media all and (orientation:portrait) {
+@media all and (orientation: portrait) {
   #navbar-spacing {
     width: 100vw;
     height: calc(100vh - 20px);
-
   }
 
   #navbar {
     width: 100vw;
     padding: 0 0 20px;
-
   }
 }
 
-@media all and (orientation:landscape) {
+@media all and (orientation: landscape) {
   #navbar-spacing {
     width: 250px;
     padding: 20px 0;
-    height: calc(100vh - 40px)
+    height: calc(100vh - 40px);
   }
 
   #navbar {
     width: 250px;
   }
-
 }
 
 nav#navbar a {

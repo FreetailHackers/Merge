@@ -64,8 +64,11 @@
   mask-image: url("../assets/images/dashboard-image/secondary.svg");
 }
 
-@media all and (orientation:portrait) {
-  .team-image, .team-image .background, .team-image .main, .team-image .secondary {
+@media all and (orientation: portrait) {
+  .team-image,
+  .team-image .background,
+  .team-image .main,
+  .team-image .secondary {
     width: 300px;
     height: 300px;
   }
@@ -80,9 +83,11 @@
   }
 }
 
-
-@media all and (orientation:landscape) {
-  .team-image, .team-image .background, .team-image .main, .team-image .secondary {
+@media all and (orientation: landscape) {
+  .team-image,
+  .team-image .background,
+  .team-image .main,
+  .team-image .secondary {
     width: 500px;
     height: 500px;
   }

@@ -4,30 +4,29 @@ import ChatSidebar from "../components/ChatSidebar";
 import ChatWindow from "../components/ChatWindow";
 import ChatMissing from "../components/ChatsMissing";
 import PropTypes from "prop-types";
-import { useOutletContext } from "react-router-dom";
 import "./Chat.css";
 import {
   createRoom,
   newMessage,
   listenForNewMessages,
+  listenForRoomRename,
   readMessage,
   addUser,
   removeUsers,
-  //// blockUsers,
-  //// unblockUsers,
-  //renameRoom,
+  blockUsers,
+  unblockUsers,
+  listenForBlockAndUnblock,
+  renameRoom,
   leaveRoom,
   deleteRoom,
   listenForRoomAdditions,
   listenForRoomDeletions,
   listenForUserAdditions,
   listenForUserRemovals,
-  listenForNameChanges,
 } from "../utils/firebase";
 
 function Chat(props) {
   const [chats, setChats] = useState([]);
-  const socket = useOutletContext();
 
   const updateChat = (id, newValue) => {
     setChats((prev) => {
@@ -46,7 +45,6 @@ function Chat(props) {
 
   const { userID } = props;
 
-  const connected = socket?.connected;
   useEffect(() => {
     async function setupAPICalls() {
       let res = await axios.get(
@@ -55,22 +53,14 @@ function Chat(props) {
       setOtherUsers(res.data);
     }
 
-    if (connected) {
-      setupAPICalls();
-    }
+    setupAPICalls();
+  }, [userID]);
 
-    return () => {
-      if (connected) {
-        socket.emit("leave-chat-rooms");
-      }
-    };
-  }, [socket, connected, userID]);
-
-  useEffect(()=> {
+  useEffect(() => {
     const broadcastMessageWS = (data) => {
       setMessages((prev) => [...prev, data]);
       if (data.chat === selectedChat) {
-        readMessage(data.chat, userID); 
+        readMessage(data.chat, userID);
       }
       setChats((prev) => {
         let chatIndex = prev.map((e) => e._id).indexOf(data.chat);
@@ -90,132 +80,115 @@ function Chat(props) {
     };
 
     const userAddWS = async (userId) => {
-      // FIXME: Concurrency issues?
       const chat = chats.find((e) => e._id === selectedChat);
       if (chat.users.indexOf(userId) === -1) {
         chat.users.push(userId);
       }
       updateChat(selectedChat, chat);
     };
-    
+
     const userRemWS = async (userId) => {
       // FIXME: Concurrency issues?
       const chat = chats.find((e) => e._id === selectedChat);
-      const idx = chat.users.indexOf(userId)
+      const idx = chat.users.indexOf(userId);
       if (idx > 0) {
         chat.users.splice(idx, 1);
       }
       updateChat(selectedChat, chat);
     };
-    
+
     const renamedWS = (data) => {
-      return;
       setChats((prev) => {
         let index = prev.map((e) => e._id).indexOf(data.chatID);
-        let newArr = [...prev];
-        newArr[index].name = data.newName;
-        return newArr;
+        if (index != -1) {
+          let newArr = [...prev];
+          newArr[index].name = data.newName;
+          return newArr;
+        }
+        return prev;
       });
     };
 
-    setChats((prev) => {
-      if(selectedChat === null) return prev;
-        let chatIndex = prev.map((e) => e._id).indexOf(selectedChat);
-        const chat = prev[chatIndex];
-        chat.seen = true;
-        return [
-          ...prev.slice(0, chatIndex),
-          chat,
-          ...prev.slice(chatIndex + 1, prev.length),
-        ];
-      });
+    const blockedUnblockedWS = async (data) => {
+      if (data.type === "block") {
+        setOtherUsers((prev) => [...prev.filter((e) => e._id !== data.userID)]);
+      } else {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${data.userID}`
+        );
+        setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }]);
+      }
+    };
 
-    setMessages([])
-    var lfnmCleanup = listenForNewMessages({ roomId: selectedChat, userId: userID}, broadcastMessageWS);
-    var lfuaCleanup = listenForUserAdditions(selectedChat, userAddWS)
-    var lfurCleanup = listenForUserRemovals(selectedChat, userRemWS)
-    var lfncCleanup = listenForNameChanges(selectedChat, renamedWS)
+    setChats((prev) => {
+      if (selectedChat === null) return prev;
+      let chatIndex = prev.map((e) => e._id).indexOf(selectedChat);
+      if (chatIndex === -1) return prev;
+      const chat = prev[chatIndex];
+      chat.seen = true;
+      return [
+        ...prev.slice(0, chatIndex),
+        chat,
+        ...prev.slice(chatIndex + 1, prev.length),
+      ];
+    });
+
+    setMessages([]);
+    var lfnmCleanup = listenForNewMessages(
+      { roomId: selectedChat, userId: userID },
+      broadcastMessageWS
+    );
+    var lfrCleanup = listenForRoomRename({ roomId: selectedChat }, renamedWS);
+    var lfuaCleanup = listenForUserAdditions(selectedChat, userAddWS);
+    var lfurCleanup = listenForUserRemovals(selectedChat, userRemWS);
+    var lfbauCleanup = listenForBlockAndUnblock(
+      selectedChat,
+      blockedUnblockedWS
+    );
     return () => {
       lfnmCleanup();
       lfuaCleanup();
       lfurCleanup();
-      lfncCleanup();
-    }
-  }, [selectedChat])
+      lfrCleanup();
+      lfbauCleanup();
+    };
+  }, [selectedChat]);
 
   useEffect(() => {
     const addedWS = async (chat) => {
       setChats((prev) => [...prev, chat]);
-     };
-       const deletedWS = (deletedChat) => {
+    };
+    const deletedWS = (deletedChat) => {
       setSelectedChat((prev) => (prev === deletedChat._id ? null : prev));
       setChats((prev) => [...prev.filter((e) => e._id !== deletedChat._id)]);
     };
 
-    const blockedWS = (data) => {
-      setOtherUsers((prev) => [...prev.filter((e) => e._id !== data.userID)]);
-    };
-
-    const unblockedWS = async (data) => {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${data.userID}`
-      );
-      setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }]);
-    };
-
     var lfraCleanup = listenForRoomAdditions(userID, addedWS);
     var lfrdCleanup = listenForRoomDeletions(userID, deletedWS);
-    socket.on("blocked-by", blockedWS);
-    socket.on("unblocked-by", unblockedWS);
+
     return () => {
       lfraCleanup();
       lfrdCleanup();
-      socket.off("blocked-by", blockedWS);
-      socket.off("unblocked-by", unblockedWS);
     };
-  }, [socket]);
-
-  useEffect(() => {
-    const userLeftWS = (data) => {
-      if (data.user === userID) {
-        setSelectedChat((prev) => (prev === data.chatID ? null : prev));
-        setChats((prev) => [...prev.filter((e) => e._id !== data.chatID)]);
-      } else {
-        setChats((prev) => {
-          let index = prev.findIndex((e) => e._id === data.chatID);
-          let newArr = [...prev];
-          newArr[index].users = [
-            ...newArr[index].users.filter((e) => e !== data.user),
-          ];
-          return newArr;
-        });
-      }
-    };
-
-    socket.on("user-left", userLeftWS);
-
-    return () => {
-      socket.off("user-left", userLeftWS);
-    };
-  }, [socket, userID]);
+  }, []);
 
   async function createChat(users) {
     let chat = {
       users: [userID, ...users],
-      profiles: {}
+      profiles: {},
     };
 
     for (const userId of chat.users) {
       const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${userId}`
-        );
+        `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${userId}`
+      );
 
       chat.profiles[userId] = res.data;
     }
 
     chat.seen = true;
     chat.lastMessage = null;
-    createRoom(chat); 
+    createRoom(chat);
     setSelectedChat(chat._id);
   }
 
@@ -234,23 +207,13 @@ function Chat(props) {
 
   function addUsers(newUserIDs) {
     const chat = chats[activeChatIndex];
-    addUser({ roomId: chat._id, users: newUserIDs});
+    addUser({ roomId: chat._id, users: newUserIDs });
   }
 
   function setTitle(newTitle) {
     let chat = chats[activeChatIndex];
-    axios
-      .post(process.env.REACT_APP_API_URL + `/api/chats/${chat._id}/rename`, {
-        name: newTitle,
-      })
-      .then(() => {
-        chat.name = newTitle;
-        updateChat(chat._id, chat);
-        socket.emit("rename-chat", {
-          chatID: chat._id,
-          newName: chat.name,
-        });
-      });
+    console.log(chat);
+    renameRoom({ chatId: chat._id, name: newTitle });
   }
 
   function deleteChat() {
@@ -260,7 +223,7 @@ function Chat(props) {
 
   function leaveChat() {
     const leftChat = { ...chats[activeChatIndex] };
-    leaveRoom({ _id: leftChat._id, userId: userID});
+    leaveRoom({ _id: leftChat._id, userId: userID });
   }
 
   async function blockUnblockUsers(blocking, unblocking) {
@@ -270,7 +233,7 @@ function Chat(props) {
       );
     }
     if (blocking.length > 0) {
-      socket.emit("block-users", { users: blocking });
+      blockUsers(chats[activeChatIndex]._id, blocking);
     }
     for (const user of unblocking) {
       await axios.post(
@@ -278,7 +241,7 @@ function Chat(props) {
       );
     }
     if (unblocking.length > 0) {
-      socket.emit("unblock-users", { users: unblocking });
+      unblockUsers(chats[activeChatIndex]._id, unblocking);
     }
     const res = await axios.get(
       process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
@@ -292,7 +255,7 @@ function Chat(props) {
   }
 
   async function kickUsers(users, chatID) {
-    removeUsers(chatID, users); 
+    removeUsers(chatID, users);
   }
 
   return (

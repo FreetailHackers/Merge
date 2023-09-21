@@ -5,12 +5,11 @@
   height: calc(100 * var(--vh));
 }
 
-
 .hidden {
   display: none;
 }
 
-@media all and (orientation:landscape) {
+@media all and (orientation: landscape) {
   .reportFloatingWindow {
     width: 50%;
     height: 50%;
@@ -18,7 +17,7 @@
   }
 }
 
-@media all and (orientation:portrait) {
+@media all and (orientation: portrait) {
   .reportFloatingWindow {
     left: 0%;
     width: 98%;
@@ -66,14 +65,16 @@
   cursor: pointer;
 }
 
-.exitButton, .reportFloatingWindow .themeButton, .redText {
+.exitButton,
+.reportFloatingWindow .themeButton,
+.redText {
   font-size: 16px;
   font-weight: bold;
 }
 
 .userRow p {
   margin-left: 0;
-  margin-right: auto
+  margin-right: auto;
 }
 
 .actionButton {
@@ -88,7 +89,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 #submit {
   position: relative;
@@ -105,7 +105,8 @@
   align-items: center;
 }
 
-.userRow, .leaveRow {
+.userRow,
+.leaveRow {
   display: flex;
   flex-direction: row;
   margin-top: 15px;
@@ -129,7 +130,6 @@
 .userRowActions div {
   margin: 0;
 }
-
 
 /*
 New message box
@@ -265,7 +265,7 @@ Messages
 }
 
 .chatWindowHeader input {
-  width: 100%
+  width: 100%;
 }
 
 .chatWindowTitle {
@@ -291,8 +291,6 @@ h3 {
   margin-right: 8px;
 }
 
-
-
 .chatScrollBox {
   width: 100%;
   margin-top: 0;
@@ -312,8 +310,6 @@ h3 {
   margin-top: 15px;
 }
 
-
-
 .chatWindowHeader .windowToggleHolder {
   margin-left: 10px;
   margin-right: 20px;
@@ -325,5 +321,5 @@ h3 {
 }
 
 .chatWindowHeader .toggleSidebar {
-  margin: 0
+  margin: 0;
 }

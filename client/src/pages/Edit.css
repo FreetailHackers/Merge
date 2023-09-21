@@ -59,7 +59,7 @@
   flex-direction: column;
 }
 
-@media all and (orientation:portrait) {
+@media all and (orientation: portrait) {
   .profile-container {
     flex-direction: column;
     padding: 0 20px;
@@ -77,8 +77,7 @@
   }
 }
 
-
-@media all and (orientation:landscape) {
+@media all and (orientation: landscape) {
   .profile-container {
     flex-direction: row;
     padding: 20px;
@@ -94,11 +93,11 @@
     width: 50%;
     height: 100%;
   }
-  .profile-container, .myTeam {
+  .profile-container,
+  .myTeam {
     width: calc(100vw - 290px);
   }
 }
-
 
 .myTeam {
   display: flex;
@@ -109,11 +108,9 @@
   flex-direction: column;
 }
 
-
 .profile-container {
   display: flex;
 }
-
 
 .mantine-radio-group-label {
   font-size: 14px;
@@ -127,10 +124,10 @@
   margin-bottom: 10px;
 }
 
-.teamRequests, .teamRequests > div {
+.teamRequests,
+.teamRequests > div {
   width: 100%;
   align-items: center;
-
 }
 
 .mergeRequest {
@@ -142,7 +139,9 @@
   margin-top: 10px;
 }
 
-.myTeam p, .merge-requests h3, .merge-requests h4 {
+.myTeam p,
+.merge-requests h3,
+.merge-requests h4 {
   margin-block-start: 0;
   margin-block-end: 0;
 }
@@ -161,10 +160,10 @@
   margin: auto auto;
 }
 
-.myTeam .flexColumn, .myTeam .hideDivClosed {
+.myTeam .flexColumn,
+.myTeam .hideDivClosed {
   margin-bottom: 20px;
 }
-
 
 .merge-requests {
   display: flex;
@@ -176,5 +175,4 @@
 
 .mrColumn {
   align-items: center;
-
 }

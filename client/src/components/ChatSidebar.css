@@ -5,7 +5,6 @@
   overflow-y: auto;
 }
 
-
 .chatPreview {
   padding: 15px 5px;
   border-radius: 12px;
@@ -100,7 +99,7 @@
   margin-left: 5px;
   background: var(--primary);
   border-radius: 50%;
-  display: inline-block
+  display: inline-block;
 }
 
 .newChatButton {
@@ -114,7 +113,7 @@
   flex-direction: row;
 }
 
-@media all and (orientation:portrait) {
+@media all and (orientation: portrait) {
   .buttonHolder {
     justify-content: flex-start;
     height: 100%;
@@ -130,12 +129,11 @@
   }
 }
 
-@media all and (orientation:landscape) {
+@media all and (orientation: landscape) {
   .buttonHolder {
     justify-content: center;
   }
 }
-
 
 .chatSidebarTop {
   display: flex;
@@ -146,8 +144,8 @@
 }
 
 .chatSidebarTop div {
-   margin-top: 0;
-   margin-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .innerButtonHolder {
