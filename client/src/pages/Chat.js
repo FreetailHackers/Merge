@@ -4,7 +4,6 @@ import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatWindow from "../components/chat/ChatWindow";
 import ChatMissing from "../components/chat/ChatsMissing";
 import PropTypes from "prop-types";
-import { useOutletContext } from "react-router-dom";
 import {
   createRoom,
   newMessage,
@@ -100,7 +99,7 @@ function Chat(props) {
     const renamedWS = (data) => {
       setChats((prev) => {
         let index = prev.map((e) => e._id).indexOf(data.chatID);
-        if (index != -1) {
+        if (index !== -1) {
           let newArr = [...prev];
           newArr[index].name = data.newName;
           return newArr;
