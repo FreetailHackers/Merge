@@ -32,7 +32,7 @@ const TeamSchema = new Schema({
       type: [String],
       required: false,
     },
-    wantedSkills: {
+    desiredSkills: {
       type: [String],
       required: false,
     },

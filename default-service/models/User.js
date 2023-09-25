@@ -29,7 +29,7 @@ const UserSchema = new Schema({
     class: String,
     skills: [String],
     experience: String,
-    intro: String,
+    bio: String,
     profilePictureUrl: String,
     github: String,
     linkedin: String,

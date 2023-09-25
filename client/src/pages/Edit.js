@@ -16,6 +16,14 @@ import {
   NativeSelect,
 } from "@mantine/core";
 
+const requiredFields = [
+  "name",
+  "bio",
+  "skills",
+  "experience",
+  "competitiveness",
+];
+
 function Edit(props) {
   //frontend for updating
   const [saved, setSaved] = useState(false);
@@ -173,10 +181,14 @@ function Edit(props) {
             <Textarea
               placeholder="What can you bring to this hackathon and what do you want to get out of it?"
               label="Bio"
-              value={userProfile.intro}
+              value={userProfile.bio}
               autosize
-              error={userProfile.intro?.length === 0 ? "Required" : ""}
-              onChange={(e) => setProfile("intro", e.target.value)}
+              error={
+                !userProfile.bio || userProfile.bio.length === 0
+                  ? "Required"
+                  : ""
+              }
+              onChange={(e) => setProfile("bio", e.target.value)}
               className="question"
               required
             />
@@ -254,6 +266,7 @@ function Edit(props) {
               label="Years of coding experience"
               placeholder="Pick one"
               data={[
+                { value: undefined, label: "Pick one" },
                 { value: "<1", label: "Less than one year" },
                 { value: "1-3", label: "One to three years" },
                 { value: ">3", label: "Over three years" },
@@ -261,7 +274,11 @@ function Edit(props) {
               value={userProfile.experience}
               onChange={(value) => setProfile("experience", value.target.value)}
               className="question"
-              error={userProfile.experience?.length === 0 ? "Required" : ""}
+              error={
+                !userProfile.experience || userProfile.experience.length === 0
+                  ? "Required"
+                  : ""
+              }
               required
             />
             <Radio.Group
@@ -272,9 +289,7 @@ function Edit(props) {
               value={userProfile.competitiveness}
               onChange={(value) => setProfile("competitiveness", value)}
               required
-              error={
-                userProfile.competitiveness?.length === 0 ? "Required" : ""
-              }
+              error={!userProfile.competitiveness ? "Required" : ""}
             >
               <Radio
                 value="learn"
@@ -328,11 +343,9 @@ function Edit(props) {
           <button
             onClick={handleSubmit}
             disabled={
-              userProfile.name?.length === 0 ||
-              userProfile.intro?.length === 0 ||
-              userProfile.skills?.length === 0 ||
-              userProfile.experience?.length === 0 ||
-              userProfile.competitiveness?.length === 0
+              !requiredFields.every(
+                (e) => userProfile[e] && userProfile[e].length > 0
+              )
             }
             className="action"
             id="save"

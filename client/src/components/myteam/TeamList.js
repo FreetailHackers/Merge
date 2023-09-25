@@ -140,52 +140,54 @@ function TeamList(props) {
 
   return (
     <div className="flexColumn centerCol">
-      <div className="flexColumn teamRequests">
-        <h3>Requests</h3>
-        <div className="merge-requests">
-          <div className="mrColumn flexColumn">
-            {props.ingoingMRs?.length > 0 && <h4>Ingoing</h4>}
-            {props.ingoingMRs &&
-              props.ingoingMRs.map((request, index) => (
-                <TeamInfoCard
-                  key={index}
-                  team={request.requestingTeam}
-                  buttons={[
-                    {
-                      text: "Accept Request",
-                      func: () => acceptRequest(request.requestingTeam._id),
-                    },
-                    {
-                      text: "Reject Request",
-                      func: () => rejectRequest(request.requestingTeam._id),
-                    },
-                  ]}
-                  showButtons={props.team.leader === userID}
-                />
-              ))}
-          </div>
-          <div className="mrColumn flexColumn">
-            {props.outgoingMRs?.length > 0 && <h4>Outgoing</h4>}
-            {props.outgoingMRs &&
-              props.outgoingMRs.map((request, index) => (
-                <TeamInfoCard
-                  key={index}
-                  team={request.requestedTeam}
-                  buttons={[
-                    {
-                      text: "Cancel Request",
-                      func: () => cancelRequest(request.requestedTeam._id),
-                    },
-                  ]}
-                  showButtons={props.team.leader === userID}
-                />
-              ))}
+      {(props.ingoingMRs?.length > 0 || props.outgoingMRs?.length > 0) && (
+        <div className="flexColumn teamRequests">
+          <h3>Requests</h3>
+          <div className="merge-requests">
+            <div className="mrColumn flexColumn">
+              {props.ingoingMRs?.length > 0 && <h4>Ingoing</h4>}
+              {props.ingoingMRs &&
+                props.ingoingMRs.map((request, index) => (
+                  <TeamInfoCard
+                    key={index}
+                    team={request.requestingTeam}
+                    buttons={[
+                      {
+                        text: "Accept Request",
+                        func: () => acceptRequest(request.requestingTeam._id),
+                      },
+                      {
+                        text: "Reject Request",
+                        func: () => rejectRequest(request.requestingTeam._id),
+                      },
+                    ]}
+                    showButtons={props.team.leader === userID}
+                  />
+                ))}
+            </div>
+            <div className="mrColumn flexColumn">
+              {props.outgoingMRs?.length > 0 && <h4>Outgoing</h4>}
+              {props.outgoingMRs &&
+                props.outgoingMRs.map((request, index) => (
+                  <TeamInfoCard
+                    key={index}
+                    team={request.requestedTeam}
+                    buttons={[
+                      {
+                        text: "Cancel Request",
+                        func: () => cancelRequest(request.requestedTeam._id),
+                      },
+                    ]}
+                    showButtons={props.team.leader === userID}
+                  />
+                ))}
+            </div>
           </div>
         </div>
-      </div>
-      <h3>Grow your Team</h3>
+      )}
 
       <div className="flexColumn centerCol">
+        <h3>Grow your Team</h3>
         <div className="flexRow filterList">
           <TextInput
             label="Name"

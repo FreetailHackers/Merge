@@ -17,7 +17,7 @@ function TeamInfoCard(props) {
         <div className="flexRow mrButtons">
           {props.buttons &&
             props.buttons.map((e, i) => (
-              <button onClick={e.func} key={i}>
+              <button onClick={e.func} key={i} className="teamInfoButton">
                 {e.text}
               </button>
             ))}

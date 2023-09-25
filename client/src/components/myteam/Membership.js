@@ -85,8 +85,10 @@ function Membership(props) {
       </div>
       {team.users.length > 1 && userID !== team.leader && (
         <div className="flexColumn centerCol">
-          <h3>Leave team</h3>
-          <button onClick={leaveTeam}>Leave</button>
+          <h3>Leave Team</h3>
+          <button onClick={leaveTeam} className="leaveTeamButton">
+            Leave
+          </button>
         </div>
       )}
     </div>
