@@ -301,7 +301,7 @@ describe("update router tests", () => {
           profile: {
             school: "ut",
             class: "CS",
-            intro: "ello",
+            bio: "ello",
           },
         },
       },

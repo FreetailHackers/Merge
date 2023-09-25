@@ -62,6 +62,10 @@ router.get("/teamsToSwipe/:user", async (req, res) =>
   getTeamsToSwipe(req, res)
 );
 
+router.post("/swipe/resetLeftSwipe", async (req, res) =>
+  resetLeftSwipes(req, res)
+);
+
 router.post("/swipe", async (req, res) => swipe(req, res));
 
 router.post("/leaveTeam", async (req, res) => leaveTeam(req, res));
@@ -108,6 +112,41 @@ async function requestMerge(req, res) {
   }
 }
 
+async function combineProfiles(absorbingTeam, absorbedTeam) {
+  if (absorbingTeam.users.length === 1) {
+    // implies that the absorbed team is also size 1
+    const absorbingLeader = await User.findById(absorbingTeam.leader);
+    const absorbedLeader = await User.findById(absorbedTeam.leader);
+    absorbingTeam.profile.skills = [
+      ...new Set([
+        ...(absorbingLeader.profile.skills ?? []),
+        ...(absorbedLeader.profile.skills ?? []),
+      ]),
+    ];
+    absorbingTeam.profile.competitiveness =
+      absorbingLeader.profile.competitiveness;
+    absorbingTeam.profile.name = `${absorbingLeader.name}'s Team`;
+  } else if (absorbedTeam.users.length === 1) {
+    // implies that the absorbing team is bigger than 1
+    const absorbedLeader = await User.findById(absorbedTeam.leader);
+    absorbingTeam.profile.skills = [
+      ...new Set([
+        ...(absorbingTeam.profile.skills ?? []),
+        ...(absorbedLeader.profile.skills ?? []),
+      ]),
+    ];
+  } else {
+    // both teams bigger than 1
+    absorbingTeam.profile.skills = [
+      ...new Set([
+        ...(absorbingTeam.profile.skills ?? []),
+        ...(absorbedTeam.profile.skills ?? []),
+      ]),
+    ];
+  }
+  absorbingTeam = await absorbingTeam.save();
+}
+
 /**
  * Accept an outstanding request to merge your team with another.
  * If the other team is greater or equal in size, your team will be absorbed by them.
@@ -121,7 +160,12 @@ async function acceptMerge(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
     let myTeam = await Team.findOne({ users: { $in: [req.user] } });
-    if (!otherTeam || !myTeam || req.user != myTeam.leader) {
+    if (
+      !otherTeam ||
+      !myTeam ||
+      req.user != myTeam.leader ||
+      otherTeam.users.length + myTeam.users.length > MAX_TEAM_SIZE
+    ) {
       return res.sendStatus(400);
     }
     const index = myTeam.mergeRequests.findIndex(
@@ -130,12 +174,12 @@ async function acceptMerge(req, res) {
     if (index == -1) {
       return res.sendStatus(400);
     }
-    if (otherTeam.users.length + myTeam.users.length > MAX_TEAM_SIZE) {
-      return res.sendStatus(400);
-    }
     const absorbed = otherTeam.users.length >= myTeam.users.length;
     let absorbingTeam = absorbed ? otherTeam : myTeam;
     let absorbedTeam = absorbed ? myTeam : otherTeam;
+
+    await combineProfiles(absorbingTeam, absorbedTeam);
+
     for (const userID of absorbedTeam.users) {
       let user = await User.findOne({ _id: userID });
       user.team = absorbingTeam._id;
@@ -144,7 +188,7 @@ async function acceptMerge(req, res) {
     }
     await Team.deleteOne({ _id: absorbedTeam._id });
     if (!absorbed) {
-      myTeam.mergeRequests.splice(index, 1);
+      myTeam.mergeRequests.splice(index, 1); // is this necessary?
     }
     const saved = await absorbingTeam.save();
     await Team.updateMany(
@@ -236,7 +280,7 @@ async function listTeams(req, res) {
     delete filters.skills;
   }
   if (filters.desiredSkills) {
-    filters["profile.wantedSkills"] = { $all: [...filters.desiredSkills] };
+    filters["profile.desiredSkills"] = { $all: [...filters.desiredSkills] };
     delete filters.desiredSkills;
   }
   if (filters.competitiveness) {
@@ -390,10 +434,10 @@ const requiredTeamFields = [
   "name",
   "bio",
   "skills",
-  "wantedSkills",
+  "desiredSkills",
   "competitiveness",
 ];
-const requiredUserFields = ["intro", "skills", "experience", "competitiveness"];
+const requiredUserFields = ["bio", "skills", "experience", "competitiveness"];
 
 async function isTeamSwipeReady(teamId) {
   try {
@@ -407,18 +451,93 @@ async function isTeamSwipeReady(teamId) {
         user &&
         user.name?.length !== 0 &&
         user.profile &&
-        requiredUserFields.every((e) => user.profile[e]?.length !== 0)
+        requiredUserFields.every(
+          (e) => user.profile[e] && user.profile[e].length !== 0
+        )
       );
     } else {
       return (
         team.profile &&
-        requiredTeamFields.every((e) => team.profile[e]?.length !== 0)
+        requiredTeamFields.every(
+          (e) => team.profile[e] && team.profile[e]?.length !== 0
+        )
       );
     }
   } catch (err) {
     console.error(err);
     return false;
   }
+}
+
+async function standardizeTeamObj(team) {
+  let newTeam = team.toObject();
+  await addProfilesAndSanitize(newTeam);
+  if (team.users.length === 1) {
+    const user = await User.findById(team.users[0]);
+    const userObj = user.toObject();
+    newTeam.profile = {
+      ...userObj.profile,
+      name: userObj.name,
+      githubFinished: !!userObj.profile.github,
+    };
+  }
+  return newTeam;
+}
+
+function prioritizeSkillMatches(yourTeam, teamList) {
+  function skillScore(team) {
+    let out = 0;
+    if (yourTeam.profile.desiredSkills) {
+      const intersection = team.profile.skills.filter((e) =>
+        yourTeam.profile.desiredSkills.includes(e)
+      );
+      out += intersection.length * 2;
+    }
+    if (team.profile.desiredSkills) {
+      const intersection = yourTeam.profile.skills.filter((e) =>
+        team.profile.desiredSkills.includes(e)
+      );
+      out += intersection.length;
+    }
+    return out;
+  }
+  function compScore(team) {
+    return yourTeam.profile.competitiveness === team.profile.competitiveness
+      ? 1
+      : 0;
+  }
+  teamList.sort((a, b) => skillScore(b) - skillScore(a));
+  teamList.sort((a, b) => compScore(b) - compScore(a));
+}
+
+async function getAverageData(team) {
+  const expOptions = ["<1", "1-3", ">3"];
+  const users = await User.find({ team: team._id });
+  let hours = 0;
+  let experience = 0;
+  for (const user of users) {
+    hours += user.profile.hours ?? 12;
+    experience += expOptions.indexOf(user.profile.experience);
+  }
+  hours /= users.length * 2;
+  experience /= users.length * 24;
+  return { hours, experience };
+}
+
+async function sortByAverages(yourTeam, teamList) {
+  const yourAverageInfo = await getAverageData(yourTeam);
+  let averageInfo = {};
+  for (const team of teamList) {
+    const info = await getAverageData(team);
+    averageInfo[team._id] = info;
+  }
+  function averageScore(team) {
+    return (
+      Math.abs(averageInfo[team._id].hours - yourAverageInfo.hours) +
+      Math.abs(averageInfo[team._id].experience - yourAverageInfo.experience)
+    );
+  }
+  teamList.sort((a, b) => averageScore(a) - averageScore(b));
 }
 
 async function getTeamsToSwipe(req, res) {
@@ -449,21 +568,31 @@ async function getTeamsToSwipe(req, res) {
     for (const team of teamList) {
       const swipeReady = await isTeamSwipeReady(team);
       if (swipeReady) {
-        let newTeam = team.toObject();
-        await addProfilesAndSanitize(newTeam);
-        if (team.users.length === 1) {
-          const user = await User.findById(team.users[0]);
-          const userObj = user.toObject();
-          newTeam.profile = {
-            ...userObj.profile,
-            name: userObj.name,
-            githubFinished: !!userObj.profile.github,
-          };
-        }
+        const newTeam = await standardizeTeamObj(team);
         out.push(newTeam);
       }
     }
+    const yourTeam = await standardizeTeamObj(team);
+    await sortByAverages(yourTeam, out);
+    prioritizeSkillMatches(yourTeam, out);
     return res.json({ ready: true, teams: out.slice(0, 5) });
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+}
+
+async function resetLeftSwipes(req, res) {
+  try {
+    const team = await Team.findOne({ users: { $in: [req.user] } });
+    if (!team) {
+      console.error("Incorrect team ID provided");
+      return res.sendStatus(400);
+    }
+    const list = "leftSwipeList";
+    await Team.updateOne({ _id: team._id }, { $set: { [list]: [] } });
+
+    return res.json({ success: true });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
@@ -586,4 +715,5 @@ module.exports = {
   getTeam,
   update,
   getTeamsToSwipe,
+  resetLeftSwipes,
 };

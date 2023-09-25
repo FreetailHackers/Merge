@@ -14,6 +14,14 @@ import {
   Textarea,
 } from "@mantine/core";
 
+const requiredFields = [
+  "name",
+  "bio",
+  "skills",
+  "desiredSkills",
+  "competitiveness",
+];
+
 function TeamProfile(props) {
   const socket = useOutletContext();
   const { team, setTeam, saved, setSaved } = props;
@@ -75,7 +83,11 @@ function TeamProfile(props) {
             <TextInput
               label="Name"
               placeholder="Your team's name"
-              error={teamProfile.name?.length === 0 ? "Required" : ""}
+              error={
+                !teamProfile.name || teamProfile.name.length === 0
+                  ? "Required"
+                  : ""
+              }
               value={teamProfile.name}
               onChange={(e) => setProfile("name", e.target.value)}
               className="question"
@@ -86,7 +98,11 @@ function TeamProfile(props) {
               label="Bio"
               value={teamProfile.bio}
               autosize
-              error={teamProfile.bio?.length === 0 ? "Required" : ""}
+              error={
+                !teamProfile.bio || teamProfile.bio.length === 0
+                  ? "Required"
+                  : ""
+              }
               onChange={(e) => setProfile("bio", e.target.value)}
               className="question"
               required
@@ -100,7 +116,10 @@ function TeamProfile(props) {
               onChange={(value) => setProfile("competitiveness", value)}
               required
               error={
-                teamProfile.competitiveness?.length === 0 ? "Required" : ""
+                !teamProfile.competitiveness ||
+                teamProfile.competitiveness.length === 0
+                  ? "Required"
+                  : ""
               }
             >
               <Radio
@@ -119,8 +138,8 @@ function TeamProfile(props) {
             />
             <SkillSelector
               label={"Desired Skills"}
-              skills={teamProfile.wantedSkills}
-              setSkills={(value) => setProfile("wantedSkills", value)}
+              skills={teamProfile.desiredSkills}
+              setSkills={(value) => setProfile("desiredSkills", value)}
             />
             <MultiSelect
               data={categories}
@@ -140,10 +159,9 @@ function TeamProfile(props) {
           <button
             onClick={handleSubmit}
             disabled={
-              teamProfile.name?.length === 0 ||
-              teamProfile.bio?.length === 0 ||
-              teamProfile.skills?.length === 0 ||
-              teamProfile.competitiveness?.length === 0
+              !requiredFields.every(
+                (e) => teamProfile[e] && teamProfile[e].length > 0
+              )
             }
             className="action"
             id="save"

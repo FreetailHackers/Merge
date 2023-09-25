@@ -10,7 +10,7 @@ section#register, section#login form button, section#register form button {
 
 nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase, 
 .selectedButton, section#login form button, section#register form button, 
-.closetos, .message.rightSide .messageContent {
+.closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton {
   color: var(--text-on-primary);
 }
 
@@ -59,7 +59,7 @@ section#register form label, section#login form button, section#register form bu
 }
 
 hr, .toggleSidebar, .themeButton, .chat-button, #settings button.action, .manageTeamButton, section#login form button,
-section#register form button, .exitButton, .actionButton, .newMessageBox input{
+section#register form button, .exitButton, .actionButton, .newMessageBox input, .teamInfoButton, .leaveTeamButton{
   border: none;
 }
 
@@ -72,8 +72,8 @@ section#login form button, section#register form button, .closetos,
 
 input, .github-card, .linkedin-card, .portfolio-card, .themeButton,
 .chat-button, #settings, section#login form input, section#register form input,
-section#login form button, section#register form button, .closetos 
-.exitButton, .newMessageBox, .messageContent {
+section#login form button, section#register form button, .closetos,
+.exitButton, .newMessageBox, .messageContent, .leaveTeamButton {
   padding: 10px;
 }
 
@@ -551,6 +551,8 @@ nav#navbar a.active {
   border-radius: 5px;
   padding: 5px 10px;
   margin-top: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .swipe-profile {
@@ -681,7 +683,7 @@ nav#navbar a.active {
 
 /* Chat.css */
 
-.themeButton {
+.themeButton, .leaveTeamButton {
   border-radius: 15px;
 }
 
@@ -908,7 +910,7 @@ nav#navbar a.active {
 }
 
 .mergeRequest {
-  background-color: var(--tertiary-transparent);
+  background-color: #a3c0e955;
   padding: 5px;
   border-radius: 10px;
   align-items: center;
@@ -923,6 +925,7 @@ nav#navbar a.active {
 
 .mrButtons {
   justify-content: space-evenly;
+  margin: 3px;
 }
 
 .hideDiv {
@@ -1481,7 +1484,7 @@ section#register form span.error {
   margin-right: auto;
 }
 
-h3 {
+h3, .teamInfoButton {
   padding: 5px;
 }
 
@@ -1522,3 +1525,15 @@ input[type=range]::-webkid-slider-runnable-track {
   background: #0E21A0;
 }
 
+.teamInfoButton {
+  border-radius: 10px;
+  background-color: var(--tertiary);
+}
+
+.leaveTeamButton {
+  border-radius: 10px;
+  background-color: rgb(153, 0, 0);
+}
+.teamRow {
+  padding-top: 5px;
+}

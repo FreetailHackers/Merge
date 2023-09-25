@@ -66,14 +66,11 @@ function MyTeam(props) {
       if (data.requestingTeam._id === team._id) {
         setOutgoingMRs((prev) => [...prev, data]);
       } else if (data.requestedTeam._id === team._id) {
-        console.log(data);
         setIngoingMRs((prev) => [...prev, data]);
       }
     }
 
     function mergeAcceptedWS(data) {
-      console.log(data.newTeam._id);
-      console.log(team._id);
       if (team._id === data.newTeam._id) {
         setOutgoingMRs((prev) => [
           ...prev.filter((e) => e.requestedTeam._id !== data.absorbedTeamID),

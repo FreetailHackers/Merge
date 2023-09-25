@@ -17,7 +17,7 @@ const SwipeProfile = (props) => {
       onTouchStart={(e) => props.onMouseDown(e, true)}
       onMouseUp={props.onMouseUp}
       onTouchEnd={props.onMouseUp}
-      onMouseMove={(e) => props.onMouseMove(e, false)}
+      onMouseMove={(e) => props.onMouseMove && props.onMouseMove(e, false)}
       onTouchMove={(e) => props.onMouseMove(e, true)}
       onMouseLeave={props.onMouseUp}
       onTouchCancel={props.onMouseUp}
@@ -31,7 +31,7 @@ const SwipeProfile = (props) => {
       <img src={props.profile.profilePictureUrl} alt="" />
       <h4 draggable={false}>{props.profile.school}</h4>
       <p draggable={false} style={{ marginBottom: 60 }}>
-        {props.isAlone ? props.profile.intro : props.profile.bio}
+        {props.profile.bio}
       </p>
       <div draggable={false}>
         {!props.isAlone &&

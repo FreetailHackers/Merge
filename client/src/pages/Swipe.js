@@ -91,6 +91,27 @@ function Swipe(props) {
       });
   };
 
+  const clearLeftSwipes = async () => {
+    try {
+      await axios.post(
+        process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe"
+      );
+
+      const nextCall = await axios.get(
+        process.env.REACT_APP_API_URL +
+          "/api/teams/teamsToSwipe/" +
+          props.userID
+      );
+
+      if (nextCall.data.ready) {
+        setTeamsToShow(nextCall.data.teams);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error("Error:", error);
+    }
+  };
+
   const mouseDownOnArrows = (e) => {
     e.preventDefault();
     if (profileState.profileSide.indexOf("committed") !== -1) return;
@@ -284,9 +305,14 @@ function Swipe(props) {
             Searching for teams of size{" "}
             <strong>{idealSize > 0 ? idealSize : "any"}</strong>
           </p>
-          <button onClick={getTeamToShow} className="refreshBtn">
-            Refresh
-          </button>
+          <div className="flexRow">
+            <button onClick={getTeamToShow} className="refreshBtn">
+              Refresh
+            </button>
+            <button onClick={clearLeftSwipes} className="refreshBtn">
+              Clear Left Swipes
+            </button>
+          </div>
         </div>
       )}
     </div>
