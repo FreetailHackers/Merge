@@ -4,7 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 import SwipeProfile from "../SwipeProfile";
 import SkillSelector from "../SkillSelector";
-import { categories } from "../../data/categories";
+import { roles } from "../../data/roles";
 
 import {
   TextInput,
@@ -20,6 +20,7 @@ const requiredFields = [
   "skills",
   "desiredSkills",
   "competitiveness",
+  "desiredRoles",
 ];
 
 function TeamProfile(props) {
@@ -142,12 +143,19 @@ function TeamProfile(props) {
               setSkills={(value) => setProfile("desiredSkills", value)}
             />
             <MultiSelect
-              data={categories}
-              label="What categories are you planning to submit to?"
-              placeholder="May be left blank if undecided"
-              value={teamProfile.categories}
-              onChange={(value) => setProfile("categories", value)}
+              data={roles}
+              label="What roles are you still looking to fill?"
+              placeholder="Frontend, Backend, Full Stack, etc."
+              value={teamProfile.desiredRoles}
+              onChange={(value) => setProfile("desiredRoles", value)}
               className="question"
+              required
+              error={
+                !teamProfile.desiredRoles ||
+                teamProfile.desiredRoles.length === 0
+                  ? "Required"
+                  : ""
+              }
             />
             {saved && (
               <p style={{ fontSize: "15.4px", color: "green" }}>

@@ -2,19 +2,19 @@
 
 /* grouping repeated lines */
 
-nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background, 
+nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background,
 .team-image .primary, .team-image .secondary, .headerDatabase, .selectedButton, section#login,
 section#register, section#login form button, section#register form button {
   background-color: var(--primary);
 }
 
-nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase, 
-.selectedButton, section#login form button, section#register form button, 
+nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
+.selectedButton, section#login form button, section#register form button,
 .closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton {
   color: var(--text-on-primary);
 }
 
-.flexColumn, .about-page, #dashboard, .dash, .profile-child, .myTeam, .chatSidebarTop, 
+.flexColumn, .about-page, #dashboard, .dash, .profile-child, .myTeam, .chatSidebarTop,
 .chatsMissingWindow, .chatWindow, .reportWindowUserSelect, .chatScrollBox, .userAddition {
   display: flex;
   flex-direction: column;
@@ -26,15 +26,15 @@ nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
   flex-direction: row;
 }
 
-.dash, .team-image .primary, .teamRequests, .teamRequests > div, 
-.centerCol, .mrButtons, .merge-requests, .hideDiv, section#login form label, 
-section#register form label, section#login form button, section#register form button, 
-.chatPreview h4, .buttonHolder, .reportFloatingWindowHeader, .reportWindowUserSelect, 
+.dash, .team-image .primary, .teamRequests, .teamRequests > div,
+.centerCol, .mrButtons, .merge-requests, .hideDiv, section#login form label,
+section#register form label, section#login form button, section#register form button,
+.chatPreview h4, .buttonHolder, .reportFloatingWindowHeader, .reportWindowUserSelect,
 .chatWindowHeader, .chatWindowHeader input, .chatScrollBox, .userAddition {
   width: 100%;
 }
 
-.github-card .githubLogo, .linkedin-card .linkedinLogo, 
+.github-card .githubLogo, .linkedin-card .linkedinLogo,
 .portfolio-card .portfolioLogo {
   width: 50px;
   height: 50px;
@@ -48,12 +48,12 @@ section#register form label, section#login form button, section#register form bu
   text-decoration: none;
 }
 
-.themeButton, #dashboard, .dash, .headerTitle, .pagination, 
+.themeButton, #dashboard, .dash, .headerTitle, .pagination,
 .newMessageBox p {
   text-align: center;
 }
 
-.github-card h5, .github-card p, .linkedin-card h5, .linkedin-card p, 
+.github-card h5, .github-card p, .linkedin-card h5, .linkedin-card p,
 .portfolio-card h5, .portfolio-card p {
   color: #000;
 }
@@ -71,13 +71,13 @@ section#login form button, section#register form button, .closetos,
 }
 
 input, .github-card, .linkedin-card, .portfolio-card, .themeButton,
-.chat-button, #settings, section#login form input, section#register form input,
+#settings, section#login form input, section#register form input,
 section#login form button, section#register form button, .closetos,
 .exitButton, .newMessageBox, .messageContent, .leaveTeamButton {
   padding: 10px;
 }
 
-input, .portfolio-card p, .headerDatabase, .myTeam .themeButton,
+input, .portfolio-card p, .headerDatabase,
 section#login form button, section#register form button, .closetos,
 .chatPreview h4, .newChatButton, .chatWindowHeader .themeButton, input {
   font-size: 1em;
@@ -109,7 +109,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   border-radius: 50%;
 }
 
-.github-card > a, .linkedin-card > a, nav#navbar a, 
+.github-card > a, .linkedin-card > a, nav#navbar a,
 .portfolio-card > a, #settings a {
   text-decoration: none;
 }
@@ -151,6 +151,8 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .about-page {
     width: calc(100vw - 60px);
+    font-size: 12px;
+    line-height: 1.2rem;
   }
 
   .about-page, .profile-container {
@@ -161,12 +163,12 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: 100vw;
   }
 
-  .team-image, .team-image .background, .team-image .main, 
+  .team-image, .team-image .background, .team-image .main,
   .team-image .secondary {
     width: 300px;
   }
 
-  .team-image .primary, .team-image, .team-image .background, 
+  .team-image .primary, .team-image, .team-image .background,
   .team-image .main, .team-image .secondary {
     height: 300px;
   }
@@ -208,6 +210,37 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     height: 98%;
     top: 0%;
   }
+
+  .swipe-profile h3 {
+    font-size: 2em;
+  }
+
+  .terms {
+    width: 70vw;
+  }
+  .container {
+    flex-direction: column;
+  }
+  section#login form, .about {
+    margin-top: calc(2 * var(--vh, 1vh));
+  }
+
+  .chat-button {
+    font-size: 0.9em;
+    padding: 8px;
+  }
+
+  .myTeam .themeButton {
+    font-size: 0.85em;
+  }
+
+  .filterList {
+    padding: 0 5px;
+  }
+
+  .filterList .question {
+    width: calc(max(160px, 40vw));
+  }
 }
 
 @media all and (orientation:landscape) {
@@ -236,12 +269,12 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: calc(100vw - 250px);
   }
 
-  .team-image, .team-image .background, 
+  .team-image, .team-image .background,
   .team-image .main, .team-image .secondary {
     width: 500px;
   }
 
-  .team-image .primary, .team-image, .team-image .background, 
+  .team-image .primary, .team-image, .team-image .background,
   .team-image .main, .team-image .secondary {
     height: 500px;
   }
@@ -280,7 +313,49 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     height: calc(90 * var(--vh, 1vh));
   }
 
-}  
+  .swipe-profile h3 {
+    font-size: 3.5em;
+  }
+
+  .terms {
+    width: 35vw;
+  }
+  .container {
+    flex-direction: row;
+  }
+
+  section#login form {
+    margin-left: auto;
+    margin-right: 5vw;
+    margin-bottom: 0;
+    margin-top: 200px;
+  }
+  .about {
+    margin-right: auto;
+    margin-left: 5vw;
+    margin-top: 0;
+    margin-bottom: 200px;
+  }
+
+  .about-page {
+    font-size: 18px;
+    line-height: 1.5rem;
+  }
+
+  .chat-button {
+    font-size: 1.2em;
+    padding: 10px;
+  }
+
+  .myTeam .themeButton {
+    font-size: 1em;
+  }
+
+  .filterList .question {
+    width: calc(max(175px, 15vw));
+  }
+
+}
 
 /* App.css */
 
@@ -463,9 +538,13 @@ code {
 
 nav#navbar {
   position: fixed;
-  overflow-y: auto;
-  height: calc(100vh);
+  overflow-y: scroll;
+  height: calc(100 * var(--vh, 1vh));
   z-index: 1;
+}
+
+#navbar-spacing {
+  overflow-y: scroll;
 }
 
 .toggle {
@@ -519,7 +598,7 @@ nav#navbar a.active {
 
 /* SwipeProfile.css */
 
-#swipe-profile {
+#swipe-profile-holder {
   display: flex;
   flex-direction: column;
   height: calc(80 * var(--vh, 1vh));
@@ -563,17 +642,17 @@ nav#navbar a.active {
   box-shadow: -10px -20px 50px var(--primary-transparent),
     10px 20px 50px var(--secondary-transparent);
   border-radius: 20px;
-  max-height: 70%;
+  min-height: calc(min(50%, 40 * var(--vh, 1vh)));
+  max-height: calc(min(70%, 56 * var(--vh, 1vh)));
   position: relative;
   filter: grayscale(0);
   overflow: scroll;
   transition: left 0.5s, top 0.5s, transform 0.5s, border 0.4s, box-shadow 0.3s,
     opacity 0.8s, filter 0.8s;
-  
+
 }
 
 .swipe-profile h3 {
-  font-size: 3.5em;
   font-weight: normal;
   word-wrap: break-word;
 }
@@ -672,8 +751,9 @@ nav#navbar a.active {
 .about-page {
   justify-content: center;
   align-items: center;
-  line-height: 1.5rem;
-  font-size: 18px;
+}
+
+.about-page p {
   text-indent: 2rem;
 }
 
@@ -819,7 +899,6 @@ nav#navbar a.active {
   color: var(--text-on-tertiary);
   float: right;
   font-family: var(--font-body);
-  font-size: 1.2em;
   border-radius: 8px;
   margin-left: 10px;
 }
@@ -831,10 +910,11 @@ nav#navbar a.active {
 }
 
 .filterList .question {
-  width: calc(max(175px, 15vw));
   margin-left: 5px;
   margin-right: 5px;
 }
+
+
 
 /* Edit.css */
 
@@ -918,7 +998,7 @@ nav#navbar a.active {
   margin-top: 10px;
 }
 
-.myTeam p, h3, .merge-requests h4, .reportFloatingWindow p {
+.myTeam p, h3, .merge-requests h4, .reportFloatingWindow p, .about-page ul {
   margin-block-start: 0;
   margin-block-end: 0;
 }
@@ -1006,41 +1086,6 @@ section#register form,
   border-radius:10px;
   align-items: center;
   justify-content: center;
-}
-
-@media all and (orientation: portrait) {
-  .terms {
-    width: 70vw;
-  }
-  .container {
-    flex-direction: column;
-  }
-  section#login form, .about {
-    margin-top: calc(2 * var(--vh, 1vh));
-  }
-}
-
-@media all and (orientation: landscape) {
-  .terms {
-    width: 35vw;
-  }
-  .container {
-    flex-direction: row;
-  }
-
-  section#login form {
-    margin-left: auto;
-    margin-right: 5vw;
-    margin-bottom: 0;
-    margin-top: 200px;
-  }
-  .about {
-    margin-right: auto;
-    margin-left: 5vw;
-    margin-top: 0;
-    margin-bottom: 200px;
-  }
-
 }
 
 .terms strong {
@@ -1311,7 +1356,7 @@ section#register form span.error {
 
 .exitButton {
   float: left;
-  background: #ddd;  
+  background: #ddd;
   border-radius: 15px;
 }
 

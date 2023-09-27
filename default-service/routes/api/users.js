@@ -119,6 +119,11 @@ async function list_func(req, res) {
     filters["profile.competitiveness"] = filters.competitiveness;
     delete filters.competitiveness;
   }
+  if (filters.roles) {
+    filters["profile.roles"] = filters.roles;
+    delete filters.roles;
+  }
+
   var options = {
     skip: parseInt(req.query.page ?? 0) * 10,
     limit: 10,

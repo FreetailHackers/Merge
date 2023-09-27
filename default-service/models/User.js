@@ -35,7 +35,6 @@ const UserSchema = new Schema({
     linkedin: String,
     portfolio: String,
     hours: Number,
-    categories: [String],
     roles: [String],
     competitiveness: String,
   },

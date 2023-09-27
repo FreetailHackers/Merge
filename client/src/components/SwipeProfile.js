@@ -3,11 +3,13 @@ import PropTypes from "prop-types";
 import GithubCard from "./GithubCard";
 import LinkedInCard from "./LinkedInCard";
 import PortfolioCard from "./PortfolioCard";
+import { skillsDict } from "../data/skills";
+import { rolesDict } from "../data/roles";
 
 const SwipeProfile = (props) => {
-  const relativePosition = props.relativePosition || [0, 0];
+  const relativePosition = props.relativePosition || 0;
   const angle = props.relativeAngle || 0;
-  const isBeingDragged = relativePosition.some((v) => v !== 0);
+  const isBeingDragged = relativePosition !== 0;
   return (
     <div
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
@@ -22,23 +24,76 @@ const SwipeProfile = (props) => {
       onMouseLeave={props.onMouseUp}
       onTouchCancel={props.onMouseUp}
       style={{
-        left: `${relativePosition[0]}px`,
-        top: `${relativePosition[1]}px`,
+        left: `${relativePosition}px`,
+        top: `${0}px`,
         transform: `rotate(${angle}deg)`,
       }}
     >
       <h3 draggable={false}>{props.name}</h3>
-      <img src={props.profile.profilePictureUrl} alt="" />
-      <h4 draggable={false}>{props.profile.school}</h4>
-      <p draggable={false} style={{ marginBottom: 60 }}>
+      {/*<img src={props.profile.profilePictureUrl} alt="" />*/}
+      {props.profile.school && (
+        <h4 draggable={false}>{props.profile.school}</h4>
+      )}
+      <p draggable={false} style={{ marginBottom: "1em" }}>
         {props.profile.bio}
       </p>
-      <div draggable={false}>
-        {!props.isAlone &&
-          Object.keys(props.userProfiles).map((e, i) => (
-            <p key={i}>{props.userProfiles[e].name}</p>
-          ))}
-      </div>
+
+      {!props.isAlone && (
+        <p>
+          <b>Members:</b>{" "}
+          {String(
+            Object.values(props.userProfiles).map(
+              (e) =>
+                `${e.name}${
+                  e.roles?.length > 0
+                    ? " (" +
+                      String(e.roles.map((r) => rolesDict[r])).replaceAll(
+                        ",",
+                        ", "
+                      ) +
+                      ")"
+                    : ""
+                }`
+            )
+          ).replaceAll(",", ", ")}
+        </p>
+      )}
+
+      <p>
+        <b>Skills:</b>&nbsp;
+        {String(props.profile.skills.map((e) => skillsDict[e] ?? e)).replaceAll(
+          ",",
+          ", "
+        )}
+      </p>
+
+      {!props.isAlone && (
+        <p>
+          <b>Desired Skills:</b>&nbsp;
+          {String(
+            props.profile.desiredSkills.map((e) => skillsDict[e] ?? e)
+          ).replaceAll(",", ", ")}
+        </p>
+      )}
+
+      {props.isAlone && props.profile.roles?.length > 0 && (
+        <p>
+          <b>Roles:</b>&nbsp;
+          {String(props.profile.roles.map((e) => rolesDict[e] ?? e)).replaceAll(
+            ",",
+            ", "
+          )}
+        </p>
+      )}
+
+      {!props.isAlone && props.profile.desiredRoles?.length > 0 && (
+        <p>
+          <b>Looking for:</b>&nbsp;
+          {String(
+            props.profile.desiredRoles.map((e) => rolesDict[e] ?? e)
+          ).replaceAll(",", ", ")}
+        </p>
+      )}
 
       {props.isAlone && props.profile.github && props.profile.githubFinished ? (
         <GithubCard
@@ -61,7 +116,7 @@ SwipeProfile.propTypes = {
   isAlone: PropTypes.bool.isRequired,
   name: PropTypes.string,
   userProfiles: PropTypes.object,
-  relativePosition: PropTypes.array,
+  relativePosition: PropTypes.number,
   relativeAngle: PropTypes.number,
   borderColor: PropTypes.string,
   onMouseDown: PropTypes.func,

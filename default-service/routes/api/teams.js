@@ -244,7 +244,7 @@ async function cancelRequest(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
     const myTeam = await Team.findOne({ users: { $in: [req.user] } });
-    if (!otherTeam || !myTeam || req.user !== String(myTeam.leader)) {
+    if (!otherTeam || !myTeam) {
       return res.sendStatus(400);
     }
     const index = otherTeam.mergeRequests.findIndex(
@@ -309,9 +309,9 @@ async function listTeams(req, res) {
     const data = await Team.find(filters, {}, options);
     let foundTeams = [];
     for (let teamItem of data) {
-      let team = teamItem.toObject();
+      let team = await standardizeTeamObj(teamItem);
       delete team.mergeRequests;
-      await addProfilesAndSanitize(team);
+      //await addProfilesAndSanitize(team, true);
       foundTeams.push(team);
     }
     return res.json({
@@ -353,7 +353,7 @@ async function getUserTeam(req, res) {
     }
     let teamObj = team.toObject();
     //delete teamObj.mergeRequests;
-    await addProfiles(teamObj);
+    await addProfiles(teamObj, true);
     return res.json(teamObj);
   } catch (err) {
     console.error(err);
@@ -361,8 +361,8 @@ async function getUserTeam(req, res) {
   }
 }
 
-async function addProfilesAndSanitize(teamObj) {
-  await addProfiles(teamObj);
+async function addProfilesAndSanitize(teamObj, addRoles = false) {
+  await addProfiles(teamObj, addRoles);
   delete teamObj.mergeRequests;
   delete teamObj.leftSwipeList;
   delete teamObj.rightSwipeList;
@@ -436,8 +436,15 @@ const requiredTeamFields = [
   "skills",
   "desiredSkills",
   "competitiveness",
+  "desiredRoles",
 ];
-const requiredUserFields = ["bio", "skills", "experience", "competitiveness"];
+const requiredUserFields = [
+  "bio",
+  "skills",
+  "experience",
+  "competitiveness",
+  "roles",
+];
 
 async function isTeamSwipeReady(teamId) {
   try {
@@ -471,7 +478,7 @@ async function isTeamSwipeReady(teamId) {
 
 async function standardizeTeamObj(team) {
   let newTeam = team.toObject();
-  await addProfilesAndSanitize(newTeam);
+  await addProfilesAndSanitize(newTeam, team.users.length > 1);
   if (team.users.length === 1) {
     const user = await User.findById(team.users[0]);
     const userObj = user.toObject();
@@ -480,6 +487,14 @@ async function standardizeTeamObj(team) {
       name: userObj.name,
       githubFinished: !!userObj.profile.github,
     };
+  } else {
+    newTeam.profile.roles = [
+      ...new Set(
+        Object.values(newTeam.profiles)
+          .map((e) => e.roles)
+          .flat()
+      ),
+    ];
   }
   return newTeam;
 }
@@ -501,12 +516,42 @@ function prioritizeSkillMatches(yourTeam, teamList) {
     }
     return out;
   }
+
+  function roleScore(team) {
+    let out = 0;
+    if (yourTeam.profile.desiredRoles && team.profile.roles) {
+      const intersection = team.profile.roles.filter((e) =>
+        yourTeam.profile.desiredRoles.includes(e)
+      );
+      out += intersection.length * 2;
+    }
+    if (team.profile.desiredRoles && yourTeam.profile.roles) {
+      const intersection = yourTeam.profile.roles.filter((e) =>
+        team.profile.desiredRoles.includes(e)
+      );
+      out += intersection.length;
+    }
+    if (yourTeam.users.length === 1 && team.users.length === 1) {
+      const disjointRoles = [
+        ...yourTeam.profile.roles.filter(
+          (e) => !team.profile.roles.includes(e)
+        ),
+        ...team.profile.roles.filter(
+          (e) => !yourTeam.profile.roles.includes(e)
+        ),
+      ];
+      out += disjointRoles.length;
+    }
+    return out;
+  }
+
   function compScore(team) {
     return yourTeam.profile.competitiveness === team.profile.competitiveness
       ? 1
       : 0;
   }
   teamList.sort((a, b) => skillScore(b) - skillScore(a));
+  teamList.sort((a, b) => roleScore(b) - roleScore(a));
   teamList.sort((a, b) => compScore(b) - compScore(a));
 }
 

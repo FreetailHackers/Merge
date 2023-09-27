@@ -157,14 +157,16 @@ function MyTeam(props) {
       <div></div>
 
       <div className={`flexRow hideDiv`}>
-        <button
-          className={`themeButton ${
-            section === "Profile" ? "selectedButton" : "notSelectedButton"
-          }`}
-          onClick={() => setSection("Profile")}
-        >
-          Profile
-        </button>
+        {team?.users?.length > 1 && (
+          <button
+            className={`themeButton ${
+              section === "Profile" ? "selectedButton" : "notSelectedButton"
+            }`}
+            onClick={() => setSection("Profile")}
+          >
+            Profile
+          </button>
+        )}
         <button
           className={`themeButton ${
             section === "Membership" ? "selectedButton" : "notSelectedButton"

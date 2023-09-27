@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { TextInput, NativeSelect } from "@mantine/core";
+import { TextInput, NativeSelect, MultiSelect } from "@mantine/core";
 import PropTypes from "prop-types";
 import SkillSelector from "../SkillSelector";
 import Collapsible from "../Collapsible";
 import { UserToParagraph } from "../UserToParagraph";
 import { Pagination } from "../Pagination";
 import { useNavigate } from "react-router-dom";
+import { roles } from "../../data/roles";
 
 function UserList(props) {
   const [users, setUsers] = useState([]);
@@ -16,6 +17,7 @@ function UserList(props) {
   const [nameFilter, setNameFilter] = useState("");
   const [competitiveness, setCompetitiveness] = useState("");
   const [skillFilter, setSkillFilter] = useState([]);
+  const [roleFilter, setRoleFilter] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +28,7 @@ function UserList(props) {
           filters: {
             ...(nameFilter && { name: nameFilter }),
             ...(skillFilter?.length > 0 && { skills: skillFilter }),
+            ...(roleFilter?.length > 0 && { roles: roleFilter }),
             ...(competitiveness?.length > 0 && { competitiveness }),
           },
         };
@@ -50,7 +53,7 @@ function UserList(props) {
       }
     }
     getUsersFromAPI();
-  }, [nameFilter, skillFilter, competitiveness, page]);
+  }, [nameFilter, skillFilter, competitiveness, roleFilter, page]);
 
   async function messageUser(userID) {
     try {
@@ -65,7 +68,7 @@ function UserList(props) {
 
   return (
     <div className="flexColumn fsCenter">
-      <h1 className="headerTitle">User Database</h1>
+      <h3 className="headerTitle">User Database</h3>
       <div className="flexRow filterList">
         <TextInput
           label="Name"
@@ -90,6 +93,14 @@ function UserList(props) {
           onChange={(value) => setCompetitiveness(value.target.value)}
           className="question"
         />
+        <MultiSelect
+          data={roles}
+          label="Roles"
+          placeholder="Frontend, Backend, Full Stack, etc."
+          value={roleFilter}
+          onChange={(value) => setRoleFilter(value)}
+          className="question"
+        />
       </div>
 
       {users.map((user, index) => (
@@ -102,7 +113,10 @@ function UserList(props) {
               Message
             </button>
           )}
-          <UserToParagraph user={user} hideKeys={["_id"]} />
+          <UserToParagraph
+            user={user}
+            hideKeys={["_id", "profilePictureUrl"]}
+          />
         </Collapsible>
       ))}
       <Pagination page={page} setPage={setPage} pages={pages} />
