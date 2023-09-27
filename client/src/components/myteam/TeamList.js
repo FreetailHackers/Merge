@@ -130,7 +130,10 @@ function TeamList(props) {
   async function messageTeam(team) {
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}/api/chats/new`, {
-        otherUsers: team.users,
+        otherUsers: [
+          ...team.users,
+          ...props.team.users.filter((e) => e !== userID),
+        ],
       });
       navigate("/chat");
     } catch (err) {
@@ -145,7 +148,7 @@ function TeamList(props) {
           <h3>Requests</h3>
           <div className="merge-requests">
             <div className="mrColumn flexColumn">
-              {props.ingoingMRs?.length > 0 && <h4>Ingoing</h4>}
+              {props.ingoingMRs?.length > 0 && <h4>Incoming</h4>}
               {props.ingoingMRs &&
                 props.ingoingMRs.map((request, index) => (
                   <TeamInfoCard
@@ -178,7 +181,7 @@ function TeamList(props) {
                         func: () => cancelRequest(request.requestedTeam._id),
                       },
                     ]}
-                    showButtons={props.team.leader === userID}
+                    showButtons={true}
                   />
                 ))}
             </div>
@@ -266,7 +269,18 @@ function TeamList(props) {
               )}
               <UserToParagraph
                 user={teamObj}
-                hideKeys={["_id", "name", "displayTeamProfile"]}
+                hideKeys={[
+                  "_id",
+                  "name",
+                  "displayTeamProfile",
+                  "profilePictureUrl",
+                  "githubFinished",
+                  "github",
+                  "experience",
+                  "linkedin",
+                  "school",
+                  "portfolio",
+                ]}
               />
             </Collapsible>
           );

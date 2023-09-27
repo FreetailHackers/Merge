@@ -20,8 +20,8 @@ function Swipe(props) {
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
     cursorDown: false,
-    mouseDownPosition: [0, 0],
-    profilePosition: [0, 0],
+    mouseDownPosition: 0,
+    profilePosition: 0,
     profileAngle: 0,
     profileSide: "neutral",
   };
@@ -100,7 +100,12 @@ function Swipe(props) {
       const nextCall = await axios.get(
         process.env.REACT_APP_API_URL +
           "/api/teams/teamsToSwipe/" +
-          props.userID
+          props.userID,
+        {
+          params: {
+            idealSize: idealSize,
+          },
+        }
       );
 
       if (nextCall.data.ready) {
@@ -120,7 +125,7 @@ function Swipe(props) {
         setProfileState((prev) => ({
           ...prev,
           profileSide: "reject-committed",
-          profilePosition: [0, 0],
+          profilePosition: 0,
           profileAngle: -20,
         }));
         swipeCallback("reject-committed");
@@ -129,7 +134,7 @@ function Swipe(props) {
         setProfileState((prev) => ({
           ...prev,
           profileSide: "accept-committed",
-          profilePosition: [0, 0],
+          profilePosition: 0,
           profileAngle: 20,
         }));
         swipeCallback("accept-committed");
@@ -143,12 +148,12 @@ function Swipe(props) {
     if (!isMobile) e.preventDefault();
     if (profileState.profileSide.indexOf("committed") !== -1) return;
     const x = isMobile ? e.touches[0].pageX : e.clientX;
-    const y = isMobile ? e.touches[0].pageY : e.clientY;
+    //const y = isMobile ? e.touches[0].pageY : e.clientY;
 
     setProfileState({
       cursorDown: true,
-      mouseDownPosition: [x, y],
-      profilePosition: [0, 0],
+      mouseDownPosition: x,
+      profilePosition: 0,
       profileAngle: 0,
       profileSide: "neutral",
     });
@@ -159,21 +164,18 @@ function Swipe(props) {
     if (profileState.profileSide.indexOf("committed") !== -1) return;
 
     const x = isMobile ? e.touches[0].pageX : e.clientX;
-    const y = isMobile ? e.touches[0].pageY : e.clientY;
+    // const y = isMobile ? e.touches[0].pageY : e.clientY;
 
     if (profileState.cursorDown) {
-      const position = [
-        x - profileState.mouseDownPosition[0],
-        y - profileState.mouseDownPosition[1],
-      ];
+      const position = x - profileState.mouseDownPosition;
 
       const rotateAmount = 4;
       const angle =
-        (Math.sqrt(Math.abs(position[0] / rotateAmount) + 9) - 3) *
-        Math.sign(position[0]) *
+        (Math.sqrt(Math.abs(position / rotateAmount) + 9) - 3) *
+        Math.sign(position) *
         rotateAmount;
 
-      const positionProportionalToScreen = position[0] / window.innerWidth;
+      const positionProportionalToScreen = position / window.innerWidth;
       const commitThreshold = 0.1;
       const side =
         positionProportionalToScreen < -commitThreshold
@@ -191,7 +193,7 @@ function Swipe(props) {
     } else {
       setProfileState((prev) => ({
         ...prev,
-        profilePosition: [0, 0],
+        profilePosition: 0,
         profileAngle: 0,
         profileSide: "neutral",
       }));
@@ -219,7 +221,7 @@ function Swipe(props) {
 
   return (
     <div id="swipeContainer">
-      <section id={"swipe-profile"}>
+      <section id={"swipe-profile-holder"}>
         {!props.wideScreen && (
           <div className="toggleHolder">
             <button

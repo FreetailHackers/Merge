@@ -16,7 +16,7 @@ const ChatPreview = ({
   <div
     className={
       "chatPreview" +
-      (chatRequest && !active && !createdByYou
+      (chatRequest && !seen && !active && !createdByYou
         ? " chatrequest"
         : (!seen ? " unread" : "") + (active ? " active" : ""))
     }
@@ -96,7 +96,9 @@ const ChatPreview = ({
         <p>
           <span className="messagePreview">
             {" "}
-            {createdByYou ? "No messages yet" : "incoming chat request!"}{" "}
+            {createdByYou || seen
+              ? "No messages yet"
+              : "Incoming chat request!"}{" "}
           </span>
         </p>
       ) : (

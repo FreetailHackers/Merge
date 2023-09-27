@@ -5,6 +5,7 @@ import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
 import SkillSelector from "../components/SkillSelector";
 import toggleBars from "../assets/images/toggle-bars.png";
+import { roles } from "../data/roles";
 
 // FileInput,
 import {
@@ -262,6 +263,20 @@ function Edit(props) {
               setSkills={(value) => setProfile("skills", value)}
               skills={userProfile.skills}
             />
+            <MultiSelect
+              data={roles}
+              label="What roles are you interested in?"
+              placeholder="Frontend, Backend, Full Stack, etc."
+              value={userProfile.roles}
+              onChange={(value) => setProfile("roles", value)}
+              className="question"
+              required
+              error={
+                !userProfile.roles || userProfile.roles.length === 0
+                  ? "Required"
+                  : ""
+              }
+            />
             <NativeSelect
               label="Years of coding experience"
               placeholder="Pick one"
@@ -300,39 +315,6 @@ function Edit(props) {
                 label="I'm here to win and want teammates who are aiming to win as well!"
               />
             </Radio.Group>
-            <MultiSelect
-              // Placeholder data from HackTX 2021
-              data={[
-                { value: "overall", label: "Overall Best Hack" },
-                { value: "google", label: "Best Use of Google Cloud" },
-                {
-                  value: "emotion",
-                  label: "Best Real-Time Voice-Based Emotion Classifier",
-                },
-                { value: "solidity", label: "Best Crypto Solidity Project" },
-                { value: "misc", label: "Miscellaneous MLH Prizes" },
-              ]}
-              label="What categories are you planning to submit to?"
-              placeholder="May be left blank if undecided"
-              value={userProfile.categories}
-              onChange={(value) => setProfile("categories", value)}
-              className="question"
-            />
-            <MultiSelect
-              data={[
-                { value: "frontend", label: "Frontend" },
-                { value: "backend", label: "Backend" },
-                { value: "fullstack", label: "Full Stack" },
-                { value: "ml", label: "ML/Data Scientist" },
-                { value: "mobile", label: "Mobile Dev" },
-                { value: "design", label: "Design" },
-              ]}
-              label="What roles are you interested in?"
-              placeholder="Pick as many as you want"
-              value={userProfile.roles}
-              onChange={(value) => setProfile("roles", value)}
-              className="question"
-            />
             {saved && (
               <p style={{ fontSize: "15.4px", color: "green" }}>
                 {" "}

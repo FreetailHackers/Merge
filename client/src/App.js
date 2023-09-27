@@ -40,16 +40,17 @@ export default function App() {
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      "--vh",
-      `${window.innerHeight * 0.01}px`
-    );
-    /*window.addEventListener("resize", () => {
+    const resizeFunc = () => {
       document.documentElement.style.setProperty(
         "--vh",
         `${window.innerHeight * 0.01}px`
       );
-    });*/
+    };
+    resizeFunc();
+    window.addEventListener("resize", resizeFunc);
+    return () => {
+      window.removeEventListener("resize", resizeFunc);
+    };
   });
 
   useEffect(() => {

@@ -40,7 +40,7 @@ const TeamSchema = new Schema({
       type: String,
       required: false,
     },
-    categories: {
+    desiredRoles: {
       type: [String],
       required: false,
     },
