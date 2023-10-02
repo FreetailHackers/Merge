@@ -27,8 +27,9 @@ Ask Adi/Pranay for the AWS credentials.
 
 ## Quick Start
 
-You need to also install redis and mongo and start them as a service. On MacOS this is done with brew services
-and on Linux it is done with systemctl.
+You need to also install redis and mongo and start them as a service.On MacOS this is done with brew services
+and on Linux it is done with systemctl. You can also use Docker Compose by running the command `docker-compose up -d`
+(for Compose v1 & v2) and `docker compose up -d` (for Compose v3) in the root of the project.
 
 ```bash
 cd default-service
