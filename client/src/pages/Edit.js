@@ -346,7 +346,7 @@ function Edit(props) {
           isAlone={true}
         />
       </div>
-      <div id='mobile-nav-space' style={{height: '20vw'}}/>
+      <div id='mobile-nav-space' style={{height: '17vw'}}/>
     </div>
   );
 }
