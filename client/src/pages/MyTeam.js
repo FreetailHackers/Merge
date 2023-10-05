@@ -219,6 +219,7 @@ function MyTeam(props) {
         />
       )}
       {section === "User List" && <UserList userID={userID} />}
+      <div id='mobile-nav-space' style={{height: '20vw'}}/>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import axios from "axios";
 import io from "socket.io-client";
 
 import Navbar from "./components/Navbar";
+import NavMobile from "./components/NavMobile";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -102,6 +103,7 @@ export default function App() {
   );
 
   return (
+    <>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={login} />
@@ -110,107 +112,109 @@ export default function App() {
           path="/register"
           element={
             <Register
-              auth={auth}
-              registerUser={(userData, setErrors) =>
-                registerUser(userData, setAuth, setErrors)
-              }
+            auth={auth}
+            registerUser={(userData, setErrors) =>
+              registerUser(userData, setAuth, setErrors)
+            }
             />
           }
-        />
+          />
         {auth.userID && (
           <Route
-            path="/"
-            element={
-              <div style={{ display: "flex", flexDirection: "row" }}>
+          path="/"
+          element={
+            <div style={{ display: "flex", flexDirection: "row" }}>
                 {(displaySidebar || wideScreen) && (
                   <Navbar
-                    userID={auth.userID.id}
-                    logoutUser={() => logoutUser(setAuth)}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(false)}
+                  userID={auth.userID.id}
+                  logoutUser={() => logoutUser(setAuth)}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(false)}
                   />
-                )}
+                  )}
                 {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
               </div>
             }
-          >
+            >
             <Route
               path="dashboard"
               element={
                 <Dashboard
-                  user={user}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                user={user}
+                wideScreen={wideScreen}
+                flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
-            />
+              />
             <Route
               path="swipe"
               element={
                 <Swipe
-                  userID={auth.userID.id}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                userID={auth.userID.id}
+                wideScreen={wideScreen}
+                flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
-            />
+              />
             <Route
               path="edit"
               element={
                 user ? (
                   <Edit
-                    user={user}
-                    userID={auth.userID.id}
-                    setUser={setUser}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  user={user}
+                  userID={auth.userID.id}
+                  setUser={setUser}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                   />
-                ) : (
-                  <div>Loading...</div>
-                )
-              }
-            />
+                  ) : (
+                    <div>Loading...</div>
+                    )
+                  }
+                  />
             <Route
               path="myteam"
               element={
                 socket?.connected ? (
                   <MyTeam
-                    userID={auth.userID.id}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  userID={auth.userID.id}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
                   />
-                ) : (
-                  <div>Loading...</div>
-                )
-              }
-            />
+                  ) : (
+                    <div>Loading...</div>
+                    )
+                  }
+                  />
             <Route
               path="chat"
               element={
                 socket?.connected ? (
                   <Chat
-                    userID={auth.userID.id}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
-                    blockList={user?.blockList}
+                  userID={auth.userID.id}
+                  wideScreen={wideScreen}
+                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                  blockList={user?.blockList}
                   />
-                ) : (
-                  <div>Loading...</div>
-                )
-              }
-            />
+                  ) : (
+                    <div>Loading...</div>
+                    )
+                  }
+                  />
             <Route
               path="about"
               element={
                 <About
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
+                wideScreen={wideScreen}
+                flipDisplaySidebar={() => setDisplaySidebar(true)}
                 />
               }
-            />
+              />
           </Route>
         )}
       </Routes>
     </BrowserRouter>
+    {!wideScreen && <NavMobile/>}
+    </>
   );
 }
