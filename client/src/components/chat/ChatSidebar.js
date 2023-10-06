@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import ChatPreview from "./ChatPreview";
 import PropTypes from "prop-types";
 import { MultiSelect } from "@mantine/core";
-import toggleBars from "../../assets/images/toggle-bars.png";
 
 function ChatSidebar(props) {
   const [newChatInput, setNewChatInput] = useState([]);
@@ -14,16 +13,6 @@ function ChatSidebar(props) {
           className="buttonHolder"
           style={creatingNewChat ? { marginBottom: 10 } : {}}
         >
-          {!props.wideScreen && (
-            <div className="sidebarToggleHolder">
-              <button
-                className="toggleSidebar"
-                onClick={props.flipDisplaySidebar}
-              >
-                <img src={toggleBars} alt="toggle bars" />
-              </button>
-            </div>
-          )}
           {
             <div className={props.wideScreen ? "" : "innerButtonHolder"}>
               {creatingNewChat && (

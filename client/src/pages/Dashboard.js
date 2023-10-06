@@ -1,22 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import toggleBars from "../assets/images/toggle-bars.png";
 
 function Dashboard(props) {
   const name = props.user?.name;
 
   return (
     <section id="dashboard">
-      {!props.wideScreen && (
-        <div className="toggleHolder">
-          <button
-            className="toggleSidebar toggleCenter"
-            onClick={props.flipDisplaySidebar}
-          >
-            <img src={toggleBars} alt="toggle bars" />
-          </button>
-        </div>
-      )}
       <div className="dash">
         <h1>Welcome home{name ? `, ${name}` : `!`}</h1>
         <p>Start finding your hackathon team members!</p>

@@ -6,7 +6,6 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
-import toggleBars from "../assets/images/toggle-bars.png";
 
 import { useNavigate } from "react-router-dom";
 
@@ -222,16 +221,6 @@ function Swipe(props) {
   return (
     <div id="swipeContainer">
       <section id={"swipe-profile-holder"}>
-        {!props.wideScreen && (
-          <div className="toggleHolder">
-            <button
-              className="toggleSidebar toggleCenter"
-              onClick={props.flipDisplaySidebar}
-            >
-              <img src={toggleBars} alt="toggle bars" />
-            </button>
-          </div>
-        )}
         {loading ? (
           <center>
             <Loading />
