@@ -213,6 +213,7 @@ function ChatSettings(props) {
           Confirm {}
         </button>
       )}
+     <div id='mobile-nav-space' style={{height: '17vw'}}/>
     </div>
   );
 }
