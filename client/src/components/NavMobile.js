@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
@@ -24,19 +23,19 @@ const NavMobile = (props) => {
         <>
         {showExtendedMenu && <NavExpandMobile userID={props.userID} logoutUser={props.logoutUser}/>}
         <div className="mobile-navbar" style={{backgroundColor: '#174D7E'}} >
-            <img src={burgerbar} style={{height: '20px'}} onClick ={showMenu}/>
+            <img src={burgerbar} style={{height: '20px'}} onClick ={showMenu} alt="more options"/>
             {!showExtendedMenu && <>
                 <a href="/myteam">
-                    <img src={teams} style={{height: '33px'}}/>
+                    <img src={teams} style={{height: '33px'}} alt="my team"/>
                 </a>
                 <a href="/swipe">
-                    <img src={home} style={{height: '35px'}}/>
+                    <img src={home} style={{height: '35px'}} alt="home/swipe"/>
                 </a>
                 <a href="/chat">
-                    <img src={chat} style={{height: '38px'}}/>
+                    <img src={chat} style={{height: '38px'}} alt="chat"/>
                 </a>
                 <a href="/edit">
-                    <img src={profile} style={{height: '39px'}}/>
+                    <img src={profile} style={{height: '39px'}} alt="profile"/>
                 </a>
             </> }
         </div>

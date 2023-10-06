@@ -5,6 +5,7 @@ function Dashboard(props) {
   const name = props.user?.name;
 
   return (
+    <>
     <section id="dashboard">
       <div className="dash">
         <h1>Welcome home{name ? `, ${name}` : `!`}</h1>
@@ -45,10 +46,16 @@ function Dashboard(props) {
             <br />
             <br />
             <span id="madewithlove">Made with ❤️ by Freetail Hackers</span>
+            <br className="mobile-nav-space"/>
+            <br className="mobile-nav-space"/>
+            <br className="mobile-nav-space"/>
+            <br className="mobile-nav-space"/>
+            <br className="mobile-nav-space"/> 
           </div>
         </div>
       </div>
     </section>
+    </>
   );
 }
 
