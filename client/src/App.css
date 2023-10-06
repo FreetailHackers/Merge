@@ -1606,3 +1606,17 @@ input[type=range]::-webkid-slider-runnable-track {
   width: 100vw;
   z-index: 20;
 }
+
+.extended-mobile-nav a {
+  text-decoration: none;
+  color: white;
+  font-weight: bolder;
+  font-size: 28px;
+  padding-left: 32px;
+  margin-bottom: 50px;
+}
+
+.extended-mobile-nav .menuItem {
+  margin-top: 10vw;
+  margin-bottom: 5vw;
+}

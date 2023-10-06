@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import toggleBars from "../assets/images/toggle-bars-white.png";
 
 const Navbar = (props) => {
   const navigate = useNavigate();
@@ -21,14 +20,6 @@ const Navbar = (props) => {
   return (
     <div id="navbar-spacing">
       <nav id="navbar">
-        {!props.wideScreen && (
-          <button
-            className="toggle toggleSidebar"
-            onClick={props.flipDisplaySidebar}
-          >
-            <img src={toggleBars} alt="toggle bars" />
-          </button>
-        )}
         <Link to="/dashboard" onClick={props.flipDisplaySidebar}>
           <div className="logo white" />
         </Link>
