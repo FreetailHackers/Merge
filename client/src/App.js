@@ -133,6 +133,10 @@ export default function App() {
                   />
                   )}
                 {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
+                {!wideScreen && (
+                  <NavMobile 
+                  userID={auth.userID.id}
+                  logoutUser={() => logoutUser(setAuth)}/>)}
               </div>
             }
             >
@@ -214,7 +218,6 @@ export default function App() {
         )}
       </Routes>
     </BrowserRouter>
-    {!wideScreen && <NavMobile/>}
     </>
   );
 }

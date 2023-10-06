@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 // components
 
@@ -21,7 +22,7 @@ const NavMobile = (props) => {
 
     return (
         <>
-        {showExtendedMenu && <NavExpandMobile/>}
+        {showExtendedMenu && <NavExpandMobile userID={props.userID} logoutUser={props.logoutUser}/>}
         <div className="mobile-navbar" style={{backgroundColor: '#174D7E'}} >
             <img src={burgerbar} style={{height: '20px'}} onClick ={showMenu}/>
             {!showExtendedMenu && <>
@@ -41,6 +42,11 @@ const NavMobile = (props) => {
         </div>
         </>
     )
+}
+
+NavMobile.propTypes = {
+    userID: PropTypes.string.isRequired,
+    logoutUser: PropTypes.func.isRequired
 }
 
 export default NavMobile;
