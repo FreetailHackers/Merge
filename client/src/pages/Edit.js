@@ -70,7 +70,7 @@ function Edit(props) {
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/update",
-        data
+        data,
       );
       setSaved(true);
       setPortfolioRegex(true);
@@ -315,7 +315,7 @@ function Edit(props) {
             onClick={handleSubmit}
             disabled={
               !requiredFields.every(
-                (e) => userProfile[e] && userProfile[e].length > 0
+                (e) => userProfile[e] && userProfile[e].length > 0,
               )
             }
             className="action"
@@ -335,7 +335,7 @@ function Edit(props) {
           isAlone={true}
         />
       </div>
-      <div id='mobile-nav-space' style={{height: '17vw'}}/>
+      <div id="mobile-nav-space" style={{ height: "17vw" }} />
     </div>
   );
 }

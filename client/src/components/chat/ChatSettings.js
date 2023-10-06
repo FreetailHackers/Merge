@@ -83,7 +83,7 @@ function ChatSettings(props) {
                       props.blockedByMe.includes(entry[0])
                         ? unblocking
                         : blocking,
-                      entry[0]
+                      entry[0],
                     ),
                   }}
                   onClick={
@@ -206,14 +206,14 @@ function ChatSettings(props) {
               blocking,
               unblocking,
               reporting,
-              leavingDeleting
+              leavingDeleting,
             )
           }
         >
           Confirm {}
         </button>
       )}
-     <div id='mobile-nav-space' style={{height: '17vw'}}/>
+      <div id="mobile-nav-space" style={{ height: "17vw" }} />
     </div>
   );
 }

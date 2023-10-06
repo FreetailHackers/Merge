@@ -37,7 +37,7 @@ const ChatPreview = ({
       {profiles?.length > 1 &&
         profiles.map((prof, i) => {
           const mu = Math.sqrt(
-            (1 - Math.cos((2 * Math.PI) / profiles.length)) / 2
+            (1 - Math.cos((2 * Math.PI) / profiles.length)) / 2,
           );
           const theta = Math.PI / 2 + (2 * Math.PI * i) / profiles.length;
           const size = (45 * mu) / (1 + mu);
@@ -108,7 +108,7 @@ const ChatPreview = ({
         </p>
       )}
     </div>
-    <div id='mobile-nav-space' style={{height: '17vw'}}/>
+    <div id="mobile-nav-space" style={{ height: "17vw" }} />
   </div>
 );
 

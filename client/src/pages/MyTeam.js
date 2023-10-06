@@ -32,7 +32,9 @@ function MyTeam(props) {
   useEffect(() => {
     axios
       .get(
-        process.env.REACT_APP_API_URL + "/api/teams/mergeRequestsInfo/" + userID
+        process.env.REACT_APP_API_URL +
+          "/api/teams/mergeRequestsInfo/" +
+          userID,
       )
       .then((res) => {
         setIngoingMRs(res.data.ingoing);
@@ -208,7 +210,7 @@ function MyTeam(props) {
         />
       )}
       {section === "User List" && <UserList userID={userID} />}
-      <div id='mobile-nav-space' style={{height: '17vw'}}/>
+      <div id="mobile-nav-space" style={{ height: "17vw" }} />
     </div>
   );
 }
