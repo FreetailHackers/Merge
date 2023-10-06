@@ -34,7 +34,6 @@ function Login(props) {
       <div className="container">
         <form id="fields">
           <div className="logo" />
-          <hr />
           <label htmlFor="email">Email</label>
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -70,39 +69,6 @@ function Login(props) {
             Register
           </button>
         </form>
-        <div className="about">
-          <h4>
-            Merge is a team-matching and real-time chat app made with ❤️ by
-            Freetail Hackers.
-          </h4>
-          <p>
-            <a
-              rel="noreferrer"
-              target="_blank"
-              href="https://freetailhackers.com/"
-            >
-              <strong>Freetail Hackers</strong>
-            </a>{" "}
-            is an organization centered at the University of Texas at Austin
-            that specializes in hosting hackathons.
-          </p>
-          <p>
-            We host two hackathons every year - our spring hackathon (
-            <a
-              rel="noreferrer"
-              target="_blank"
-              href="https://freetailhackers.com/hack-the-future/"
-            >
-              Hack the Future 2023
-            </a>
-            !) , and our flagship event,{" "}
-            <a rel="noreferrer" target="_blank" href="https://hacktx.com/">
-              <strong>HackTX</strong>
-            </a>{" "}
-            , in the fall.
-          </p>
-          <p>We hope to see you at one of our events!</p>
-        </div>
       </div>
     </section>
   );

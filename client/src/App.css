@@ -4,8 +4,12 @@
 
 nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background,
 .team-image .primary, .team-image .secondary, .headerDatabase, .selectedButton, section#login,
-section#register, section#login form button, section#register form button {
+section#register {
   background-color: var(--primary);
+}
+
+section#login form button, section#register form button {
+  background-color: #774158;
 }
 
 nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
@@ -478,7 +482,7 @@ code {
   --text-on-accept: var(--text-on-tertiary);
   --text-on-reject: var(--text-on-primary);
 
-  --login-background: url("./assets/images/background.png");
+  --login-background: url("./assets/images/login-background-blue.svg");
 
   --logo-color: url("./assets/images/logo/color.png");
   --logo-white: url("./assets/images/logo/white.png");
