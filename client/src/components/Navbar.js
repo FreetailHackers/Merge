@@ -36,12 +36,14 @@ const Navbar = (props) => {
           Find Team Members
         </NavLink>
         <NavLink to="/chat" onClick={props.flipDisplaySidebar}>
+          {props.updates.chat ? <span className="unreadBubble" /> : null}
           Chat
         </NavLink>
         <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
           Edit Profile
         </NavLink>
         <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
+          {props.updates.myteam ? <span className="unreadBubble" /> : null}
           My Team
         </NavLink>
         <NavLink to="/about" onClick={props.flipDisplaySidebar}>
@@ -60,6 +62,7 @@ Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
+  updates: PropTypes.object,
 };
 
 export default Navbar;

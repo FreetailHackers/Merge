@@ -2,10 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const AWS = require("aws-sdk");
-const CronJob = require("cron").CronJob;
-const mongoose = require("mongoose");
-const User = require("./models/User");
-const Chat = require("./models/Chat");
+//const CronJob = require("cron").CronJob;
+//const mongoose = require("mongoose");
+//const User = require("./models/User");
+//const Chat = require("./models/Chat");
 
 const app = express();
 const server = http.createServer(app);
@@ -111,8 +111,11 @@ function errHandler(data, socket) {
   return true;
 }
 
-function newMessage(data, socket) {
-  socket.to(data.chat).emit("broadcast-message", data);
+async function newMessage(data, socket) {
+  socket.to(data.chat).emit("broadcast-message", data.message);
+  for (const user of data.users) {
+    socket.to(user).emit("received-message");
+  }
 }
 
 function joinRoom(data, socket) {
@@ -125,7 +128,7 @@ function leaveRoom(data, socket) {
 
 function leaveChatRooms(socket) {
   for (const room of socket.rooms) {
-    if (room != socket.id) {
+    if (room !== socket.id && room !== socket.data.mongoID) {
       socket.leave(room);
     }
   }
@@ -253,15 +256,15 @@ AWS.config.update({
   region: process.env.AWS_REGION,
 });
 
-const db = process.env.MONGO_URI;
+/*const db = process.env.MONGO_URI;
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => console.log("MongoDB successfully connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log(err));*/
 
-const ses = new AWS.SES();
+//const ses = new AWS.SES();
 
-async function sendEmails() {
+/*async function sendEmails() {
   const chats = await Chat.find();
   const users = await User.find();
   let promises = [];
@@ -344,17 +347,17 @@ async function sendEmails() {
   }
 
   await Promise.all(promises);
-}
+}*/
 
-new CronJob(
-  "00 0 */4 * * *",
-  () => {
-    sendEmails();
-  },
-  null,
-  true,
-  "America/Chicago"
-);
+//new CronJob(
+//"00 0 */4 * * *",
+//() => {
+//  sendEmails();
+//},
+//null,
+//true,
+//"America/Chicago"
+//);
 
 const port = process.env.CHAT_PORT || 5000;
 

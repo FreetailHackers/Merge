@@ -105,7 +105,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 }
 
 .github-card img.githubImage, .chatPreview .smallDivider,
-.chatPreview .unreadBubble, .newMessageBox p, .messageImage{
+.newMessageBox p, .messageImage{
   border-radius: 50%;
 }
 
@@ -1273,13 +1273,24 @@ section#register form span.error {
   height: 45px;
 }
 
+
+.unreadBubble {
+  border-radius: 50%;
+  display: inline-block
+}
+
+#navbar .unreadBubble {
+  width: 10px;
+  height: 10px;
+  background: var(--text-on-primary);
+  margin-right: 5px;
+}
+
 .chatPreview .unreadBubble {
   width: 12px;
   height: 12px;
   margin-left: 5px;
   background: var(--primary);
-  border-radius: 50%;
-  display: inline-block
 }
 
 .newChatButton {

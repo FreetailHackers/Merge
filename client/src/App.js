@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   loginUser,
   registerUser,
@@ -8,10 +8,6 @@ import {
 } from "./utils/authActions";
 
 import axios from "axios";
-import io from "socket.io-client";
-
-import Navbar from "./components/Navbar";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -24,6 +20,7 @@ import MyTeam from "./pages/MyTeam";
 import { useMediaQuery } from "@mantine/hooks";
 
 import "./App.css";
+import LoggedInApp from "./LoggedInApp";
 
 const initialUserState = {
   userID: null,
@@ -35,7 +32,7 @@ const initialUserState = {
 export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [user, setUser] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const [socketConnected, setSocketConnected] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
@@ -72,26 +69,6 @@ export default function App() {
     }
   }, [userID]);
 
-  const token = auth?.token;
-  useEffect(() => {
-    if (token) {
-      const socketVar = io(process.env.REACT_APP_CHAT_URL, {
-        transports: ["websocket"],
-        query: { token },
-      });
-      socketVar.on("connect", () => {
-        setSocket(socketVar);
-      });
-    } else {
-      setSocket((prev) => {
-        if (prev?.connected) {
-          prev.disconnect();
-        }
-        return null;
-      });
-    }
-  }, [token]);
-
   const login = (
     <Login
       auth={auth}
@@ -121,17 +98,14 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {(displaySidebar || wideScreen) && (
-                  <Navbar
-                    userID={auth.userID.id}
-                    logoutUser={() => logoutUser(setAuth)}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(false)}
-                  />
-                )}
-                {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
-              </div>
+              <LoggedInApp
+                auth={auth}
+                logoutUser={() => logoutUser(setAuth)}
+                displaySidebar={displaySidebar}
+                wideScreen={wideScreen}
+                setSocketConnected={setSocketConnected}
+                setDisplaySidebar={setDisplaySidebar}
+              />
             }
           >
             <Route
@@ -173,7 +147,7 @@ export default function App() {
             <Route
               path="myteam"
               element={
-                socket?.connected ? (
+                socketConnected ? (
                   <MyTeam
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
@@ -187,7 +161,7 @@ export default function App() {
             <Route
               path="chat"
               element={
-                socket?.connected ? (
+                socketConnected ? (
                   <Chat
                     userID={auth.userID.id}
                     wideScreen={wideScreen}

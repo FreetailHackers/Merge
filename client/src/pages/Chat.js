@@ -227,7 +227,7 @@ function Chat(props) {
       })
       .then((res) => {
         // Update the last message of the chat and move it to the top
-        socket.emit("new-message", message);
+        socket.emit("new-message", { message, users: chat.users });
         chat.lastMessage = res.data;
         setChats((prev) => [
           chat,
