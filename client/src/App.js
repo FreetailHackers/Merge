@@ -69,6 +69,16 @@ export default function App() {
     }
   }, [userID]);
 
+  const teamID = user?.team;
+  const setTeamID = (newID) =>
+    setUser((prev) => {
+      if (prev) {
+        return { ...prev, team: newID };
+      } else {
+        return prev;
+      }
+    });
+
   const login = (
     <Login
       auth={auth}
@@ -105,6 +115,8 @@ export default function App() {
                 wideScreen={wideScreen}
                 setSocketConnected={setSocketConnected}
                 setDisplaySidebar={setDisplaySidebar}
+                teamID={teamID}
+                setTeamID={setTeamID}
               />
             }
           >
@@ -147,11 +159,13 @@ export default function App() {
             <Route
               path="myteam"
               element={
-                socketConnected ? (
+                socketConnected && teamID ? (
                   <MyTeam
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
                     flipDisplaySidebar={() => setDisplaySidebar(true)}
+                    teamID={teamID}
+                    setTeamID={setTeamID}
                   />
                 ) : (
                   <div>Loading...</div>

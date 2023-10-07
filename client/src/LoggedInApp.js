@@ -17,6 +17,7 @@ function LoggedInApp(props) {
     wideScreen,
     setSocketConnected,
     logoutUser,
+    teamID,
   } = props;
   const [socket, setSocket] = useState(null);
   const [updates, setUpdates] = useState({ ...noUpdates });
@@ -64,6 +65,17 @@ function LoggedInApp(props) {
       }
     };
   }, [socket, userID]);
+
+  useEffect(() => {
+    if (teamID) {
+      socket.emit("join-room", { id: teamID });
+    }
+    return () => {
+      if (teamID) {
+        socket.emit("leave-room", { id: teamID });
+      }
+    };
+  }, [socket, teamID]);
 
   useEffect(() => {
     if (socket) {
@@ -115,6 +127,8 @@ LoggedInApp.propTypes = {
   setDisplaySidebar: PropTypes.func,
   wideScreen: PropTypes.bool,
   setSocketConnected: PropTypes.func,
+  teamID: PropTypes.string,
+  setTeamID: PropTypes.func,
 };
 
 export default LoggedInApp;

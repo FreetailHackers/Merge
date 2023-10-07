@@ -12,13 +12,12 @@ function MyTeam(props) {
   //frontend for updating
   const socket = useOutletContext();
   const [team, setTeam] = useState(null);
-  const { userID } = props;
+  const { userID, teamID, setTeamID } = props;
   const [section, setSection] = useState("Membership");
   const [saved, setSaved] = useState(false);
   const [ingoingMRs, setIngoingMRs] = useState([]);
   const [outgoingMRs, setOutgoingMRs] = useState([]);
 
-  const teamID = team?._id;
   useEffect(() => {
     axios
       .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID}`)
@@ -28,7 +27,7 @@ function MyTeam(props) {
           setSection("Profile");
         }
       });
-  }, [userID]);
+  }, [userID, teamID]);
 
   useEffect(() => {
     axios
@@ -42,17 +41,6 @@ function MyTeam(props) {
   }, [userID, teamID]);
 
   useEffect(() => {
-    if (teamID) {
-      socket.emit("join-room", { id: teamID });
-    }
-    return () => {
-      if (teamID) {
-        socket.emit("leave-room", { id: teamID });
-      }
-    };
-  }, [socket, teamID]);
-
-  useEffect(() => {
     function teammateLeftWS(data) {
       setTeam((prev) => {
         let newTeam = { ...prev };
@@ -63,29 +51,30 @@ function MyTeam(props) {
     }
 
     function mergeRequestedWS(data) {
-      if (data.requestingTeam._id === team._id) {
+      if (data.requestingTeam._id === teamID) {
         setOutgoingMRs((prev) => [...prev, data]);
-      } else if (data.requestedTeam._id === team._id) {
+      } else if (data.requestedTeam._id === teamID) {
         setIngoingMRs((prev) => [...prev, data]);
       }
     }
 
     function mergeAcceptedWS(data) {
-      if (team._id === data.newTeam._id) {
+      if (teamID === data.newTeam._id) {
         setOutgoingMRs((prev) => [
           ...prev.filter((e) => e.requestedTeam._id !== data.absorbedTeamID),
         ]);
       }
       setTeam(data.newTeam);
+      setTeamID(data.newTeam._id);
       setSection("Profile");
     }
 
     function mergeRejectedWS(data) {
-      if (data.requestingTeamID === team._id) {
+      if (data.requestingTeamID === teamID) {
         setOutgoingMRs((prev) => [
           ...prev.filter((e) => e.requestedTeam._id !== data.rejectingTeamID),
         ]);
-      } else if (data.rejectingTeamID === team._id) {
+      } else if (data.rejectingTeamID === teamID) {
         setIngoingMRs((prev) => [
           ...prev.filter((e) => e.requestingTeam._id !== data.requestingTeamID),
         ]);
@@ -93,11 +82,11 @@ function MyTeam(props) {
     }
 
     function requestCancelledWS(data) {
-      if (data.requestedTeamID === team._id) {
+      if (data.requestedTeamID === teamID) {
         setIngoingMRs((prev) => [
           ...prev.filter((e) => e.requestingTeam._id !== data.cancellingTeamID),
         ]);
-      } else if (data.cancellingTeamID === team._id) {
+      } else if (data.cancellingTeamID === teamID) {
         setOutgoingMRs((prev) => [
           ...prev.filter((e) => e.requestedTeam._id !== data.requestedTeamID),
         ]);
@@ -105,7 +94,7 @@ function MyTeam(props) {
     }
 
     function profileUpdatedWS(data) {
-      if (data.teamID === team._id) {
+      if (data.teamID === teamID) {
         setTeam((prev) => ({ ...prev, profile: data.profile }));
         setSaved(true);
       }
@@ -116,6 +105,7 @@ function MyTeam(props) {
         .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID}`)
         .then((res) => {
           setTeam(res.data);
+          setTeamID(res.data._id);
         });
     }
 
@@ -136,7 +126,7 @@ function MyTeam(props) {
       socket.off("profile-updated", profileUpdatedWS);
       socket.off("membership-updated", membershipUpdatedWS);
     };
-  }, [socket, team, setTeam, userID]);
+  }, [socket, teamID, setTeamID, setTeam, userID]);
 
   if (!team || !team.profile) {
     return <div></div>;
@@ -227,6 +217,8 @@ MyTeam.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
+  teamID: PropTypes.string,
+  setTeamID: PropTypes.func,
 };
 
 export default MyTeam;
