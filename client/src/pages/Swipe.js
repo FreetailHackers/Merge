@@ -31,7 +31,7 @@ function Swipe(props) {
       const res = await axios.get(
         process.env.REACT_APP_API_URL +
           "/api/teams/teamsToSwipe/" +
-          props.userID,
+          props.userID
       );
       if (res.data.ready) {
         setTeamsToShow(res.data.teams);
@@ -53,7 +53,7 @@ function Swipe(props) {
         params: {
           idealSize: idealSize,
         },
-      },
+      }
     );
     setTeamsToShow(res.data.teams);
     setLoading(false);
@@ -93,7 +93,7 @@ function Swipe(props) {
   const clearLeftSwipes = async () => {
     try {
       await axios.post(
-        process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe",
+        process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe"
       );
 
       const nextCall = await axios.get(
@@ -104,7 +104,7 @@ function Swipe(props) {
           params: {
             idealSize: idealSize,
           },
-        },
+        }
       );
 
       if (nextCall.data.ready) {
@@ -315,7 +315,6 @@ Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
   navigate: PropTypes.func,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Swipe;

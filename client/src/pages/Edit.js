@@ -70,7 +70,7 @@ function Edit(props) {
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/update",
-        data,
+        data
       );
       setSaved(true);
       setPortfolioRegex(true);
@@ -315,7 +315,7 @@ function Edit(props) {
             onClick={handleSubmit}
             disabled={
               !requiredFields.every(
-                (e) => userProfile[e] && userProfile[e].length > 0,
+                (e) => userProfile[e] && userProfile[e].length > 0
               )
             }
             className="action"
@@ -345,7 +345,6 @@ Edit.propTypes = {
   userID: PropTypes.string.isRequired,
   setUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Edit;

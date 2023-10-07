@@ -31,7 +31,7 @@ function Chat(props) {
   useEffect(() => {
     async function setupAPICalls() {
       let res = await axios.get(
-        process.env.REACT_APP_API_URL + "/api/chats/reachableUsers",
+        process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
       );
       setOtherUsers(res.data);
       res = await axios.get(process.env.REACT_APP_API_URL + "/api/chats");
@@ -60,7 +60,7 @@ function Chat(props) {
       setMessages((prev) => [...prev, data]);
       if (data.chat === selectedChat) {
         axios.post(
-          process.env.REACT_APP_API_URL + `/api/chats/${data.chat}/read`,
+          process.env.REACT_APP_API_URL + `/api/chats/${data.chat}/read`
         );
       }
       setChats((prev) => {
@@ -118,7 +118,7 @@ function Chat(props) {
 
     const unblockedWS = async (data) => {
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${data.userID}`,
+        `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${data.userID}`
       );
       setOtherUsers((prev) => [...prev, { _id: data.userID, ...res.data }]);
     };
@@ -176,7 +176,7 @@ function Chat(props) {
       process.env.REACT_APP_API_URL + `/api/chats/new`,
       {
         otherUsers: users,
-      },
+      }
     );
     let chat = res.data;
     chat.seen = true;
@@ -193,7 +193,7 @@ function Chat(props) {
   async function getMessages(chatID) {
     let chat = chats[chats.findIndex((e) => e._id === chatID)];
     const res = await axios.get(
-      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/messages`,
+      process.env.REACT_APP_API_URL + `/api/chats/${chatID}/messages`
     );
     chat.seen = true;
     const messageList = res.data;
@@ -202,7 +202,7 @@ function Chat(props) {
     for (const author of authors) {
       if (!(author in chat.profiles)) {
         const res2 = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${author}`,
+          `${process.env.REACT_APP_API_URL}/api/users/conciseInfo/${author}`
         );
         chat.profiles[author] = res2.data;
       }
@@ -273,7 +273,7 @@ function Chat(props) {
     const deletedChat = { ...chats[activeChatIndex] };
     axios
       .post(
-        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`,
+        process.env.REACT_APP_API_URL + `/api/chats/${deletedChat._id}/delete`
       )
       .then(() => {
         socket.emit("delete-chat", deletedChat);
@@ -299,7 +299,7 @@ function Chat(props) {
   async function blockUnblockUsers(blocking, unblocking) {
     for (const user of blocking) {
       await axios.post(
-        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block",
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/block"
       );
     }
     if (blocking.length > 0) {
@@ -307,19 +307,19 @@ function Chat(props) {
     }
     for (const user of unblocking) {
       await axios.post(
-        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock",
+        process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock"
       );
     }
     if (unblocking.length > 0) {
       socket.emit("unblock-users", { users: unblocking });
     }
     const res = await axios.get(
-      process.env.REACT_APP_API_URL + "/api/chats/reachableUsers",
+      process.env.REACT_APP_API_URL + "/api/chats/reachableUsers"
     );
     setOtherUsers(res.data);
     setBlockedByMe((prev) => [
       ...[...new Set([...prev, ...blocking])].filter(
-        (u) => !unblocking.includes(u),
+        (u) => !unblocking.includes(u)
       ),
     ]);
   }
@@ -327,7 +327,7 @@ function Chat(props) {
   async function kickUsers(users, chatID) {
     await axios.post(
       process.env.REACT_APP_API_URL + `/api/chats/${chatID}/remove`,
-      { users },
+      { users }
     );
     socket.emit("remove-users", {
       chatID: chatID,
@@ -350,7 +350,6 @@ function Chat(props) {
           }}
           selectedChat={selectedChat}
           createChat={createChat}
-          flipDisplaySidebar={props.flipDisplaySidebar}
           wideScreen={props.wideScreen}
           otherUsers={otherUsers}
           selfID={userID}
@@ -360,13 +359,12 @@ function Chat(props) {
         (activeChatIndex === -1 ? (
           <ChatMissing
             hasChats={chats.length > 0}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ) : (
           <ChatWindow
             messages={messages.filter(
-              (message) => message.chat === selectedChat,
+              (message) => message.chat === selectedChat
             )}
             key={selectedChat._id}
             sendMessage={sendMessage}
@@ -381,7 +379,6 @@ function Chat(props) {
             blockedByMe={blockedByMe}
             blockUnblockUsers={blockUnblockUsers}
             kickUsers={kickUsers}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ))}
@@ -393,7 +390,6 @@ function Chat(props) {
 Chat.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
   blockList: PropTypes.array,
 };
 

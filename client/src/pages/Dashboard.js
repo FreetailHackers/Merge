@@ -62,7 +62,6 @@ function Dashboard(props) {
 Dashboard.propTypes = {
   user: PropTypes.object,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Dashboard;

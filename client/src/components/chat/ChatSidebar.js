@@ -94,7 +94,6 @@ ChatSidebar.propTypes = {
   chats: PropTypes.array.isRequired,
   createChat: PropTypes.func.isRequired,
   changeChat: PropTypes.func.isRequired,
-  flipDisplaySidebar: PropTypes.func,
   wideScreen: PropTypes.bool,
   otherUsers: PropTypes.arrayOf(PropTypes.object),
   selfID: PropTypes.string.isRequired,

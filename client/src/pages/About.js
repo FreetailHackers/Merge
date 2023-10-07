@@ -71,7 +71,6 @@ function About(props) {
 
 About.propTypes = {
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default About;

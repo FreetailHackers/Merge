@@ -24,7 +24,7 @@ function ChatWindow(props) {
     const handleScroll = (e) => {
       setLockScroll(
         scrollBox.scrollTop + 10 >=
-          scrollBox.scrollHeight - scrollBox.offsetHeight,
+          scrollBox.scrollHeight - scrollBox.offsetHeight
       );
     };
     scrollBox.addEventListener("scroll", handleScroll);
@@ -68,7 +68,7 @@ function ChatWindow(props) {
     blocking,
     unblocking,
     reporting,
-    leavingDeleting,
+    leavingDeleting
   ) => {
     if (reporting.length > 0) {
       const contents = document.getElementById("reason").value;
@@ -100,12 +100,7 @@ function ChatWindow(props) {
       <div className="chatWindowHeader">
         {!props.wideScreen && (
           <div className="windowToggleHolder">
-            <button
-              className="toggleSidebar"
-              onClick={props.flipDisplaySidebar}
-            >
-              ←
-            </button>
+            <button className="toggleSidebar">←</button>
           </div>
         )}
         <div className="chatWindowTitle">
@@ -130,8 +125,8 @@ function ChatWindow(props) {
                 ? props.title
                 : String(
                     props.chat.users.map(
-                      (id) => `${props.chat.profiles[id].name}`,
-                    ),
+                      (id) => `${props.chat.profiles[id].name}`
+                    )
                   ).replaceAll(",", ", ")}
             </h3>
           )}
@@ -191,7 +186,7 @@ function ChatWindow(props) {
           otherUsers={
             props.otherUsers &&
             props.otherUsers.filter(
-              (user) => !props.chat.users.includes(user._id),
+              (user) => !props.chat.users.includes(user._id)
             )
           }
           addUsers={props.addUsers}
@@ -200,8 +195,8 @@ function ChatWindow(props) {
               ? props.title
               : String(
                   props.chat.users.map(
-                    (id) => `${props.chat.profiles[id].name}`,
-                  ),
+                    (id) => `${props.chat.profiles[id].name}`
+                  )
                 ).replaceAll(",", ", ")
           }
           wideScreen={props.wideScreen}
@@ -253,7 +248,6 @@ ChatWindow.propTypes = {
   blockUnblockUsers: PropTypes.func,
   blockedByMe: PropTypes.array,
   kickUsers: PropTypes.func,
-  flipDisplaySidebar: PropTypes.func,
   wideScreen: PropTypes.bool,
 };
 

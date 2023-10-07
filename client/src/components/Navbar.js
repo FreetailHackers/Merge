@@ -12,7 +12,6 @@ const Navbar = (props) => {
 
   const onLogoutClick = (e) => {
     e.preventDefault();
-    props.flipDisplaySidebar();
     props.logoutUser();
     navigate("/login");
   };
@@ -20,24 +19,14 @@ const Navbar = (props) => {
   return (
     <div id="navbar-spacing">
       <nav id="navbar">
-        <Link to="/dashboard" onClick={props.flipDisplaySidebar}>
+        <Link to="/dashboard">
           <div className="logo white" />
         </Link>
-        <NavLink to="/swipe" onClick={props.flipDisplaySidebar}>
-          Find Team Members
-        </NavLink>
-        <NavLink to="/chat" onClick={props.flipDisplaySidebar}>
-          Chat
-        </NavLink>
-        <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
-          Edit Profile
-        </NavLink>
-        <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
-          My Team
-        </NavLink>
-        <NavLink to="/about" onClick={props.flipDisplaySidebar}>
-          About
-        </NavLink>
+        <NavLink to="/swipe">Find Team Members</NavLink>
+        <NavLink to="/chat">Chat</NavLink>
+        <NavLink to="/edit">Edit Profile</NavLink>
+        <NavLink to="/myteam">My Team</NavLink>
+        <NavLink to="/about">About</NavLink>
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
@@ -50,7 +39,6 @@ Navbar.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Navbar;

@@ -455,7 +455,7 @@ code {
 /* Theme.css  */
 
 :root {
-  --primary: #e76482;
+  --primary: #174D7E;
   --primary-transparent: #e7648230;
   --primary-less-transparent: #e7648250;
   --secondary: #473899;
@@ -1596,13 +1596,14 @@ input[type=range]::-webkid-slider-runnable-track {
   width: 100vw;
   user-select: none;
   height: 17vw;
+  background-color: var(--primary);
 }
 
 .extended-mobile-nav {
   position: fixed;
   top: 0;
   background-color: rgb(23, 77, 126);
-  height: 100vh;
+  height: calc(100 * var(--vh, 1vh));
   width: 100vw;
   z-index: 20;
 }

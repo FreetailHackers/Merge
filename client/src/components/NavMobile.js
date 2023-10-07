@@ -24,7 +24,7 @@ const NavMobile = (props) => {
       {showExtendedMenu && (
         <NavExpandMobile userID={props.userID} logoutUser={props.logoutUser} />
       )}
-      <div className="mobile-navbar" style={{ backgroundColor: "#174D7E" }}>
+      <div className="mobile-navbar">
         <img
           src={burgerbar}
           style={{ height: "20px" }}

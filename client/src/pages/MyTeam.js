@@ -32,9 +32,7 @@ function MyTeam(props) {
   useEffect(() => {
     axios
       .get(
-        process.env.REACT_APP_API_URL +
-          "/api/teams/mergeRequestsInfo/" +
-          userID,
+        process.env.REACT_APP_API_URL + "/api/teams/mergeRequestsInfo/" + userID
       )
       .then((res) => {
         setIngoingMRs(res.data.ingoing);
@@ -218,7 +216,6 @@ function MyTeam(props) {
 MyTeam.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default MyTeam;
