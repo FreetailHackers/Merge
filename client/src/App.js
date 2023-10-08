@@ -70,7 +70,7 @@ export default function App() {
   }, [userID]);
 
   const teamID = user?.team;
-  const setTeamID = (newID) =>
+  const setTeamID = (newID) => {
     setUser((prev) => {
       if (prev) {
         return { ...prev, team: newID };
@@ -78,6 +78,7 @@ export default function App() {
         return prev;
       }
     });
+  };
 
   const login = (
     <Login

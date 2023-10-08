@@ -51,7 +51,8 @@ function TeamList(props) {
     axios
       .post(process.env.REACT_APP_API_URL + `/api/teams/acceptMerge/${teamID}`)
       .then((res) => {
-        props.setTeam(res.data);
+        props.setTeamID(res.data._id);
+        //props.setTeam(res.data);
         const absorbedTeamID = res.data._id === teamID ? oldTeamID : teamID;
         socket.emit("accept-merge", { absorbedTeamID, newTeam: res.data });
         props.setSection("Profile");
@@ -302,6 +303,7 @@ TeamList.propTypes = {
   setOutgoingMRs: PropTypes.func,
   userID: PropTypes.string,
   setSection: PropTypes.func,
+  setTeamID: PropTypes.func,
 };
 
 export default TeamList;

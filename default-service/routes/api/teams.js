@@ -730,6 +730,7 @@ async function updateMembership(req, res) {
       team.leader = req.body.newLeader;
       await team.save();
     }
+    let newTeams = {};
     if (req.body.kickedUsers?.length > 0) {
       for (const kickedUserID of req.body.kickedUsers) {
         const kickedUser = await User.findById(kickedUserID);
@@ -738,13 +739,14 @@ async function updateMembership(req, res) {
         }
         team.users = [...team.users.filter((e) => String(e) !== kickedUserID)];
         await team.save();
-        await createTeam({ body: { user: kickedUserID } }, res);
+        const newTeam = await createTeam({ body: { user: kickedUserID } }, res);
+        newTeams[kickedUserID] = newTeam._id;
       }
     }
     let teamObj = team.toObject();
     //delete teamObj.mergeRequests;
     await addProfiles(teamObj);
-    return res.json(teamObj);
+    return res.json({ team: teamObj, newTeams });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

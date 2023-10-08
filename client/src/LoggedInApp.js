@@ -18,6 +18,7 @@ function LoggedInApp(props) {
     setSocketConnected,
     logoutUser,
     teamID,
+    setTeamID,
   } = props;
   const [socket, setSocket] = useState(null);
   const [updates, setUpdates] = useState({ ...noUpdates });
@@ -55,23 +56,27 @@ function LoggedInApp(props) {
   const onMyTeam = path?.endsWith("myteam");
 
   const userID = auth.userID.id;
+
   useEffect(() => {
+    function changeTeam(data) {
+      setTeamID(data.newTeam);
+    }
     if (socket) {
-      socket.emit("join-room", { id: userID });
+      socket.on("kicked-from-team", changeTeam);
     }
     return () => {
       if (socket) {
-        socket.emit("leave-room", { id: userID });
+        socket.off("kicked-from-team", changeTeam);
       }
     };
-  }, [socket, userID]);
+  }, [socket, setTeamID]);
 
   useEffect(() => {
-    if (teamID) {
-      socket.emit("join-room", { id: teamID });
+    if (socket && teamID) {
+      socket.emit("join-team-room", { id: teamID });
     }
     return () => {
-      if (teamID) {
+      if (socket && teamID) {
         socket.emit("leave-room", { id: teamID });
       }
     };
@@ -88,7 +93,7 @@ function LoggedInApp(props) {
       if (onMyTeam) {
         setUpdates((prev) => ({ ...prev, myteam: false }));
       } else {
-        socket.on("merge-requested", setMyTeamUpdate);
+        socket.on("myteam-update", setMyTeamUpdate);
       }
     }
     return () => {
@@ -97,7 +102,7 @@ function LoggedInApp(props) {
           socket.off("received-message", setChatUpdate);
         }
         if (!onMyTeam) {
-          socket.on("merge-requested", setMyTeamUpdate);
+          socket.off("myteam-update", setMyTeamUpdate);
         }
       }
     };
@@ -107,7 +112,7 @@ function LoggedInApp(props) {
     <div style={{ display: "flex", flexDirection: "row" }}>
       {(displaySidebar || wideScreen) && (
         <Navbar
-          userID={auth.userID.id}
+          userID={userID}
           logoutUser={logoutUser}
           wideScreen={wideScreen}
           flipDisplaySidebar={() => setDisplaySidebar(false)}

@@ -14,7 +14,6 @@ function MyTeam(props) {
   const [team, setTeam] = useState(null);
   const { userID, teamID, setTeamID } = props;
   const [section, setSection] = useState("Membership");
-  const [saved, setSaved] = useState(false);
   const [ingoingMRs, setIngoingMRs] = useState([]);
   const [outgoingMRs, setOutgoingMRs] = useState([]);
 
@@ -25,6 +24,8 @@ function MyTeam(props) {
         setTeam(res.data);
         if (res.data.users?.length > 1) {
           setSection("Profile");
+        } else {
+          setSection("Team List");
         }
       });
   }, [userID, teamID]);
@@ -46,6 +47,9 @@ function MyTeam(props) {
         let newTeam = { ...prev };
         delete newTeam.profiles[data.userID];
         newTeam.users = [...newTeam.users.filter((e) => e !== data.userID)];
+        if (newTeam.users.length === 1) {
+          setSection("Team List");
+        }
         return newTeam;
       });
     }
@@ -93,20 +97,24 @@ function MyTeam(props) {
       }
     }
 
-    function profileUpdatedWS(data) {
-      if (data.teamID === teamID) {
-        setTeam((prev) => ({ ...prev, profile: data.profile }));
-        setSaved(true);
-      }
-    }
-
-    function membershipUpdatedWS() {
-      axios
-        .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID}`)
-        .then((res) => {
-          setTeam(res.data);
-          setTeamID(res.data._id);
+    function membershipUpdatedWS(data) {
+      if (data.kickedUsers.includes(userID)) {
+        setTeamID(data.newTeams[userID]);
+      } else {
+        setTeam((prev) => {
+          let newTeam = { ...prev };
+          newTeam.users = [
+            ...newTeam.users.filter((e) => !data.kickedUsers.includes(e)),
+          ];
+          for (const user of data.kickedUsers) {
+            delete newTeam.profiles[user];
+          }
+          if (data.newLeader) {
+            newTeam.leader = data.newLeader;
+          }
+          return newTeam;
         });
+      }
     }
 
     socket.on("teammate-left", teammateLeftWS);
@@ -114,7 +122,6 @@ function MyTeam(props) {
     socket.on("merge-accepted", mergeAcceptedWS);
     socket.on("merge-rejected", mergeRejectedWS);
     socket.on("request-cancelled", requestCancelledWS);
-    socket.on("profile-updated", profileUpdatedWS);
     socket.on("membership-updated", membershipUpdatedWS);
 
     return () => {
@@ -123,7 +130,6 @@ function MyTeam(props) {
       socket.off("merge-accepted", mergeAcceptedWS);
       socket.off("merge-rejected", mergeRejectedWS);
       socket.off("request-cancelled", requestCancelledWS);
-      socket.off("profile-updated", profileUpdatedWS);
       socket.off("membership-updated", membershipUpdatedWS);
     };
   }, [socket, teamID, setTeamID, setTeam, userID]);
@@ -184,16 +190,16 @@ function MyTeam(props) {
       </div>
 
       {section === "Profile" && (
-        <TeamProfile
-          team={team}
-          setTeam={setTeam}
-          saved={saved}
-          setSaved={setSaved}
-        />
+        <TeamProfile team={team} setTeam={setTeam} userID={userID} />
       )}
 
       {section === "Membership" && (
-        <Membership team={team} userID={userID} setTeam={setTeam} />
+        <Membership
+          team={team}
+          userID={userID}
+          setTeam={setTeam}
+          setTeamID={setTeamID}
+        />
       )}
 
       {section === "Team List" && (
@@ -205,6 +211,7 @@ function MyTeam(props) {
           userID={userID}
           team={team}
           setTeam={setTeam}
+          setTeamID={setTeamID}
           setSection={setSection}
         />
       )}
