@@ -8,14 +8,13 @@ import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
 import toggleBars from "../assets/images/toggle-bars.png";
 
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 function Swipe(props) {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [teamsToShow, setTeamsToShow] = useState([]);
   const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
-
+  const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
   const [idealSize, setIdealSize] = useState(0);
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
@@ -47,7 +46,7 @@ function Swipe(props) {
     }
   }, [props.userID]);
 
-  async function getTeamToShow() {
+  async function getTeamsToShow() {
     const res = await axios.get(
       process.env.REACT_APP_API_URL + "/api/teams/teamsToSwipe/" + props.userID,
       {
@@ -72,22 +71,18 @@ function Swipe(props) {
         decision,
       })
       .then((res) => {
-        if (decision === "accept-committed") {
-          navigate("/chat");
-        } else {
-          setTimeout(() => {
-            if (teamsToShow.length === 1) {
-              getTeamToShow();
-            } else {
-              setTeamsToShow((prev) => [...prev.slice(1)]);
-              setProfileState((prev) => ({
-                ...prev,
-                profileAngle: 0,
-                profileSide: "neutral",
-              }));
-            }
-          }, 175);
-        }
+        setTimeout(() => {
+          if (teamsToShow.length === 1) {
+            getTeamsToShow();
+          } else {
+            setTeamsToShow((prev) => [...prev.slice(1)]);
+            setProfileState((prev) => ({
+              ...prev,
+              profileAngle: 0,
+              profileSide: "neutral",
+            }));
+          }
+        }, 175);
       });
   };
 
@@ -294,21 +289,25 @@ function Swipe(props) {
             value={String(idealSize)}
             onChange={(e) => setIdealSize(parseInt(e.target.value))}
             min={0}
-            max={4}
+            max={MAX_TEAM_SIZE - 1}
             step={1}
             list="team-sizes"
           />
-          <datalist id="team-sizes">
-            {[...[...Array(4).keys()].map((e) => e + 1)].map((e) => (
-              <option value={e} key={e} label={`${e}`} />
-            ))}
-          </datalist>
+          {
+            <datalist id="team-sizes">
+              {[...[...Array(MAX_TEAM_SIZE - 1).keys()].map((e) => e + 1)].map(
+                (e) => (
+                  <option value={e} key={e} label={`${e}`} />
+                )
+              )}
+            </datalist>
+          }
           <p>
             Searching for teams of size{" "}
             <strong>{idealSize > 0 ? idealSize : "any"}</strong>
           </p>
           <div className="flexRow">
-            <button onClick={getTeamToShow} className="refreshBtn">
+            <button onClick={getTeamsToShow} className="refreshBtn">
               Refresh
             </button>
             <button onClick={clearLeftSwipes} className="refreshBtn">
@@ -323,7 +322,6 @@ function Swipe(props) {
 
 Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
-  navigate: PropTypes.func,
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
 };

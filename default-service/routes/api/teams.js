@@ -13,7 +13,7 @@ router.use(authenticateToken);
 const dotenv = require("dotenv");
 dotenv.config();
 
-const MAX_TEAM_SIZE = 5;
+const MAX_TEAM_SIZE = 4;
 
 // @route POST api/team/requestMerge
 // @desc Request Team Merge
