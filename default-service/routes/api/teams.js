@@ -592,14 +592,26 @@ async function getTeamsToSwipe(req, res) {
       console.error("Invalid user ID provided");
       return res.sendStatus(400);
     }
+    const capacity = MAX_TEAM_SIZE - team.users.length;
+    if (capacity === 0) {
+      return res.json({ ready: false, capacity, teams: [] });
+    }
+
     const swipeReady = await isTeamSwipeReady(team);
     if (!swipeReady) {
       return res.json({ ready: false, teams: [] });
     }
+
+    // 1 to MAX_TEAM_SIZE - size
+    const sizeRange = [...Array(MAX_TEAM_SIZE - team.users.length).keys()].map(
+      (e) => ({ users: { $size: e + 1 } })
+    );
+
     const userFilter =
       req.query.idealSize && req.query.idealSize > 0
         ? { users: { $size: req.query.idealSize } }
-        : { users: { $not: { $size: MAX_TEAM_SIZE } } };
+        : { $or: sizeRange }; //{ users: { $not: { $size: MAX_TEAM_SIZE } } };
+
     let teamList = await Team.find({
       ...userFilter,
       "profile.displayTeamProfile": true,
@@ -620,7 +632,7 @@ async function getTeamsToSwipe(req, res) {
     const yourTeam = await standardizeTeamObj(team);
     await sortByAverages(yourTeam, out);
     prioritizeSkillMatches(yourTeam, out);
-    return res.json({ ready: true, teams: out.slice(0, 5) });
+    return res.json({ ready: true, capacity, teams: out.slice(0, 5) });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

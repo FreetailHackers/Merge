@@ -14,8 +14,9 @@ function Swipe(props) {
   const [loading, setLoading] = useState(false);
   const [teamsToShow, setTeamsToShow] = useState([]);
   const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
-  const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
+  //const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
   const [idealSize, setIdealSize] = useState(0);
+  const [capacity, setCapacity] = useState(0);
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
     cursorDown: false,
@@ -29,40 +30,25 @@ function Swipe(props) {
   useEffect(() => {
     async function findTeam() {
       const res = await axios.get(
-        process.env.REACT_APP_API_URL +
-          "/api/teams/teamsToSwipe/" +
-          props.userID
+        `${process.env.REACT_APP_API_URL}/api/teams/teamsToSwipe/${props.userID}`,
+        { params: { idealSize } }
       );
       if (res.data.ready) {
         setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
+      setCapacity(res.data.capacity);
       setLoading(false);
     }
 
-    if (props.userID) {
+    if (
+      props.userID &&
+      (!teamToShow || (idealSize > 0 && teamToShow.users.length !== idealSize))
+    ) {
       setLoading(true);
       findTeam();
     }
-  }, [props.userID]);
-
-  async function getTeamsToShow() {
-    const res = await axios.get(
-      process.env.REACT_APP_API_URL + "/api/teams/teamsToSwipe/" + props.userID,
-      {
-        params: {
-          idealSize: idealSize,
-        },
-      }
-    );
-    setTeamsToShow(res.data.teams);
-    setLoading(false);
-    setProfileState((prev) => ({
-      ...prev,
-      profileAngle: 0,
-      profileSide: "neutral",
-    }));
-  }
+  }, [props.userID, idealSize, teamToShow]);
 
   const swipeCallback = (decision) => {
     axios
@@ -72,40 +58,38 @@ function Swipe(props) {
       })
       .then((res) => {
         setTimeout(() => {
-          if (teamsToShow.length === 1) {
-            getTeamsToShow();
-          } else {
-            setTeamsToShow((prev) => [...prev.slice(1)]);
-            setProfileState((prev) => ({
-              ...prev,
-              profileAngle: 0,
-              profileSide: "neutral",
-            }));
-          }
+          setTeamsToShow((prev) => [...prev.slice(1)]);
+          setProfileState((prev) => ({
+            ...prev,
+            profileAngle: 0,
+            profileSide: "neutral",
+          }));
         }, 175);
       });
   };
+
+  async function refreshTeams(s) {
+    if (teamsToShow.length === 0) {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/teams/teamsToSwipe/${props.userID}`,
+        { params: { s } }
+      );
+      if (res.data.ready) {
+        setTeamsToShow(res.data.teams);
+      }
+      setContainsRequired(res.data.ready);
+      setCapacity(res.data.capacity);
+    } else {
+      setTeamsToShow([]);
+    }
+  }
 
   const clearLeftSwipes = async () => {
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe"
       );
-
-      const nextCall = await axios.get(
-        process.env.REACT_APP_API_URL +
-          "/api/teams/teamsToSwipe/" +
-          props.userID,
-        {
-          params: {
-            idealSize: idealSize,
-          },
-        }
-      );
-
-      if (nextCall.data.ready) {
-        setTeamsToShow(nextCall.data.teams);
-      }
+      await refreshTeams(idealSize);
     } catch (error) {
       // Handle errors here
       console.error("Error:", error);
@@ -267,7 +251,9 @@ function Swipe(props) {
             <label>
               <p style={{ fontSize: "20px", marginTop: "15%" }}>
                 {" "}
-                {!containsRequired
+                {capacity === 0
+                  ? "Team is Full"
+                  : !containsRequired
                   ? "Please Make Sure Your Profile is Completed"
                   : "No Teams Left To Swipe"}
               </p>{" "}
@@ -281,7 +267,7 @@ function Swipe(props) {
           </center>
         )}
       </section>
-      {containsRequired && (
+      {containsRequired && capacity > 0 && (
         <div id="ts-container">
           <input
             type="range"
@@ -289,17 +275,15 @@ function Swipe(props) {
             value={String(idealSize)}
             onChange={(e) => setIdealSize(parseInt(e.target.value))}
             min={0}
-            max={MAX_TEAM_SIZE - 1}
+            max={capacity}
             step={1}
             list="team-sizes"
           />
           {
             <datalist id="team-sizes">
-              {[...[...Array(MAX_TEAM_SIZE - 1).keys()].map((e) => e + 1)].map(
-                (e) => (
-                  <option value={e} key={e} label={`${e}`} />
-                )
-              )}
+              {[...[...Array(capacity).keys()].map((e) => e + 1)].map((e) => (
+                <option value={e} key={e} label={`${e}`} />
+              ))}
             </datalist>
           }
           <p>
@@ -307,7 +291,10 @@ function Swipe(props) {
             <strong>{idealSize > 0 ? idealSize : "any"}</strong>
           </p>
           <div className="flexRow">
-            <button onClick={getTeamsToShow} className="refreshBtn">
+            <button
+              onClick={() => refreshTeams(idealSize)}
+              className="refreshBtn"
+            >
               Refresh
             </button>
             <button onClick={clearLeftSwipes} className="refreshBtn">
