@@ -23,16 +23,23 @@ const Navbar = (props) => {
         {props.wideScreen && (
           <>
             <NavLink to="/swipe">Home</NavLink>
+            <div className="nav-line" />
             <NavLink to="/chat">Chat</NavLink>
+            <div className="nav-line" />
             <NavLink to="/edit">Profile</NavLink>
+            <div className="nav-line" />
             <NavLink to="/myteam">My Team</NavLink>
+            <div className="nav-line" />
           </>
         )}
         <NavLink to="/about">About</NavLink>
+        <div className="nav-line" />
         <NavLink to="/dashboard">Help & Support</NavLink>
+        <div className="nav-line" />
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
+        <div className="nav-line" />
       </nav>
     </div>
   );
