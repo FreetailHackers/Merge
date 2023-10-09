@@ -585,6 +585,32 @@ async function sortByAverages(yourTeam, teamList) {
   teamList.sort((a, b) => averageScore(a) - averageScore(b));
 }
 
+async function noBlocks(team1, team2) {
+  try {
+    const team1Users = await User.find({team: team1._id})
+    const team1IDs = team1Users.map(e => e._id)
+    const team2Users = await User.find({team: team2._id})
+    const team2IDs = team2Users.map(e => e._id)
+    let found = false
+    for (let i = 0; !found && i < team1Users.length; i++) {
+      const intersection = team1Users[i].blockList?.filter(e => team2IDs.includes(e))
+      if (intersection?.length > 0) {
+        found = true
+      }
+    }
+    for (let i = 0; !found && i < team2Users.length; i++) {
+      const intersection = team2Users[i].blockList?.filter(e => team1IDs.includes(e))
+      if (intersection?.length > 0) {
+        found = true
+      }
+    }
+    return !found
+  } catch (err) {
+    console.log(err)
+    return false
+  }
+}
+
 async function getTeamsToSwipe(req, res) {
   try {
     const team = await Team.findOne({ users: { $in: [req.user] } });
@@ -622,10 +648,11 @@ async function getTeamsToSwipe(req, res) {
       return res.sendStatus(404);
     }
     let out = [];
-    for (const team of teamList) {
-      const swipeReady = await isTeamSwipeReady(team);
-      if (swipeReady) {
-        const newTeam = await standardizeTeamObj(team);
+    for (const othTeam of teamList) {
+      const swipeReady = await isTeamSwipeReady(othTeam);
+      const noBlocksFound = await noBlocks(team, othTeam)
+      if (swipeReady && noBlocksFound) {
+        const newTeam = await standardizeTeamObj(othTeam);
         out.push(newTeam);
       }
     }
