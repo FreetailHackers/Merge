@@ -1593,3 +1593,7 @@ input[type=range]::-webkid-slider-runnable-track {
 .teamRow {
   padding-top: 5px;
 }
+
+.newInfoButton {
+  font-weight: 900;
+}

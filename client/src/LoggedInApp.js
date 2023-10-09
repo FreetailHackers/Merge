@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 const noUpdates = {
   chat: false,
@@ -30,6 +31,17 @@ function LoggedInApp(props) {
   let location = useLocation();
 
   const token = auth?.token;
+  const userID = auth.userID.id;
+
+  useEffect(() => {
+    async function checkForUpdates() {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/users/checkForUpdates/${userID}`
+      );
+      setUpdates(res.data);
+    }
+    if (userID) checkForUpdates();
+  }, [userID]);
 
   useEffect(() => {
     if (token) {
@@ -55,18 +67,13 @@ function LoggedInApp(props) {
   const onChat = path?.endsWith("chat");
   const onMyTeam = path?.endsWith("myteam");
 
-  const userID = auth.userID.id;
-
   useEffect(() => {
-    function changeTeam(data) {
-      setTeamID(data.newTeam);
-    }
     if (socket) {
-      socket.on("kicked-from-team", changeTeam);
+      socket.on("kicked-from-team", (data) => setTeamID(data.newTeam));
     }
     return () => {
       if (socket) {
-        socket.off("kicked-from-team", changeTeam);
+        socket.off("kicked-from-team");
       }
     };
   }, [socket, setTeamID]);

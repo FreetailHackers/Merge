@@ -14,8 +14,7 @@ function MyTeam(props) {
   const [team, setTeam] = useState(null);
   const { userID, teamID, setTeamID } = props;
   const [section, setSection] = useState("Membership");
-  const [ingoingMRs, setIngoingMRs] = useState([]);
-  const [outgoingMRs, setOutgoingMRs] = useState([]);
+  const [newRequests, setNewRequests] = useState(false);
 
   useEffect(() => {
     axios
@@ -24,20 +23,12 @@ function MyTeam(props) {
         setTeam(res.data);
         if (res.data.users?.length > 1) {
           setSection("Profile");
+          if (res.data.mergeRequests?.length > 0) {
+            setNewRequests(true);
+          }
         } else {
           setSection("Team List");
         }
-      });
-  }, [userID, teamID]);
-
-  useEffect(() => {
-    axios
-      .get(
-        process.env.REACT_APP_API_URL + "/api/teams/mergeRequestsInfo/" + userID
-      )
-      .then((res) => {
-        setIngoingMRs(res.data.ingoing);
-        setOutgoingMRs(res.data.outgoing);
       });
   }, [userID, teamID]);
 
@@ -54,47 +45,10 @@ function MyTeam(props) {
       });
     }
 
-    function mergeRequestedWS(data) {
-      if (data.requestingTeam._id === teamID) {
-        setOutgoingMRs((prev) => [...prev, data]);
-      } else if (data.requestedTeam._id === teamID) {
-        setIngoingMRs((prev) => [...prev, data]);
-      }
-    }
-
     function mergeAcceptedWS(data) {
-      if (teamID === data.newTeam._id) {
-        setOutgoingMRs((prev) => [
-          ...prev.filter((e) => e.requestedTeam._id !== data.absorbedTeamID),
-        ]);
-      }
       setTeam(data.newTeam);
       setTeamID(data.newTeam._id);
       setSection("Profile");
-    }
-
-    function mergeRejectedWS(data) {
-      if (data.requestingTeamID === teamID) {
-        setOutgoingMRs((prev) => [
-          ...prev.filter((e) => e.requestedTeam._id !== data.rejectingTeamID),
-        ]);
-      } else if (data.rejectingTeamID === teamID) {
-        setIngoingMRs((prev) => [
-          ...prev.filter((e) => e.requestingTeam._id !== data.requestingTeamID),
-        ]);
-      }
-    }
-
-    function requestCancelledWS(data) {
-      if (data.requestedTeamID === teamID) {
-        setIngoingMRs((prev) => [
-          ...prev.filter((e) => e.requestingTeam._id !== data.cancellingTeamID),
-        ]);
-      } else if (data.cancellingTeamID === teamID) {
-        setOutgoingMRs((prev) => [
-          ...prev.filter((e) => e.requestedTeam._id !== data.requestedTeamID),
-        ]);
-      }
     }
 
     function membershipUpdatedWS(data) {
@@ -118,21 +72,27 @@ function MyTeam(props) {
     }
 
     socket.on("teammate-left", teammateLeftWS);
-    socket.on("merge-requested", mergeRequestedWS);
     socket.on("merge-accepted", mergeAcceptedWS);
-    socket.on("merge-rejected", mergeRejectedWS);
-    socket.on("request-cancelled", requestCancelledWS);
     socket.on("membership-updated", membershipUpdatedWS);
 
     return () => {
       socket.off("teammate-left", teammateLeftWS);
-      socket.off("merge-requested", mergeRequestedWS);
       socket.off("merge-accepted", mergeAcceptedWS);
-      socket.off("merge-rejected", mergeRejectedWS);
-      socket.off("request-cancelled", requestCancelledWS);
       socket.off("membership-updated", membershipUpdatedWS);
     };
   }, [socket, teamID, setTeamID, setTeam, userID]);
+
+  useEffect(() => {
+    function newMR(data) {
+      if (section !== "Other Teams") {
+        setNewRequests(true);
+      }
+    }
+    socket.on("merge-requested", newMR);
+    return () => {
+      socket.off("merge-requested", newMR);
+    };
+  }, [socket, section]);
 
   if (!team || !team.profile) {
     return <div></div>;
@@ -172,10 +132,13 @@ function MyTeam(props) {
           Membership
         </button>
         <button
-          className={`themeButton ${
-            section === "Team List" ? "selectedButton" : "notSelectedButton"
-          }`}
-          onClick={() => setSection("Team List")}
+          className={`themeButton${
+            section === "Team List" ? " selectedButton" : " notSelectedButton"
+          }${newRequests ? " newInfoButton" : ""}`}
+          onClick={() => {
+            setSection("Team List");
+            setNewRequests(false);
+          }}
         >
           Other Teams
         </button>
@@ -204,10 +167,6 @@ function MyTeam(props) {
 
       {section === "Team List" && (
         <TeamList
-          setOutgoingMRs={setOutgoingMRs}
-          ingoingMRs={ingoingMRs}
-          setIngoingMRs={setIngoingMRs}
-          outgoingMRs={outgoingMRs}
           userID={userID}
           team={team}
           setTeam={setTeam}

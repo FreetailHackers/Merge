@@ -35,14 +35,26 @@ const Navbar = (props) => {
         <NavLink to="/swipe" onClick={props.flipDisplaySidebar}>
           Find Team Members
         </NavLink>
-        <NavLink to="/chat" onClick={props.flipDisplaySidebar}>
+        <NavLink
+          to="/chat"
+          onClick={() => {
+            props.flipDisplaySidebar();
+            props.setUpdates((prev) => ({ ...prev, chat: false }));
+          }}
+        >
           {props.updates.chat ? <span className="unreadBubble" /> : null}
           Chat
         </NavLink>
         <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
           Edit Profile
         </NavLink>
-        <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
+        <NavLink
+          to="/myteam"
+          onClick={() => {
+            props.flipDisplaySidebar();
+            props.setUpdates((prev) => ({ ...prev, myteam: false }));
+          }}
+        >
           {props.updates.myteam ? <span className="unreadBubble" /> : null}
           My Team
         </NavLink>
@@ -63,6 +75,7 @@ Navbar.propTypes = {
   wideScreen: PropTypes.bool,
   flipDisplaySidebar: PropTypes.func,
   updates: PropTypes.object,
+  setUpdates: PropTypes.func,
 };
 
 export default Navbar;
