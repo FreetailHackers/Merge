@@ -19,14 +19,17 @@ const Navbar = (props) => {
   return (
     <div id="navbar-spacing">
       <nav id="navbar">
-        <Link to="/dashboard">
-          <div className="logo white" />
-        </Link>
-        <NavLink to="/swipe">Find Team Members</NavLink>
-        <NavLink to="/chat">Chat</NavLink>
-        <NavLink to="/edit">Edit Profile</NavLink>
-        <NavLink to="/myteam">My Team</NavLink>
+        <div className="logo white" />
+        {props.wideScreen && (
+          <>
+            <NavLink to="/swipe">Home</NavLink>
+            <NavLink to="/chat">Chat</NavLink>
+            <NavLink to="/edit">Profile</NavLink>
+            <NavLink to="/myteam">My Team</NavLink>
+          </>
+        )}
         <NavLink to="/about">About</NavLink>
+        <NavLink to="/dashboard">Help & Support</NavLink>
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>

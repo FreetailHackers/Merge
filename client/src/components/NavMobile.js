@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { NavLink } from "react-router-dom";
 
 // components
 
@@ -10,7 +11,7 @@ import teams from "../assets/navbar icons/team-icon.svg";
 import home from "../assets/navbar icons/home-icon.svg";
 import chat from "../assets/navbar icons/chat-icon.svg";
 import profile from "../assets/navbar icons/profile-icon.svg";
-import NavExpandMobile from "./NavExpandMobile";
+import Navbar from "./Navbar";
 
 const NavMobile = (props) => {
   const [showExtendedMenu, setExtendedMenu] = useState(false);
@@ -22,10 +23,15 @@ const NavMobile = (props) => {
   return (
     <>
       {showExtendedMenu && (
-        <NavExpandMobile userID={props.userID} logoutUser={props.logoutUser} />
+        <Navbar
+          userID={props.userID}
+          logoutUser={props.logoutUser}
+          wideScreen={props.wideScreen}
+        />
       )}
       <div className="mobile-navbar">
         <img
+          className="burgerbar"
           src={burgerbar}
           style={{ height: "20px" }}
           onClick={showMenu}
@@ -33,18 +39,18 @@ const NavMobile = (props) => {
         />
         {!showExtendedMenu && (
           <>
-            <a href="/myteam">
+            <NavLink to="/myteam">
               <img src={teams} style={{ height: "33px" }} alt="my team" />
-            </a>
-            <a href="/swipe">
+            </NavLink>
+            <NavLink to="/swipe">
               <img src={home} style={{ height: "35px" }} alt="home/swipe" />
-            </a>
-            <a href="/chat">
+            </NavLink>
+            <NavLink to="/chat">
               <img src={chat} style={{ height: "38px" }} alt="chat" />
-            </a>
-            <a href="/edit">
+            </NavLink>
+            <NavLink to="/edit">
               <img src={profile} style={{ height: "39px" }} alt="profile" />
-            </a>
+            </NavLink>
           </>
         )}
       </div>
@@ -55,6 +61,7 @@ const NavMobile = (props) => {
 NavMobile.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
+  wideScreen: PropTypes.bool,
 };
 
 export default NavMobile;

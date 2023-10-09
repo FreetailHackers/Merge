@@ -103,98 +103,96 @@ export default function App() {
   );
 
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={login} />
-          <Route path="/login" element={login} />
-          <Route
-            path="/register"
-            element={
-              <Register
-                auth={auth}
-                registerUser={(userData, setErrors) =>
-                  registerUser(userData, setAuth, setErrors)
-                }
-              />
-            }
-          />
-          {auth.userID && (
-            <Route
-              path="/"
-              element={
-                <div style={{ display: "flex", flexDirection: "row" }}>
-                  {wideScreen && (
-                    <Navbar
-                      userID={auth.userID.id}
-                      logoutUser={() => logoutUser(setAuth)}
-                      wideScreen={wideScreen}
-                    />
-                  )}
-                  <Outlet context={socket} />
-                  {!wideScreen && (
-                    <NavMobile
-                      userID={auth.userID.id}
-                      logoutUser={() => logoutUser(setAuth)}
-                    />
-                  )}
-                </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={login} />
+        <Route path="/login" element={login} />
+        <Route
+          path="/register"
+          element={
+            <Register
+              auth={auth}
+              registerUser={(userData, setErrors) =>
+                registerUser(userData, setAuth, setErrors)
               }
-            >
-              <Route
-                path="dashboard"
-                element={<Dashboard user={user} wideScreen={wideScreen} />}
-              />
-              <Route
-                path="swipe"
-                element={
-                  <Swipe userID={auth.userID.id} wideScreen={wideScreen} />
-                }
-              />
-              <Route
-                path="edit"
-                element={
-                  user ? (
-                    <Edit
-                      user={user}
-                      userID={auth.userID.id}
-                      setUser={setUser}
-                      wideScreen={wideScreen}
-                    />
-                  ) : (
-                    <div>Loading...</div>
-                  )
-                }
-              />
-              <Route
-                path="myteam"
-                element={
-                  socket?.connected ? (
-                    <MyTeam userID={auth.userID.id} wideScreen={wideScreen} />
-                  ) : (
-                    <div>Loading...</div>
-                  )
-                }
-              />
-              <Route
-                path="chat"
-                element={
-                  socket?.connected ? (
-                    <Chat
-                      userID={auth.userID.id}
-                      wideScreen={wideScreen}
-                      blockList={user?.blockList}
-                    />
-                  ) : (
-                    <div>Loading...</div>
-                  )
-                }
-              />
-              <Route path="about" element={<About wideScreen={wideScreen} />} />
-            </Route>
-          )}
-        </Routes>
-      </BrowserRouter>
-    </>
+            />
+          }
+        />
+        {auth.userID && (
+          <Route
+            path="/"
+            element={
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {wideScreen && (
+                  <Navbar
+                    userID={auth.userID.id}
+                    logoutUser={() => logoutUser(setAuth)}
+                    wideScreen={wideScreen}
+                  />
+                )}
+                <Outlet context={socket} />
+                {!wideScreen && (
+                  <NavMobile
+                    userID={auth.userID.id}
+                    logoutUser={() => logoutUser(setAuth)}
+                  />
+                )}
+              </div>
+            }
+          >
+            <Route
+              path="dashboard"
+              element={<Dashboard user={user} wideScreen={wideScreen} />}
+            />
+            <Route
+              path="swipe"
+              element={
+                <Swipe userID={auth.userID.id} wideScreen={wideScreen} />
+              }
+            />
+            <Route
+              path="edit"
+              element={
+                user ? (
+                  <Edit
+                    user={user}
+                    userID={auth.userID.id}
+                    setUser={setUser}
+                    wideScreen={wideScreen}
+                  />
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route
+              path="myteam"
+              element={
+                socket?.connected ? (
+                  <MyTeam userID={auth.userID.id} wideScreen={wideScreen} />
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route
+              path="chat"
+              element={
+                socket?.connected ? (
+                  <Chat
+                    userID={auth.userID.id}
+                    wideScreen={wideScreen}
+                    blockList={user?.blockList}
+                  />
+                ) : (
+                  <div>Loading...</div>
+                )
+              }
+            />
+            <Route path="about" element={<About wideScreen={wideScreen} />} />
+          </Route>
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }

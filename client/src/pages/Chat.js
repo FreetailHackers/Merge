@@ -382,7 +382,6 @@ function Chat(props) {
             wideScreen={props.wideScreen}
           />
         ))}
-      <div id="mobile-nav-space" style={{ height: "17vw" }} />
     </div>
   );
 }

@@ -108,7 +108,6 @@ const ChatPreview = ({
         </p>
       )}
     </div>
-    <div id="mobile-nav-space" style={{ height: "17vw" }} />
   </div>
 );
 

@@ -228,7 +228,6 @@ function ChatWindow(props) {
         </p>
         <p onClick={sendMessageButton}>➡️</p>
       </div>
-      <div id="mobile-nav-space" style={{ height: "17vw" }} />
     </div>
   );
 }

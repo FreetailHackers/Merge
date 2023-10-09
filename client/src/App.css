@@ -142,11 +142,12 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
 @media all and (orientation:portrait) {
   #navbar-spacing {
-    height: calc(100 * var(--vh, 1vh) - 20px);
-  }
-
-  #navbar {
-    padding: 0 0 20px;
+    padding-top: calc(5 * var(--vh, 1vh));;
+    position: fixed;
+    top: 0;
+    height: calc(100 * var(--vh, 1vh));
+    width: 100vw;
+    z-index: 20;
   }
 
   .about-page {
@@ -555,7 +556,6 @@ nav#navbar a {
   width: calc(100% - 50px);
   padding: 20px;
   border-left: #fff0 10px solid;
-  border-bottom: #fff3 1px solid;
 
   text-decoration: none;
   font-size: 1.2em;
@@ -565,7 +565,7 @@ nav#navbar a:first-of-type {
   border-bottom: none;
 }
 
-nav#navbar a:nth-of-type(2) {
+nav#navbar a:nth-of-type(1) {
   margin-top: 40px;
 }
 
@@ -1597,27 +1597,4 @@ input[type=range]::-webkid-slider-runnable-track {
   user-select: none;
   height: 17vw;
   background-color: var(--primary);
-}
-
-.extended-mobile-nav {
-  position: fixed;
-  top: 0;
-  background-color: rgb(23, 77, 126);
-  height: calc(100 * var(--vh, 1vh));
-  width: 100vw;
-  z-index: 20;
-}
-
-.extended-mobile-nav a {
-  text-decoration: none;
-  color: white;
-  font-weight: bolder;
-  font-size: 28px;
-  padding-left: 32px;
-  margin-bottom: 50px;
-}
-
-.extended-mobile-nav .menuItem {
-  margin-top: 10vw;
-  margin-bottom: 5vw;
 }
