@@ -649,10 +649,7 @@ async function generateTeamName(team) {
     return team.profile.name;
   }
   const leaderUser = await User.findById(team.leader);
-  if (team.users.length > 1) {
-    return `${leaderUser.name}'s team`;
-  }
-  return leaderUser.name;
+  return `${leaderUser.name}'s team`;
 }
 
 async function swipe(req, res) {
@@ -663,6 +660,13 @@ async function swipe(req, res) {
       console.error("Incorrect team ID provided");
       return res.sendStatus(400);
     }
+    if (
+      [...team.leftSwipeList, ...team.rightSwipeList]
+        .map((e) => String(e))
+        .includes(req.body.otherTeamID)
+    ) {
+      return res.json({ success: false });
+    }
     const list = `${
       req.body.decision === "accept-committed" ? "right" : "left"
     }SwipeList`;
@@ -672,7 +676,10 @@ async function swipe(req, res) {
       { upsert: true }
     );
 
-    if (req.body.decision === "accept-committed") {
+    if (
+      req.body.decision === "accept-committed" &&
+      !otherTeam.rightSwipeList.includes(team._id)
+    ) {
       const firstName = await generateTeamName(team);
       const secondName = await generateTeamName(otherTeam);
       const name = `${firstName} and ${secondName}`;
