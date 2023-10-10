@@ -29,7 +29,7 @@ const NavMobile = (props) => {
           wideScreen={props.wideScreen}
         />
       )}
-      <div className="mobile-navbar">
+      <div className={!showExtendedMenu ? "mobile-navbar" : "extend-menu"}>
         <img
           className="burgerbar"
           src={burgerbar}
