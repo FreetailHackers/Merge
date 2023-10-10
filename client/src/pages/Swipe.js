@@ -7,7 +7,7 @@ import SwipeProfile from "../components/SwipeProfile";
 import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Swipe(props) {
   const navigate = useNavigate();
@@ -261,9 +261,26 @@ function Swipe(props) {
             <label>
               <p style={{ fontSize: "20px", marginTop: "15%" }}>
                 {" "}
-                {!containsRequired
-                  ? "Please Make Sure Your Profile is Completed"
-                  : "No Teams Left To Swipe"}
+                {!containsRequired ? (
+                  <p>
+                    {" "}
+                    Please Make Sure Your{" "}
+                    {
+                      <Link
+                        to="/edit"
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--secondary)",
+                        }}
+                      >
+                        <b>Profile</b>
+                      </Link>
+                    }{" "}
+                    is Completed
+                  </p>
+                ) : (
+                  "No Teams Left To Swipe"
+                )}
               </p>{" "}
             </label>
             <div className="team-image">
