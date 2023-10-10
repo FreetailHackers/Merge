@@ -138,6 +138,7 @@ export default function App() {
                   <NavMobile
                     userID={auth.userID.id}
                     logoutUser={() => logoutUser(setAuth)}
+                    displaySideBar={() => setDisplaySidebar(!displaySidebar)}
                   />
                 )}
               </div>

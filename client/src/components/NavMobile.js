@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 
@@ -14,30 +14,30 @@ import profile from "../assets/navbar icons/profile-icon.svg";
 import Navbar from "./Navbar";
 
 const NavMobile = (props) => {
-  const [showExtendedMenu, setExtendedMenu] = useState(false);
-
-  function showMenu() {
-    setExtendedMenu(!showExtendedMenu);
-  }
+  const closeBurgerMenu = () => {
+    if (!props.wideScreen) {
+      props.displaySideBar();
+    }
+  };
 
   return (
     <>
-      {showExtendedMenu && (
+      {!props.displaySideBar && (
         <Navbar
           userID={props.userID}
           logoutUser={props.logoutUser}
           wideScreen={props.wideScreen}
         />
       )}
-      <div className={!showExtendedMenu ? "mobile-navbar" : "extend-menu"}>
+      <div className={props.displaySideBar ? "mobile-navbar" : "extend-menu"}>
         <img
           className="burgerbar"
           src={burgerbar}
           style={{ height: "20px" }}
-          onClick={showMenu}
+          onClick={closeBurgerMenu}
           alt="more options"
         />
-        {!showExtendedMenu && (
+        {props.displaySideBar && (
           <>
             <NavLink to="/myteam">
               <img src={teams} style={{ height: "33px" }} alt="my team" />
@@ -62,6 +62,7 @@ NavMobile.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
+  displaySideBar: PropTypes.func.isRequired,
 };
 
 export default NavMobile;
