@@ -189,11 +189,6 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: calc(100vw - 40px);
   }
 
-  .about-page, .chat, .reportFloatingWindow,
-  #dashboard, .myTeam, #swipeContainer, .profile-container {
-    height: calc(90.5 * var(--vh, 1vh));
-  }
-
   .merge-requests, .profile-container {
     flex-direction: column;
   }

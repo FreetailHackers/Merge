@@ -16,6 +16,12 @@ const Navbar = (props) => {
     navigate("/login");
   };
 
+  const closeBurgerMenu = () => {
+    if (!props.wideScreen) {
+      props.displaySideBar();
+    }
+  };
+
   return (
     <div id="navbar-spacing">
       <nav id="navbar">
@@ -32,9 +38,13 @@ const Navbar = (props) => {
             <div className="nav-line" />
           </>
         )}
-        <NavLink to="/about">About</NavLink>
+        <NavLink to="/about" onClick={closeBurgerMenu}>
+          About
+        </NavLink>
         <div className="nav-line" />
-        <NavLink to="/dashboard">Help & Support</NavLink>
+        <NavLink to="/dashboard" onClick={closeBurgerMenu}>
+          Help & Support
+        </NavLink>
         <div className="nav-line" />
         <Link onClick={onLogoutClick} to="/">
           Logout
@@ -49,6 +59,7 @@ Navbar.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
+  displaySideBar: PropTypes.func.isRequired,
 };
 
 export default Navbar;

@@ -37,7 +37,7 @@ export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [user, setUser] = useState(null);
   const [socket, setSocket] = useState(null);
-  // const [displaySidebar, setDisplaySidebar] = useState(false);
+  const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
 
   useEffect(() => {
@@ -122,15 +122,18 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {wideScreen && (
-                  <Navbar
-                    userID={auth.userID.id}
-                    logoutUser={() => logoutUser(setAuth)}
-                    wideScreen={wideScreen}
-                  />
-                )}
-                <Outlet context={socket} />
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  {(wideScreen || displaySidebar) && (
+                    <Navbar
+                      userID={auth.userID.id}
+                      logoutUser={() => logoutUser(setAuth)}
+                      wideScreen={wideScreen}
+                      displaySideBar={() => setDisplaySidebar(!displaySidebar)}
+                    />
+                  )}
+                  <Outlet context={socket} className="content" />
+                </div>
                 {!wideScreen && (
                   <NavMobile
                     userID={auth.userID.id}
