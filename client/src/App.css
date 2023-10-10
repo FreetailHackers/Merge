@@ -163,6 +163,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding: 0 20px;
   }
 
+  .container-register {
+    width: 90%;
+  }
+
   .chatSidebar, .chatWindow, .chat, #navbar-spacing, #navbar, fsCenter {
     width: 100vw;
   }
@@ -222,10 +226,12 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .terms {
     width: 70vw;
   }
+
   .container {
     flex-direction: column;
   }
-  section#login form, .about {
+
+  .about {
     margin-top: calc(2 * var(--vh, 1vh));
   }
 
@@ -244,6 +250,12 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .filterList .question {
     width: calc(max(160px, 40vw));
+  }
+
+  section#login,
+  section#register {
+    background-image: none;
+    background-color: var(--primary);
   }
 }
 
@@ -324,16 +336,25 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .terms {
     width: 35vw;
   }
+
   .container {
     flex-direction: row;
   }
 
-  section#login form {
-    margin-left: auto;
-    margin-right: 5vw;
-    margin-bottom: 0;
-    margin-top: 200px;
+  .container-register {
+    width: 50%;
   }
+
+  section#login form,
+  section#regsiter form {
+    width: min(400px, 85vw);
+  }
+
+  section#login,
+  section#register {
+    background-image: var(--login-background);
+  }
+
   .about {
     margin-right: auto;
     margin-left: 5vw;
@@ -459,7 +480,7 @@ code {
 /* Theme.css  */
 
 :root {
-  --primary: #e76482;
+  --primary: #11538B;
   --primary-transparent: #e7648230;
   --primary-less-transparent: #e7648250;
   --secondary: #473899;
@@ -1060,7 +1081,6 @@ section#register {
   width: 100vw;
   height: calc(100 * var(--vh, 1vh));
   overflow: scroll;
-  background-image: var(--login-background);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -1070,11 +1090,9 @@ section#register {
 section#login form,
 section#register form,
 .about {
-  width: min(400px, 85vw);
   border-radius: 10px;
   background-color: #fff;
-  box-shadow: 15px 8px 8px rgba(0, 0, 0, 0.55);
-
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.55);
 }
 
 .terms {
@@ -1108,11 +1126,14 @@ section#register form,
 }
 
 .container {
-  width: 95%;
+  width: 93%;
+}
+
+.container, .container-register {
   margin: auto;
   display: flex;
-  height: 100%;
   align-items: center;
+  justify-content: center;
 }
 
 .about {
