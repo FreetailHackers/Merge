@@ -48,7 +48,7 @@ export default function App() {
     return () => {
       window.removeEventListener("resize", resizeFunc);
     };
-  });
+  }, []);
 
   useEffect(() => {
     if (!auth.userID && auth.loading) {

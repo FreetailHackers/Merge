@@ -44,11 +44,11 @@ function MyTeam(props) {
       });
     }
 
-    function mergeAcceptedWS(data) {
+    /*function mergeAcceptedWS(data) {
       setTeam(data.newTeam);
       setTeamID(data.newTeam._id);
       setSection("Profile");
-    }
+    }*/
 
     function membershipUpdatedWS(data) {
       if (data.kickedUsers.includes(userID)) {
@@ -71,12 +71,12 @@ function MyTeam(props) {
     }
 
     socket.on("teammate-left", teammateLeftWS);
-    socket.on("merge-accepted", mergeAcceptedWS);
+    //socket.on("merge-accepted", mergeAcceptedWS);
     socket.on("membership-updated", membershipUpdatedWS);
 
     return () => {
       socket.off("teammate-left", teammateLeftWS);
-      socket.off("merge-accepted", mergeAcceptedWS);
+      //socket.off("merge-accepted", mergeAcceptedWS);
       socket.off("membership-updated", membershipUpdatedWS);
     };
   }, [socket, teamID, setTeamID, setTeam, userID]);

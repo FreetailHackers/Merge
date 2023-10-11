@@ -100,7 +100,9 @@ function ChatWindow(props) {
       <div className="chatWindowHeader">
         {!props.wideScreen && (
           <div className="windowToggleHolder">
-            <button className="toggleSidebar">←</button>
+            <button onClick={props.displaySidebar} className="toggleSidebar">
+              ←
+            </button>
           </div>
         )}
         <div className="chatWindowTitle">
@@ -248,6 +250,7 @@ ChatWindow.propTypes = {
   blockedByMe: PropTypes.array,
   kickUsers: PropTypes.func,
   wideScreen: PropTypes.bool,
+  displaySidebar: PropTypes.func,
 };
 
 export default ChatWindow;

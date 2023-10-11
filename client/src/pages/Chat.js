@@ -379,6 +379,7 @@ function Chat(props) {
             chat={chats[activeChatIndex]}
             deleteChat={deleteChat}
             leaveChat={leaveChat}
+            displaySidebar={() => setDisplayWindow(false)}
             blockedByMe={blockedByMe}
             blockUnblockUsers={blockUnblockUsers}
             kickUsers={kickUsers}

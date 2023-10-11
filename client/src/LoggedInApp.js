@@ -71,10 +71,12 @@ function LoggedInApp(props) {
   useEffect(() => {
     if (socket) {
       socket.on("kicked-from-team", (data) => setTeamID(data.newTeam));
+      socket.on("merge-accepted", (data) => setTeamID(data.newTeam._id));
     }
     return () => {
       if (socket) {
         socket.off("kicked-from-team");
+        socket.off("merge-accepted");
       }
     };
   }, [socket, setTeamID]);
