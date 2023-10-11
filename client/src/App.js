@@ -11,6 +11,7 @@ import axios from "axios";
 import io from "socket.io-client";
 
 import Navbar from "./components/Navbar";
+import NavMobile from "./components/NavMobile";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -121,37 +122,37 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {(displaySidebar || wideScreen) && (
-                  <Navbar
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  {(wideScreen || displaySidebar) && (
+                    <Navbar
+                      userID={auth.userID.id}
+                      logoutUser={() => logoutUser(setAuth)}
+                      wideScreen={wideScreen}
+                      displaySideBar={() => setDisplaySidebar(!displaySidebar)}
+                    />
+                  )}
+                  <Outlet context={socket} className="content" />
+                </div>
+                {!wideScreen && (
+                  <NavMobile
                     userID={auth.userID.id}
                     logoutUser={() => logoutUser(setAuth)}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(false)}
+                    displaySideBar={displaySidebar}
+                    setDisplaySidebar={setDisplaySidebar}
                   />
                 )}
-                {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
               </div>
             }
           >
             <Route
               path="dashboard"
-              element={
-                <Dashboard
-                  user={user}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
+              element={<Dashboard user={user} wideScreen={wideScreen} />}
             />
             <Route
               path="swipe"
               element={
-                <Swipe
-                  userID={auth.userID.id}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
+                <Swipe userID={auth.userID.id} wideScreen={wideScreen} />
               }
             />
             <Route
@@ -163,7 +164,6 @@ export default function App() {
                     userID={auth.userID.id}
                     setUser={setUser}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -174,11 +174,7 @@ export default function App() {
               path="myteam"
               element={
                 socket?.connected ? (
-                  <MyTeam
-                    userID={auth.userID.id}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
-                  />
+                  <MyTeam userID={auth.userID.id} wideScreen={wideScreen} />
                 ) : (
                   <div>Loading...</div>
                 )
@@ -191,7 +187,6 @@ export default function App() {
                   <Chat
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                     blockList={user?.blockList}
                   />
                 ) : (
@@ -199,15 +194,7 @@ export default function App() {
                 )
               }
             />
-            <Route
-              path="about"
-              element={
-                <About
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
+            <Route path="about" element={<About wideScreen={wideScreen} />} />
           </Route>
         )}
       </Routes>

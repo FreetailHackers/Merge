@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import toggleBars from "../assets/images/toggle-bars-white.png";
 
 const Navbar = (props) => {
   const navigate = useNavigate();
@@ -13,43 +12,44 @@ const Navbar = (props) => {
 
   const onLogoutClick = (e) => {
     e.preventDefault();
-    props.flipDisplaySidebar();
     props.logoutUser();
     navigate("/login");
+  };
+
+  const closeBurgerMenu = () => {
+    if (!props.wideScreen) {
+      props.displaySideBar();
+    }
   };
 
   return (
     <div id="navbar-spacing">
       <nav id="navbar">
-        {!props.wideScreen && (
-          <button
-            className="toggle toggleSidebar"
-            onClick={props.flipDisplaySidebar}
-          >
-            <img src={toggleBars} alt="toggle bars" />
-          </button>
+        <div className="logo white" />
+        {props.wideScreen && (
+          <>
+            <NavLink to="/swipe">Home</NavLink>
+            <div className="nav-line" />
+            <NavLink to="/chat">Chat</NavLink>
+            <div className="nav-line" />
+            <NavLink to="/edit">Profile</NavLink>
+            <div className="nav-line" />
+            <NavLink to="/myteam">My Team</NavLink>
+            <div className="nav-line" />
+          </>
         )}
-        <Link to="/dashboard" onClick={props.flipDisplaySidebar}>
-          <div className="logo white" />
-        </Link>
-        <NavLink to="/swipe" onClick={props.flipDisplaySidebar}>
-          Find Team Members
-        </NavLink>
-        <NavLink to="/chat" onClick={props.flipDisplaySidebar}>
-          Chat
-        </NavLink>
-        <NavLink to="/edit" onClick={props.flipDisplaySidebar}>
-          Edit Profile
-        </NavLink>
-        <NavLink to="/myteam" onClick={props.flipDisplaySidebar}>
-          My Team
-        </NavLink>
-        <NavLink to="/about" onClick={props.flipDisplaySidebar}>
+        <NavLink to="/about" onClick={closeBurgerMenu}>
           About
         </NavLink>
+        <div className="nav-line" />
+        <NavLink to="/dashboard" onClick={closeBurgerMenu}>
+          Help & Support
+        </NavLink>
+        <div className="nav-line" />
         <Link onClick={onLogoutClick} to="/">
           Logout
         </Link>
+        <div className="nav-line" />
       </nav>
     </div>
   );
@@ -59,7 +59,7 @@ Navbar.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
+  displaySideBar: PropTypes.func.isRequired,
 };
 
 export default Navbar;

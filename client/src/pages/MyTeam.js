@@ -6,7 +6,6 @@ import UserList from "../components/myteam/UserList";
 import TeamProfile from "../components/myteam/TeamProfile";
 import Membership from "../components/myteam/Membership";
 import { useOutletContext } from "react-router-dom";
-import toggleBars from "../assets/images/toggle-bars.png";
 
 function MyTeam(props) {
   //frontend for updating
@@ -144,16 +143,6 @@ function MyTeam(props) {
 
   return (
     <div className="myTeam">
-      {!props.wideScreen && (
-        <div className="toggleHolder">
-          <button
-            className="toggleSidebar toggleCenter"
-            onClick={props.flipDisplaySidebar}
-          >
-            <img src={toggleBars} alt="toggle bars" />
-          </button>
-        </div>
-      )}
       <div></div>
 
       <div className={`flexRow hideDiv`}>
@@ -226,7 +215,6 @@ function MyTeam(props) {
 MyTeam.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default MyTeam;

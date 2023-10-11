@@ -100,12 +100,7 @@ function ChatWindow(props) {
       <div className="chatWindowHeader">
         {!props.wideScreen && (
           <div className="windowToggleHolder">
-            <button
-              className="toggleSidebar"
-              onClick={props.flipDisplaySidebar}
-            >
-              ←
-            </button>
+            <button className="toggleSidebar">←</button>
           </div>
         )}
         <div className="chatWindowTitle">
@@ -252,7 +247,6 @@ ChatWindow.propTypes = {
   blockUnblockUsers: PropTypes.func,
   blockedByMe: PropTypes.array,
   kickUsers: PropTypes.func,
-  flipDisplaySidebar: PropTypes.func,
   wideScreen: PropTypes.bool,
 };
 
