@@ -151,20 +151,21 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .about-page {
-    width: calc(100vw - 60px);
+    width: calc(100vw);
     font-size: 12px;
     line-height: 1.2rem;
   }
 
-  .about-page, .chat, .dashboard, .profile-container,
-  .myTeam {
-    margin-bottom: calc(9.5 * var(--vh, 1vh));
+  .about-page, .chat, .dash, .profile-container,
+  .myTeam, nav#navbar, .chatWindow {
+    height: calc(90.5 * var(--vh, 1vh));
+    overflow-y: scroll;
   }
   .about-page, .profile-container {
     padding: 0 20px;
   }
 
-  .chatSidebar, .chatWindow, .chat, #navbar-spacing, #navbar, fsCenter {
+  .chatSidebar, .chatWindow, .chat, #navbar-spacing, #navbar, fsCenter, .myTeam {
     width: 100vw;
   }
 
@@ -186,7 +187,8 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   #swipeContainer {
-    height: calc(85 * var(--vh, 1vh));
+    height: calc(90.5 * var(--vh, 1vh));
+    overflow-y: scroll;
   }
 
   .profile-container {
@@ -245,6 +247,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .filterList .question {
     width: calc(max(160px, 40vw));
+  }
+
+  #swipe-profile-holder {
+    max-height: calc(75 * var(--vh, 1vh));
   }
 }
 
@@ -359,6 +365,14 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .filterList .question {
     width: calc(max(175px, 15vw));
+  }
+
+  nav#navbar, .chat, .dash, .chatWindow, .profile-container, .about-page, .myTeam {
+    height: calc(100 * var(--vh, 1vh));
+  }
+
+  #swipe-profile-holder {
+    height: calc(80 * var(--vh, 1vh));
   }
 
 }
@@ -545,7 +559,6 @@ code {
 nav#navbar {
   position: fixed;
   overflow-y: scroll;
-  height: calc(100 * var(--vh, 1vh));
   z-index: 1;
 }
 
@@ -607,7 +620,6 @@ nav#navbar a.active {
 #swipe-profile-holder {
   display: flex;
   flex-direction: column;
-  height: calc(80 * var(--vh, 1vh));
   align-items: center;
   justify-content: center;
 }
@@ -755,7 +767,7 @@ nav#navbar a.active {
 /* About.css */
 
 .about-page {
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -777,9 +789,6 @@ nav#navbar a.active {
   background-color: var(--secondary);
 }
 
-.chat {
-  height: calc(100 * var(--vh, 1vh));
-}
 
 /* Dashboard.css */
 
@@ -806,7 +815,6 @@ nav#navbar a.active {
 
 
 .dash {
-  height: calc(100 * var(--vh, 1vh));
   align-items: center;
   justify-content: flex-start;
 }
@@ -1328,7 +1336,6 @@ section#register form span.error {
 
 .chatWindow {
   justify-content: flex-end;
-  height: calc(100 * var(--vh, 1vh));
 }
 
 .hidden {
@@ -1592,7 +1599,7 @@ input[type=range]::-webkid-slider-runnable-track {
 
 /* mobile nav style */
 
-.mobile-navbar, .extend-menu {
+.mobile-navbar {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -1608,10 +1615,4 @@ input[type=range]::-webkid-slider-runnable-track {
 .nav-line {
   background-color: white;
   height: 1px;
-}
-
-.extend-menu {
-  align-items: center;
-  justify-content: left;
-  padding-left: calc(8.8 * var(--vw, 1vw));
 }
