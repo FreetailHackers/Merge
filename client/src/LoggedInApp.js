@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
+import NavMobile from "./components/NavMobile";
 
 const noUpdates = {
   chat: false,
@@ -116,7 +117,26 @@ function LoggedInApp(props) {
   }, [socket, onChat, onMyTeam]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        {(wideScreen || displaySidebar) && (
+          <Navbar
+            userID={userID}
+            logoutUser={logoutUser}
+            wideScreen={wideScreen}
+            flipDisplaySidebar={() => setDisplaySidebar((prev) => !prev)}
+            updates={updates}
+            setUpdates={setUpdates}
+          />
+        )}
+        <Outlet context={socket} className="content" />
+      </div>
+      {!wideScreen && (
+        <NavMobile userID={userID} setDisplaySidebar={setDisplaySidebar} />
+      )}
+    </div>
+
+    /*<div style={{ display: "flex", flexDirection: "row" }}>
       {(displaySidebar || wideScreen) && (
         <Navbar
           userID={userID}
@@ -128,7 +148,7 @@ function LoggedInApp(props) {
         />
       )}
       {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
-    </div>
+    </div>*/
   );
 }
 

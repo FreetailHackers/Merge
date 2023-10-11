@@ -353,7 +353,6 @@ function Chat(props) {
           }}
           selectedChat={selectedChat}
           createChat={createChat}
-          flipDisplaySidebar={props.flipDisplaySidebar}
           wideScreen={props.wideScreen}
           otherUsers={otherUsers}
           selfID={userID}
@@ -363,7 +362,6 @@ function Chat(props) {
         (activeChatIndex === -1 ? (
           <ChatMissing
             hasChats={chats.length > 0}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ) : (
@@ -384,7 +382,6 @@ function Chat(props) {
             blockedByMe={blockedByMe}
             blockUnblockUsers={blockUnblockUsers}
             kickUsers={kickUsers}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ))}
@@ -395,7 +392,6 @@ function Chat(props) {
 Chat.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
   blockList: PropTypes.array,
 };
 

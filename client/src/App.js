@@ -123,22 +123,12 @@ export default function App() {
           >
             <Route
               path="dashboard"
-              element={
-                <Dashboard
-                  user={user}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
+              element={<Dashboard user={user} wideScreen={wideScreen} />}
             />
             <Route
               path="swipe"
               element={
-                <Swipe
-                  userID={auth.userID.id}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
+                <Swipe userID={auth.userID.id} wideScreen={wideScreen} />
               }
             />
             <Route
@@ -150,7 +140,6 @@ export default function App() {
                     userID={auth.userID.id}
                     setUser={setUser}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -164,7 +153,6 @@ export default function App() {
                   <MyTeam
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                     teamID={teamID}
                     setTeamID={setTeamID}
                   />
@@ -180,7 +168,6 @@ export default function App() {
                   <Chat
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                     blockList={user?.blockList}
                   />
                 ) : (
@@ -188,15 +175,7 @@ export default function App() {
                 )
               }
             />
-            <Route
-              path="about"
-              element={
-                <About
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
+            <Route path="about" element={<About wideScreen={wideScreen} />} />
           </Route>
         )}
       </Routes>
