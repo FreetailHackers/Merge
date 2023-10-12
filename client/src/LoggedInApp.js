@@ -188,7 +188,11 @@ function LoggedInApp(props) {
         <Outlet context={socket} className="content" />
       </div>
       {!wideScreen && (
-        <NavMobile userID={userID} setDisplaySidebar={setDisplaySidebar} />
+        <NavMobile
+          userID={userID}
+          setDisplaySidebar={setDisplaySidebar}
+          updates={updates}
+        />
       )}
     </div>
   );

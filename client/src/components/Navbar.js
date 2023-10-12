@@ -47,7 +47,7 @@ const Navbar = (props) => {
               }
             >
               {props.updates.profile ? <span className="unreadBubble" /> : null}
-              Edit Profile
+              Team Profile
             </NavLink>
             <div className="nav-line" />
             <NavLink

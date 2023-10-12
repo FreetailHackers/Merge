@@ -2,24 +2,24 @@ import React from "react";
 import PropTypes from "prop-types";
 
 function Dashboard(props) {
-  const name = props.user?.name;
+  //const name = props.user?.name;
 
   return (
     <section id="dashboard">
       <div className="dash">
-        <h1>Welcome home{name ? `, ${name}` : `!`}</h1>
-        <p>Start finding your hackathon team members!</p>
-        <div>
-          <div className="team-image">
-            <div className="background" />
-            <div className="main" />
-            <div className="primary" />
-            <div className="secondary" />
+        <h1>Help and Support</h1>
+        {props.wideScreen && (
+          <div>
+            <div className="team-image">
+              <div className="background" />
+              <div className="main" />
+              <div className="primary" />
+              <div className="secondary" />
+            </div>
           </div>
-        </div>
+        )}
         <div className="forms">
           <div className="help">
-            <h1>Help and Support</h1>
             <p>
               For help and support please reach out to a Freetail organizer.
             </p>

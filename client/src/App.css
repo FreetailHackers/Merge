@@ -77,6 +77,11 @@ section#login form button, section#register form button, .closetos,
   padding: 10px;
 }
 
+input[type="image"] {
+  padding: 10px 0 0;
+}
+
+
 input, .portfolio-card p, .headerDatabase,
 section#login form button, section#register form button, .closetos,
 .chatPreview h4, .newChatButton, .chatWindowHeader .themeButton, input {
@@ -739,7 +744,6 @@ nav#navbar a.active {
 .arrow {
   width: auto;
   height: 100%;
-  padding-bottom: 15px;
 }
 
 .left {
@@ -1592,6 +1596,7 @@ input[type="range"] {
   accent-color: #EC53B0;
   background: white;
   border-radius: 5px;
+  padding: 5px;
 }
 
 input[type=range]::-webkid-slider-runnable-track {
