@@ -6,8 +6,8 @@ import { Link } from "react-router-dom";
 import SkillSelector from "../components/SkillSelector";
 import { roles } from "../data/roles";
 
-// FileInput,
 import {
+  FileInput,
   NumberInput,
   TextInput,
   MultiSelect,
@@ -35,6 +35,7 @@ function Edit(props) {
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));
+  var oversizedFile = false;
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -85,40 +86,40 @@ function Edit(props) {
     }
   };
 
-  // handleNewProfilePicture = async (file) => {
-  //   const fd = new FormData();
-  //
-  //   // Setting up S3 upload parameters for folder upload
-  //   fd.append("file_name", props.userID.id + "/" + file.name);
-  //   fd.append("file", file);
-  //
-  //   if (file.size > 10_000_000) {
-  //     setState({ oversizedFile: true });
-  //     return;
-  //   } else {
-  //     setState({ oversizedFile: false });
-  //   }
-  //
-  //   await axios
-  //     .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then(async (res) => {
-  //       setState({
-  //         profilePictureUrl: res.data.url,
-  //         oversizedFile: false,
-  //       });
-  //       props.setUser(props.userID, {
-  //         ...props.user,
-  //         profilePictureUrl: res.data.url,
-  //       });
-  //     })
-  //     .catch(() => {
-  //       setState({ oversizedFile: true });
-  //     });
-  // };
+  const handleNewProfilePicture = async (file) => {
+    const fd = new FormData();
+
+    // Setting up S3 upload parameters for folder upload
+    fd.append("file_name", props.userID.id + "/" + file.name);
+    fd.append("file", file);
+
+    if (file.size > 10_000_000) {
+      this.setState({ oversizedFile: true });
+      return;
+    } else {
+      this.setState({ oversizedFile: false });
+    }
+
+    await axios
+      .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(async (res) => {
+        this.setState({
+          profilePictureUrl: res.data.url,
+          oversizedFile: false,
+        });
+        props.setUser(props.userID, {
+          ...props.user,
+          profilePictureUrl: res.data.url,
+        });
+      })
+      .catch(() => {
+        this.setState({ oversizedFile: true });
+      });
+  };
 
   const cancelEdit = async (e) => {
     e.preventDefault();
@@ -183,18 +184,14 @@ function Edit(props) {
               required
             />
             {
-              //   <FileInput
-              //   label="Profile Picture"
-              //   placeholder="Upload JPG/PNG/GIF, up to 10 MB"
-              //   accept="image/jpg, image/png, image/gif"
-              //   error={
-              //     oversizedFile
-              //       ? "File must be 10 MB or smaller"
-              //       : ""
-              //   }
-              //   onChange={handleNewProfilePicture}
-              //   className="question"
-              // />
+              <FileInput
+                label="Profile Picture"
+                placeholder="Upload JPG/PNG/GIF, up to 10 MB"
+                accept="image/jpg, image/png, image/gif"
+                error={oversizedFile ? "File must be 10 MB or smaller" : ""}
+                onChange={handleNewProfilePicture}
+                className="question"
+              />
             }
             <TextInput
               label="Portfolio"
