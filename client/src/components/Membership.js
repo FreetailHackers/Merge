@@ -10,11 +10,14 @@ function Membership(props) {
   const [newLeader, setNewLeader] = useState(null);
 
   async function leaveTeam() {
+    console.log(`old team ${team._id}`);
     const res = await axios.post(
       process.env.REACT_APP_API_URL + `/api/teams/leaveTeam`
     );
     socket.emit("leave-team", { teamID: team._id, userID: userID });
+    console.log(`new team ${res.data._id}`);
     props.setTeamID(res.data._id);
+    props.setSection("User");
   }
 
   async function manageMembership() {
@@ -38,7 +41,7 @@ function Membership(props) {
   }
 
   return (
-    <div className="flexColumn centerCol">
+    <div className="flexColumn centerCol membership">
       <div className="flexColumn centerCol member-list">
         <h3>Members</h3>
         {team &&
@@ -103,6 +106,7 @@ Membership.propTypes = {
   setTeam: PropTypes.func,
   userID: PropTypes.string,
   setTeamID: PropTypes.func,
+  setSection: PropTypes.func,
 };
 
 export default Membership;

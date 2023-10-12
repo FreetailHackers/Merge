@@ -35,6 +35,7 @@ export default function App() {
   const [socketConnected, setSocketConnected] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
+  const [team, setTeam] = useState(null);
 
   useEffect(() => {
     const resizeFunc = () => {
@@ -70,6 +71,17 @@ export default function App() {
   }, [userID]);
 
   const teamID = user?.team;
+
+  useEffect(() => {
+    if (userID && teamID) {
+      axios
+        .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
+        .then((res) => {
+          setTeam(res.data);
+        });
+    }
+  }, [userID, teamID]);
+
   const setTeamID = (newID) => {
     setUser((prev) => {
       if (prev) {
@@ -118,6 +130,7 @@ export default function App() {
                 setDisplaySidebar={setDisplaySidebar}
                 teamID={teamID}
                 setTeamID={setTeamID}
+                setTeam={setTeam}
               />
             }
           >
@@ -134,12 +147,15 @@ export default function App() {
             <Route
               path="edit"
               element={
-                user ? (
+                socketConnected && user && team ? (
                   <Edit
                     user={user}
                     userID={auth.userID.id}
                     setUser={setUser}
                     wideScreen={wideScreen}
+                    team={team}
+                    setTeam={setTeam}
+                    setTeamID={setTeamID}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -155,6 +171,8 @@ export default function App() {
                     wideScreen={wideScreen}
                     teamID={teamID}
                     setTeamID={setTeamID}
+                    team={team}
+                    setTeam={setTeam}
                   />
                 ) : (
                   <div>Loading...</div>

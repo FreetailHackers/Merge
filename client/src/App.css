@@ -156,7 +156,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     line-height: 1.2rem;
   }
 
-  .about-page, .chat, .dash, .profile-container,
+  .about-page, .chat, .dash, .edit,
   .myTeam, nav#navbar, .chatWindow {
     height: calc(90.5 * var(--vh, 1vh));
     overflow-y: scroll;
@@ -237,7 +237,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding: 8px;
   }
 
-  .myTeam .themeButton {
+  .myTeam .themeButton, .edit .themeButton {
     font-size: 0.85em;
   }
 
@@ -359,7 +359,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding: 10px;
   }
 
-  .myTeam .themeButton {
+  .myTeam .themeButton, .edit .themeButton {
     font-size: 1em;
   }
 
@@ -367,7 +367,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: calc(max(175px, 15vw));
   }
 
-  nav#navbar, .chat, .dash, .chatWindow, .profile-container, .about-page, .myTeam {
+  nav#navbar, .chat, .dash, .chatWindow, .edit, .about-page, .myTeam {
     height: calc(100 * var(--vh, 1vh));
   }
 
@@ -1017,6 +1017,11 @@ nav#navbar a.active {
   margin-block-end: 0;
 }
 
+.membership p {
+  margin-block-start: 0.25em;
+  margin-block-end: 0.25em;
+}
+
 .mrButtons {
   justify-content: space-evenly;
   margin: 3px;
@@ -1047,7 +1052,7 @@ nav#navbar a.active {
 
 }
 
-.myTeam .themeButton {
+.myTeam .themeButton, .edit .themeButton {
   margin-left: 5px;
   margin-right: 5px;
 }

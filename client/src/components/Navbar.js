@@ -40,7 +40,15 @@ const Navbar = (props) => {
               Chat
             </NavLink>
             <div className="nav-line" />
-            <NavLink to="/edit">Profile</NavLink>
+            <NavLink
+              to="/edit"
+              onClick={() =>
+                props.setUpdates((prev) => ({ ...prev, profile: false }))
+              }
+            >
+              {props.updates.profile ? <span className="unreadBubble" /> : null}
+              Edit Profile
+            </NavLink>
             <div className="nav-line" />
             <NavLink
               to="/myteam"
@@ -49,7 +57,7 @@ const Navbar = (props) => {
               }
             >
               {props.updates.myteam ? <span className="unreadBubble" /> : null}
-              My Team
+              Browse Teams
             </NavLink>
             <div className="nav-line" />
           </>

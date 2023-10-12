@@ -113,7 +113,7 @@ function TeamList(props) {
         //props.setTeam(res.data);
         const absorbedTeamID = res.data._id === teamID ? oldTeamID : teamID;
         socket.emit("accept-merge", { absorbedTeamID, newTeam: res.data });
-        props.setSection("Profile");
+        navigate("/edit");
       });
   }
 
@@ -354,7 +354,6 @@ TeamList.propTypes = {
   team: PropTypes.object,
   setTeam: PropTypes.func,
   userID: PropTypes.string,
-  setSection: PropTypes.func,
   setTeamID: PropTypes.func,
 };
 

@@ -106,7 +106,7 @@ io.on("connection", (socket) => {
 function newMessage(data, socket) {
   socket.to(data.chat).emit("broadcast-message", data.message);
   for (const user of data.users) {
-    socket.to(user).emit("received-message");
+    socket.to(user).emit("chat-update");
   }
 }
 
@@ -192,7 +192,7 @@ async function removeUsers(data, socket) {
 
 async function leaveTeam(data, socket) {
   socket.to(data.teamID).emit("teammate-left", { userID: data.userID });
-  socket.to(data.teamID).emit("myteam-update");
+  socket.to(data.teamID).emit("team-update");
   socket.leave(data.teamID);
 }
 
@@ -207,9 +207,9 @@ async function requestMerge(data, socket) {
 }
 
 async function acceptMerge(data, socket) {
-  socket.to(data.absorbedTeamID).emit("myteam-update");
+  //socket.to(data.absorbedTeamID).emit("myteam-update");
   socket.to(data.absorbedTeamID).emit("merge-accepted", data);
-  socket.to(data.newTeam._id).emit("myteam-update");
+  //socket.to(data.newTeam._id).emit("myteam-update");
   socket.to(data.newTeam._id).emit("merge-accepted", data);
   //socket.to(data.absorbedTeamID).to(data.newTeam._id).emit("myteam-update");
   //socket.to(data.absorbedTeamID).to(data.newTeam._id).emit("merge-accepted", data);
@@ -231,7 +231,7 @@ async function cancelRequest(data, socket) {
 
 async function updateProfile(data, socket) {
   socket.to(data.teamID).emit("profile-updated", data);
-  socket.to(data.teamID).emit("myteam-update", data);
+  socket.to(data.teamID).emit("team-update", data);
 }
 
 async function updateMembership(data, socket) {

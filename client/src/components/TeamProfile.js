@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useOutletContext } from "react-router-dom";
 import axios from "axios";
-import SwipeProfile from "../SwipeProfile";
-import SkillSelector from "../SkillSelector";
-import { roles } from "../../data/roles";
+import SwipeProfile from "./SwipeProfile";
+import SkillSelector from "./SkillSelector";
+import { roles } from "../data/roles";
 
 import {
   TextInput,

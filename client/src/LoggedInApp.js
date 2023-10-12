@@ -5,10 +5,12 @@ import { Outlet, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
 import NavMobile from "./components/NavMobile";
+import { useNavigate } from "react-router-dom";
 
 const noUpdates = {
   chat: false,
   myteam: false,
+  profile: false,
 };
 
 function LoggedInApp(props) {
@@ -21,18 +23,15 @@ function LoggedInApp(props) {
     logoutUser,
     teamID,
     setTeamID,
+    setTeam,
   } = props;
   const [socket, setSocket] = useState(null);
   const [updates, setUpdates] = useState({ ...noUpdates });
-  const setChatUpdate = () => {
-    setUpdates((prev) => ({ ...prev, chat: true }));
-  };
-  const setMyTeamUpdate = () =>
-    setUpdates((prev) => ({ ...prev, myteam: true }));
   let location = useLocation();
 
   const token = auth?.token;
   const userID = auth.userID.id;
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function checkForUpdates() {
@@ -64,22 +63,57 @@ function LoggedInApp(props) {
     }
   }, [token, setSocketConnected]);
 
-  const path = location?.pathname;
-  const onChat = path?.endsWith("chat");
-  const onMyTeam = path?.endsWith("myteam");
-
   useEffect(() => {
+    function membershipUpdatedWS(data) {
+      if (data.kickedUsers.includes(userID)) {
+        setTeamID(data.newTeams[userID]);
+      } else {
+        setTeam((prev) => {
+          let newTeam = { ...prev };
+          newTeam.users = [
+            ...newTeam.users.filter((e) => !data.kickedUsers.includes(e)),
+          ];
+          for (const user of data.kickedUsers) {
+            delete newTeam.profiles[user];
+          }
+          if (data.newLeader) {
+            newTeam.leader = data.newLeader;
+          }
+          return newTeam;
+        });
+      }
+    }
+
+    function teammateLeftWS(data) {
+      setTeam((prev) => {
+        let newTeam = { ...prev };
+        delete newTeam.profiles[data.userID];
+        newTeam.users = [...newTeam.users.filter((e) => e !== data.userID)];
+        return newTeam;
+      });
+    }
+
     if (socket) {
+      socket.on("membership-updated", membershipUpdatedWS);
       socket.on("kicked-from-team", (data) => setTeamID(data.newTeam));
-      socket.on("merge-accepted", (data) => setTeamID(data.newTeam._id));
+      socket.on("merge-accepted", (data) => {
+        if (teamID === data.newTeam._id) {
+          setTeam(data.newTeam);
+        }
+        setTeamID(data.newTeam._id);
+        navigate("/edit");
+      });
+      socket.on("teammate-left", teammateLeftWS);
     }
     return () => {
       if (socket) {
         socket.off("kicked-from-team");
         socket.off("merge-accepted");
+        socket.off("membership-updated");
+        socket.off("teammate-left");
       }
     };
-  }, [socket, setTeamID]);
+  }, [socket, teamID, setTeamID, setTeam, userID, navigate]);
 
   useEffect(() => {
     if (socket && teamID) {
@@ -92,31 +126,51 @@ function LoggedInApp(props) {
     };
   }, [socket, teamID]);
 
+  const path = location?.pathname;
+  const onChat = path?.endsWith("chat");
+  const onMyTeam = path?.endsWith("myteam");
+  const onProfile = path?.endsWith("edit");
+
   useEffect(() => {
     if (socket) {
       if (onChat) {
         setUpdates((prev) => ({ ...prev, chat: false }));
       } else {
-        socket.on("received-message", setChatUpdate);
+        socket.on("chat-update", () =>
+          setUpdates((prev) => ({ ...prev, chat: true }))
+        );
       }
 
       if (onMyTeam) {
         setUpdates((prev) => ({ ...prev, myteam: false }));
       } else {
-        socket.on("myteam-update", setMyTeamUpdate);
+        socket.on("myteam-update", () =>
+          setUpdates((prev) => ({ ...prev, myteam: true }))
+        );
+      }
+
+      if (onProfile) {
+        setUpdates((prev) => ({ ...prev, profile: false }));
+      } else {
+        socket.on("team-update", () =>
+          setUpdates((prev) => ({ ...prev, profile: true }))
+        );
       }
     }
     return () => {
       if (socket) {
         if (!onChat) {
-          socket.off("received-message", setChatUpdate);
+          socket.off("chat-update");
         }
         if (!onMyTeam) {
-          socket.off("myteam-update", setMyTeamUpdate);
+          socket.off("myteam-update");
+        }
+        if (!onProfile) {
+          socket.off("team-update");
         }
       }
     };
-  }, [socket, onChat, onMyTeam]);
+  }, [socket, onChat, onMyTeam, onProfile]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -137,20 +191,6 @@ function LoggedInApp(props) {
         <NavMobile userID={userID} setDisplaySidebar={setDisplaySidebar} />
       )}
     </div>
-
-    /*<div style={{ display: "flex", flexDirection: "row" }}>
-      {(displaySidebar || wideScreen) && (
-        <Navbar
-          userID={userID}
-          logoutUser={logoutUser}
-          wideScreen={wideScreen}
-          flipDisplaySidebar={() => setDisplaySidebar(false)}
-          updates={updates}
-          setUpdates={setUpdates}
-        />
-      )}
-      {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
-    </div>*/
   );
 }
 
@@ -163,6 +203,7 @@ LoggedInApp.propTypes = {
   setSocketConnected: PropTypes.func,
   teamID: PropTypes.string,
   setTeamID: PropTypes.func,
+  setTeam: PropTypes.func,
 };
 
 export default LoggedInApp;
