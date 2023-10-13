@@ -18,7 +18,7 @@ const Navbar = (props) => {
 
   const closeBurgerMenu = () => {
     if (!props.wideScreen) {
-      props.displaySideBar();
+      props.flipDisplaySidebar();
     }
   };
 
@@ -30,11 +30,35 @@ const Navbar = (props) => {
           <>
             <NavLink to="/swipe">Home</NavLink>
             <div className="nav-line" />
-            <NavLink to="/chat">Chat</NavLink>
+            <NavLink
+              to="/chat"
+              onClick={() =>
+                props.setUpdates((prev) => ({ ...prev, chat: false }))
+              }
+            >
+              {props.updates.chat ? <span className="unreadBubble" /> : null}
+              Chat
+            </NavLink>
             <div className="nav-line" />
-            <NavLink to="/edit">Profile</NavLink>
+            <NavLink
+              to="/edit"
+              onClick={() =>
+                props.setUpdates((prev) => ({ ...prev, profile: false }))
+              }
+            >
+              {props.updates.profile ? <span className="unreadBubble" /> : null}
+              Team Profile
+            </NavLink>
             <div className="nav-line" />
-            <NavLink to="/myteam">My Team</NavLink>
+            <NavLink
+              to="/browse"
+              onClick={() =>
+                props.setUpdates((prev) => ({ ...prev, browse: false }))
+              }
+            >
+              {props.updates.browse ? <span className="unreadBubble" /> : null}
+              Browse Teams
+            </NavLink>
             <div className="nav-line" />
           </>
         )}
@@ -59,7 +83,9 @@ Navbar.propTypes = {
   userID: PropTypes.string.isRequired,
   logoutUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
-  displaySideBar: PropTypes.func.isRequired,
+  flipDisplaySidebar: PropTypes.func,
+  updates: PropTypes.object,
+  setUpdates: PropTypes.func,
 };
 
 export default Navbar;

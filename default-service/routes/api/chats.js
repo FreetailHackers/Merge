@@ -66,6 +66,7 @@ async function get_default_function(req, res) {
         .sort({ _id: -1 })
         .exec();
       await addProfiles(chat);
+      chat.seen = chat.readBy.map((e) => String(e)).includes(req.user);
       result.push(chat);
     }
     // Sort chats in reverse chronological order; i.e., most recent on top

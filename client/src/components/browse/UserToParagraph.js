@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { startCase, isArray } from "lodash";
-import { skillsDict } from "../data/skills";
-import { rolesDict } from "../data/roles";
+import { skillsDict } from "../../data/skills";
+import { rolesDict } from "../../data/roles";
 
 export const UserToParagraph = ({ user, hideKeys }) => (
   <p>

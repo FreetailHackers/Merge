@@ -77,6 +77,11 @@ section#login form button, section#register form button, .closetos,
   padding: 10px;
 }
 
+input[type="image"] {
+  padding: 10px 0 0;
+}
+
+
 input, .portfolio-card p, .headerDatabase,
 section#login form button, section#register form button, .closetos,
 .chatPreview h4, .newChatButton, .chatWindowHeader .themeButton, input {
@@ -105,7 +110,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 }
 
 .github-card img.githubImage, .chatPreview .smallDivider,
-.chatPreview .unreadBubble, .newMessageBox p, .messageImage{
+.newMessageBox p, .messageImage{
   border-radius: 50%;
 }
 
@@ -156,7 +161,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     line-height: 1.2rem;
   }
 
-  .about-page, .chat, .dash, .profile-container,
+  .about-page, .chat, .dash, .edit,
   .myTeam, nav#navbar, .chatWindow {
     height: calc(90.5 * var(--vh, 1vh));
     overflow-y: scroll;
@@ -237,7 +242,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding: 8px;
   }
 
-  .myTeam .themeButton {
+  .myTeam .themeButton, .edit .themeButton {
     font-size: 0.85em;
   }
 
@@ -359,7 +364,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding: 10px;
   }
 
-  .myTeam .themeButton {
+  .myTeam .themeButton, .edit .themeButton {
     font-size: 1em;
   }
 
@@ -367,7 +372,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     width: calc(max(175px, 15vw));
   }
 
-  nav#navbar, .chat, .dash, .chatWindow, .profile-container, .about-page, .myTeam {
+  nav#navbar, .chat, .dash, .chatWindow, .edit, .about-page, .myTeam {
     height: calc(100 * var(--vh, 1vh));
   }
 
@@ -739,7 +744,6 @@ nav#navbar a.active {
 .arrow {
   width: auto;
   height: 100%;
-  padding-bottom: 15px;
 }
 
 .left {
@@ -1017,6 +1021,11 @@ nav#navbar a.active {
   margin-block-end: 0;
 }
 
+.membership p {
+  margin-block-start: 0.25em;
+  margin-block-end: 0.25em;
+}
+
 .mrButtons {
   justify-content: space-evenly;
   margin: 3px;
@@ -1047,7 +1056,7 @@ nav#navbar a.active {
 
 }
 
-.myTeam .themeButton {
+.myTeam .themeButton, .edit .themeButton {
   margin-left: 5px;
   margin-right: 5px;
 }
@@ -1287,13 +1296,24 @@ section#register form span.error {
   height: 45px;
 }
 
+
+.unreadBubble {
+  border-radius: 50%;
+  display: inline-block
+}
+
+#navbar .unreadBubble {
+  width: 10px;
+  height: 10px;
+  background: var(--text-on-primary);
+  margin-right: 5px;
+}
+
 .chatPreview .unreadBubble {
   width: 12px;
   height: 12px;
   margin-left: 5px;
   background: var(--primary);
-  border-radius: 50%;
-  display: inline-block
 }
 
 .newChatButton {
@@ -1576,6 +1596,7 @@ input[type="range"] {
   accent-color: #EC53B0;
   background: white;
   border-radius: 5px;
+  padding: 5px;
 }
 
 input[type=range]::-webkid-slider-runnable-track {
@@ -1596,7 +1617,9 @@ input[type=range]::-webkid-slider-runnable-track {
   padding-top: 5px;
 }
 
-
+.newInfoButton {
+  font-weight: 900;
+}
 /* mobile nav style */
 
 .mobile-navbar {
