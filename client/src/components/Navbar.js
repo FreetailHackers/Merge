@@ -51,12 +51,12 @@ const Navbar = (props) => {
             </NavLink>
             <div className="nav-line" />
             <NavLink
-              to="/myteam"
+              to="/browse"
               onClick={() =>
-                props.setUpdates((prev) => ({ ...prev, myteam: false }))
+                props.setUpdates((prev) => ({ ...prev, browse: false }))
               }
             >
-              {props.updates.myteam ? <span className="unreadBubble" /> : null}
+              {props.updates.browse ? <span className="unreadBubble" /> : null}
               Browse Teams
             </NavLink>
             <div className="nav-line" />

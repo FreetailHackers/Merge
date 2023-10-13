@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const noUpdates = {
   chat: false,
-  myteam: false,
+  browse: false,
   profile: false,
 };
 
@@ -128,7 +128,7 @@ function LoggedInApp(props) {
 
   const path = location?.pathname;
   const onChat = path?.endsWith("chat");
-  const onMyTeam = path?.endsWith("myteam");
+  const onBrowse = path?.endsWith("browse");
   const onProfile = path?.endsWith("edit");
 
   useEffect(() => {
@@ -141,11 +141,11 @@ function LoggedInApp(props) {
         );
       }
 
-      if (onMyTeam) {
-        setUpdates((prev) => ({ ...prev, myteam: false }));
+      if (onBrowse) {
+        setUpdates((prev) => ({ ...prev, browse: false }));
       } else {
-        socket.on("myteam-update", () =>
-          setUpdates((prev) => ({ ...prev, myteam: true }))
+        socket.on("browse-update", () =>
+          setUpdates((prev) => ({ ...prev, browse: true }))
         );
       }
 
@@ -162,15 +162,15 @@ function LoggedInApp(props) {
         if (!onChat) {
           socket.off("chat-update");
         }
-        if (!onMyTeam) {
-          socket.off("myteam-update");
+        if (!onBrowse) {
+          socket.off("browse-update");
         }
         if (!onProfile) {
           socket.off("team-update");
         }
       }
     };
-  }, [socket, onChat, onMyTeam, onProfile]);
+  }, [socket, onChat, onBrowse, onProfile]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>

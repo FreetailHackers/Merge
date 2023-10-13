@@ -31,9 +31,9 @@ const NavMobile = (props) => {
           onClick={closeBurgerMenu}
           alt="more options"
         />
-        <NavLink to="/myteam" onClick={showScreen}>
+        <NavLink to="/browse" onClick={showScreen}>
           <img
-            src={props.updates?.myteam ? teamsDark : teams}
+            src={props.updates?.browse ? teamsDark : teams}
             style={{ height: "33px" }}
             alt="my team"
           />

@@ -203,16 +203,12 @@ async function requestMerge(data, socket) {
   requestedCopy.requestedTeam = { _id: data.requestedTeam._id };
   socket.to(data.requestingTeam._id).emit("merge-requested", requestingCopy);
   socket.to(data.requestedTeam._id).emit("merge-requested", requestedCopy);
-  socket.to(data.requestedTeam._id).emit("myteam-update");
+  socket.to(data.requestedTeam._id).emit("browse-update");
 }
 
 async function acceptMerge(data, socket) {
-  //socket.to(data.absorbedTeamID).emit("myteam-update");
   socket.to(data.absorbedTeamID).emit("merge-accepted", data);
-  //socket.to(data.newTeam._id).emit("myteam-update");
   socket.to(data.newTeam._id).emit("merge-accepted", data);
-  //socket.to(data.absorbedTeamID).to(data.newTeam._id).emit("myteam-update");
-  //socket.to(data.absorbedTeamID).to(data.newTeam._id).emit("merge-accepted", data);
 }
 
 async function rejectMerge(data, socket) {
@@ -237,7 +233,7 @@ async function updateProfile(data, socket) {
 async function updateMembership(data, socket) {
   const fetched = await io.in(data.teamID).fetchSockets();
   for (const fetchedSocket of fetched) {
-    socket.to(fetchedSocket.id).emit("myteam-update");
+    socket.to(fetchedSocket.id).emit("team-update");
     const userID = fetchedSocket.data.mongoID;
     if (data.kickedUsers.includes(userID)) {
       socket

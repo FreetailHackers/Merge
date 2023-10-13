@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import TeamList from "../components/myteam/TeamList";
 import UserList from "../components/myteam/UserList";
 
-function MyTeam(props) {
+function BrowseTeams(props) {
   //frontend for updating
   const { team, setTeam, userID, setTeamID } = props;
   const [section, setSection] = useState("Team List");
@@ -49,7 +49,7 @@ function MyTeam(props) {
   );
 }
 
-MyTeam.propTypes = {
+BrowseTeams.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
   teamID: PropTypes.string,
@@ -58,4 +58,4 @@ MyTeam.propTypes = {
   setTeam: PropTypes.func,
 };
 
-export default MyTeam;
+export default BrowseTeams;

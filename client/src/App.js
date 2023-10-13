@@ -15,7 +15,7 @@ import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
-import MyTeam from "./pages/MyTeam";
+import BrowseTeams from "./pages/BrowseTeams";
 
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -79,6 +79,8 @@ export default function App() {
         .then((res) => {
           setTeam(res.data);
         });
+    } else {
+      setTeam(null)
     }
   }, [userID, teamID]);
 
@@ -163,10 +165,10 @@ export default function App() {
               }
             />
             <Route
-              path="myteam"
+              path="browse"
               element={
                 socketConnected && teamID ? (
-                  <MyTeam
+                  <BrowseTeams
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
                     teamID={teamID}
