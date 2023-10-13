@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import TeamList from "../components/myteam/TeamList";
-import UserList from "../components/myteam/UserList";
+import TeamList from "../components/browse/TeamList";
+import UserList from "../components/browse/UserList";
 
 function BrowseTeams(props) {
   //frontend for updating

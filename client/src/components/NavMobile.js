@@ -6,14 +6,14 @@ import { NavLink } from "react-router-dom";
 
 // assets
 // nav bar icons
-import burgerbar from "../assets/navbar icons/burger-bar.svg";
-import teams from "../assets/navbar icons/team-icon.svg";
-import teamsDark from "../assets/navbar icons/team-icon-dark.svg";
-import home from "../assets/navbar icons/home-icon.svg";
-import chat from "../assets/navbar icons/chat-icon.svg";
-import chatDark from "../assets/navbar icons/chat-icon-dark.svg";
-import profile from "../assets/navbar icons/profile-icon.svg";
-import profileDark from "../assets/navbar icons/profile-icon-dark.svg";
+import burgerbar from "../assets/navbar-icons/burger-bar.svg";
+import teams from "../assets/navbar-icons/team-icon.svg";
+import teamsDark from "../assets/navbar-icons/team-icon-dark.svg";
+import home from "../assets/navbar-icons/home-icon.svg";
+import chat from "../assets/navbar-icons/chat-icon.svg";
+import chatDark from "../assets/navbar-icons/chat-icon-dark.svg";
+import profile from "../assets/navbar-icons/profile-icon.svg";
+import profileDark from "../assets/navbar-icons/profile-icon-dark.svg";
 
 const NavMobile = (props) => {
   const closeBurgerMenu = () => {

@@ -80,7 +80,7 @@ export default function App() {
           setTeam(res.data);
         });
     } else {
-      setTeam(null)
+      setTeam(null);
     }
   }, [userID, teamID]);
 

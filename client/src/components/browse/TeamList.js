@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 import TeamInfoCard from "./TeamInfoCard";
 import { useOutletContext } from "react-router-dom";
 import SkillSelector from "../SkillSelector";
-import Collapsible from "../Collapsible";
-import { UserToParagraph } from "../UserToParagraph";
-import { Pagination } from "../Pagination";
+import Collapsible from "./Collapsible";
+import { UserToParagraph } from "./UserToParagraph";
+import { Pagination } from "./Pagination";
 import { useNavigate } from "react-router-dom";
 import { TextInput, NativeSelect, NumberInput } from "@mantine/core";
 
