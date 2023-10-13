@@ -29,19 +29,15 @@ function TeamProfile(props) {
   const { team, setTeam, userID } = props;
   const teamProfile = team.profile;
 
-  const teamID = team._id;
   useEffect(() => {
     function profileUpdatedWS(data) {
-      if (data.teamID === teamID) {
-        setTeam((prev) => ({ ...prev, profile: data.profile }));
-        setSaved(true);
-      }
+      setSaved(true);
     }
     socket.on("profile-updated", profileUpdatedWS);
     return () => {
       socket.off("profile-updated", profileUpdatedWS);
     };
-  }, [socket, teamID, setTeam]);
+  }, [socket]);
 
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
 
@@ -80,10 +76,6 @@ function TeamProfile(props) {
         [key]: value,
       },
     }));
-    /*setTeamProfile((prev) => ({
-      ...prev,
-      [key]: value,
-    }));*/
     setSaved(false);
   };
 

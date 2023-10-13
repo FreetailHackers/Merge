@@ -93,6 +93,10 @@ function LoggedInApp(props) {
       });
     }
 
+    function updateProfileWS(data) {
+      setTeam((prev) => ({ ...prev, profile: data.profile }));
+    }
+
     if (socket) {
       socket.on("membership-updated", membershipUpdatedWS);
       socket.on("kicked-from-team", (data) => setTeamID(data.newTeam));
@@ -101,6 +105,7 @@ function LoggedInApp(props) {
         navigate("/edit");
       });
       socket.on("teammate-left", teammateLeftWS);
+      socket.on("profile-updated", updateProfileWS);
     }
     return () => {
       if (socket) {
@@ -108,6 +113,7 @@ function LoggedInApp(props) {
         socket.off("merge-accepted");
         socket.off("membership-updated");
         socket.off("teammate-left");
+        socket.off("profile-updated", updateProfileWS);
       }
     };
   }, [socket, setTeamID, setTeam, userID, navigate]);
