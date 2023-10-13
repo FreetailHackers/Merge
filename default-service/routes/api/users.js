@@ -14,6 +14,8 @@ const createTeam = require("../helpers/createTeam");
 
 // Load User model
 const User = require("../../models/User");
+const Chat = require("../../models/Chat");
+const Team = require("../../models/Team");
 const Report = require("../../models/Report");
 
 //AWS credentials
@@ -30,11 +32,11 @@ const s3 = new AWS.S3({
 // @route POST api/users/register
 // @desc Register user
 // @access Public
-router.post("/register", async (req, res) => register_func(req, res));
+router.post("/register", register_func);
 // @route POST api/users/login
 // @desc Login to the application
 // @access Public
-router.post("/login", async (req, res) => login(req, res));
+router.post("/login", login);
 
 router.get("/validate", authenticateToken, (req, res) => {
   return res.json({ user: req.user });
@@ -43,45 +45,42 @@ router.get("/validate", authenticateToken, (req, res) => {
 // @route POST api/users/update
 // @desc Update the profile information of a sepcific user
 // @access Public
-router.post("/update", authenticateToken, async (req, res) => update(req, res));
+router.post("/update", authenticateToken, update);
 
 // @route POST api/users/list
 // @desc Get a list of all users, within a specified starting and ending range
 // @access Public
-router.get("/list", authenticateToken, async (req, res) => list_func(req, res));
+router.get("/list", authenticateToken, list_func);
 
 // @route GET api/users/:user
 // @desc Returns a user's profile
 // @access Public
-router.get("/:user", authenticateToken, async (req, res) => getUser(req, res));
+router.get("/:user", authenticateToken, getUser);
+
+// @route GET api/users/checkForUpdates
+// @desc returns info to logged-in users on what pages to check
+// @access Public
+router.get("/checkForUpdates/:user", authenticateToken, checkForUpdates);
 
 // @route GET api/users/conciseInfo/:user
 // @desc Get the name and profile picture of a user.
 // @access Public
-router.get("/conciseInfo/:user", authenticateToken, async (req, res) =>
-  conciseInfo(req, res)
-);
+router.get("/conciseInfo/:user", authenticateToken, conciseInfo);
 
 // @route POST api/users/:user/report
 // @desc Report a user
 // @access Public
-router.post("/report", authenticateToken, async (req, res) =>
-  reportUsers(req, res)
-);
+router.post("/report", authenticateToken, reportUsers);
 
 // @route POST api/users/:user/block
 // @desc Block a user
 // @access Public
-router.post("/:user/block", authenticateToken, async (req, res) =>
-  blockUser(req, res)
-);
+router.post("/:user/block", authenticateToken, blockUser);
 
 // @route POST api/users/:user/unblock
 // @desc Unblock a user
 // @access Public
-router.post("/:user/unblock", authenticateToken, async (req, res) =>
-  unblockUser(req, res)
-);
+router.post("/:user/unblock", authenticateToken, unblockUser);
 
 // @route POST api/users/profile-picture
 // @desc Update the profile picture of a specific user
@@ -412,6 +411,27 @@ async function unblockUser(req, res) {
   }
 }
 
+async function checkForUpdates(req, res) {
+  try {
+    if (req.params.user !== req.user) {
+      throw new Error("nope");
+    }
+    let out = { browse: false, chat: false };
+    const myTeam = await Team.findOne({ users: req.user });
+    if (myTeam?.mergeRequests?.length > 0) {
+      out.browse = true;
+    }
+    const chats = await Chat.find({ users: req.user });
+    for (let i = 0; !out.chat && i < chats.length; i++) {
+      out.chat = !chats[i].readBy.map((e) => String(e)).includes(req.user);
+    }
+    return res.json(out);
+  } catch (err) {
+    console.log(err);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports = {
   router,
   login,
@@ -424,4 +444,5 @@ module.exports = {
   reportUsers,
   blockUser,
   unblockUser,
+  checkForUpdates,
 };

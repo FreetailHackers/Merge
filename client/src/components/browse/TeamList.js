@@ -4,14 +4,16 @@ import PropTypes from "prop-types";
 import TeamInfoCard from "./TeamInfoCard";
 import { useOutletContext } from "react-router-dom";
 import SkillSelector from "../SkillSelector";
-import Collapsible from "../Collapsible";
-import { UserToParagraph } from "../UserToParagraph";
-import { Pagination } from "../Pagination";
+import Collapsible from "./Collapsible";
+import { UserToParagraph } from "./UserToParagraph";
+import { Pagination } from "./Pagination";
 import { useNavigate } from "react-router-dom";
 import { TextInput, NativeSelect, NumberInput } from "@mantine/core";
 
 function TeamList(props) {
-  const { ingoingMRs, outgoingMRs, userID } = props;
+  const [ingoingMRs, setIngoingMRs] = useState([]);
+  const [outgoingMRs, setOutgoingMRs] = useState([]);
+  const { userID } = props;
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
   const [otherTeams, setOtherTeams] = useState([]);
   const socket = useOutletContext();
@@ -26,6 +28,62 @@ function TeamList(props) {
 
   const navigate = useNavigate();
 
+  const teamID = props.team?._id;
+
+  useEffect(() => {
+    axios
+      .get(
+        process.env.REACT_APP_API_URL + "/api/teams/mergeRequestsInfo/" + userID
+      )
+      .then((res) => {
+        setIngoingMRs(res.data.ingoing);
+        setOutgoingMRs(res.data.outgoing);
+      });
+  }, [userID, teamID]);
+
+  useEffect(() => {
+    function mergeRequestedWS(data) {
+      if (data.requestingTeam._id === teamID) {
+        setOutgoingMRs((prev) => [...prev, data]);
+      } else if (data.requestedTeam._id === teamID) {
+        setIngoingMRs((prev) => [...prev, data]);
+      }
+    }
+
+    function mergeRejectedWS(data) {
+      if (data.requestingTeamID === teamID) {
+        setOutgoingMRs((prev) => [
+          ...prev.filter((e) => e.requestedTeam._id !== data.rejectingTeamID),
+        ]);
+      } else if (data.rejectingTeamID === teamID) {
+        setIngoingMRs((prev) => [
+          ...prev.filter((e) => e.requestingTeam._id !== data.requestingTeamID),
+        ]);
+      }
+    }
+
+    function requestCancelledWS(data) {
+      if (data.requestedTeamID === teamID) {
+        setIngoingMRs((prev) => [
+          ...prev.filter((e) => e.requestingTeam._id !== data.cancellingTeamID),
+        ]);
+      } else if (data.cancellingTeamID === teamID) {
+        setOutgoingMRs((prev) => [
+          ...prev.filter((e) => e.requestedTeam._id !== data.requestedTeamID),
+        ]);
+      }
+    }
+    socket.on("merge-requested", mergeRequestedWS);
+    socket.on("merge-rejected", mergeRejectedWS);
+    socket.on("request-cancelled", requestCancelledWS);
+
+    return () => {
+      socket.off("merge-requested", mergeRequestedWS);
+      socket.off("merge-rejected", mergeRejectedWS);
+      socket.off("request-cancelled", requestCancelledWS);
+    };
+  }, [socket, teamID]);
+
   function requestMerge(otherTeam) {
     axios
       .post(
@@ -36,7 +94,7 @@ function TeamList(props) {
       .then((res) => {
         let mrObj = res.data;
         mrObj.requestedTeam = otherTeam;
-        props.setOutgoingMRs((prev) => [...prev, mrObj]);
+        setOutgoingMRs((prev) => [...prev, mrObj]);
         mrObj.requestingTeam = props.team;
         socket.emit("request-merge", mrObj);
       });
@@ -54,7 +112,7 @@ function TeamList(props) {
         props.setTeam(res.data);
         const absorbedTeamID = res.data._id === teamID ? oldTeamID : teamID;
         socket.emit("accept-merge", { absorbedTeamID, newTeam: res.data });
-        props.setSection("Profile");
+        navigate("/edit");
       });
   }
 
@@ -62,7 +120,7 @@ function TeamList(props) {
     axios
       .post(process.env.REACT_APP_API_URL + `/api/teams/rejectMerge/${teamID}`)
       .then(() => {
-        props.setIngoingMRs((prev) => [
+        setIngoingMRs((prev) => [
           ...prev.filter((e) => e.requestingTeam._id !== teamID),
         ]);
         socket.emit("reject-merge", {
@@ -78,7 +136,7 @@ function TeamList(props) {
         process.env.REACT_APP_API_URL + `/api/teams/cancelRequest/${teamID}`
       )
       .then(() => {
-        props.setOutgoingMRs((prev) => [
+        setOutgoingMRs((prev) => [
           ...prev.filter((e) => e.requestedTeam._id !== teamID),
         ]);
         socket.emit("cancel-request", {
@@ -143,14 +201,14 @@ function TeamList(props) {
 
   return (
     <div className="flexColumn centerCol">
-      {(props.ingoingMRs?.length > 0 || props.outgoingMRs?.length > 0) && (
+      {(ingoingMRs?.length > 0 || outgoingMRs?.length > 0) && (
         <div className="flexColumn teamRequests">
           <h3>Requests</h3>
           <div className="merge-requests">
             <div className="mrColumn flexColumn">
-              {props.ingoingMRs?.length > 0 && <h4>Incoming</h4>}
-              {props.ingoingMRs &&
-                props.ingoingMRs.map((request, index) => (
+              {ingoingMRs?.length > 0 && <h4>Incoming</h4>}
+              {ingoingMRs &&
+                ingoingMRs.map((request, index) => (
                   <TeamInfoCard
                     key={index}
                     team={request.requestingTeam}
@@ -169,9 +227,9 @@ function TeamList(props) {
                 ))}
             </div>
             <div className="mrColumn flexColumn">
-              {props.outgoingMRs?.length > 0 && <h4>Outgoing</h4>}
-              {props.outgoingMRs &&
-                props.outgoingMRs.map((request, index) => (
+              {outgoingMRs?.length > 0 && <h4>Outgoing</h4>}
+              {outgoingMRs &&
+                outgoingMRs.map((request, index) => (
                   <TeamInfoCard
                     key={index}
                     team={request.requestedTeam}
@@ -292,16 +350,10 @@ function TeamList(props) {
 }
 
 TeamList.propTypes = {
-  otherTeams: PropTypes.array,
-  setOtherTeams: PropTypes.func,
-  ingoingMRs: PropTypes.array,
-  outgoingMRs: PropTypes.array,
   team: PropTypes.object,
   setTeam: PropTypes.func,
-  setIngoingMRs: PropTypes.func,
-  setOutgoingMRs: PropTypes.func,
   userID: PropTypes.string,
-  setSection: PropTypes.func,
+  setTeamID: PropTypes.func,
 };
 
 export default TeamList;

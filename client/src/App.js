@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   loginUser,
   registerUser,
@@ -8,11 +8,6 @@ import {
 } from "./utils/authActions";
 
 import axios from "axios";
-import io from "socket.io-client";
-
-import Navbar from "./components/Navbar";
-import NavMobile from "./components/NavMobile";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -20,11 +15,12 @@ import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
-import MyTeam from "./pages/MyTeam";
+import BrowseTeams from "./pages/BrowseTeams";
 
 import { useMediaQuery } from "@mantine/hooks";
 
 import "./App.css";
+import LoggedInApp from "./LoggedInApp";
 
 const initialUserState = {
   userID: null,
@@ -36,9 +32,10 @@ const initialUserState = {
 export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [user, setUser] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const [socketConnected, setSocketConnected] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
+  const [team, setTeam] = useState(null);
 
   useEffect(() => {
     const resizeFunc = () => {
@@ -52,7 +49,7 @@ export default function App() {
     return () => {
       window.removeEventListener("resize", resizeFunc);
     };
-  });
+  }, []);
 
   useEffect(() => {
     if (!auth.userID && auth.loading) {
@@ -68,30 +65,45 @@ export default function App() {
         .then((res) => {
           setUser(res.data);
         });
+      axios
+        .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
+        .then((res) => {
+          setTeam(res.data);
+        });
     } else {
       setUser(null);
+      setTeam(null);
     }
   }, [userID]);
 
-  const token = auth?.token;
+  const teamID = team?._id;
+
   useEffect(() => {
-    if (token) {
-      const socketVar = io(process.env.REACT_APP_CHAT_URL, {
-        transports: ["websocket"],
-        query: { token },
-      });
-      socketVar.on("connect", () => {
-        setSocket(socketVar);
-      });
-    } else {
-      setSocket((prev) => {
-        if (prev?.connected) {
-          prev.disconnect();
+    if (userID && teamID) {
+      setUser((prev) => {
+        if (prev !== teamID) {
+          return { ...prev, team: teamID };
         }
-        return null;
+        return prev;
       });
     }
-  }, [token]);
+  }, [userID, teamID]);
+
+  const setTeamID = (newID) => {
+    setUser((prev) => {
+      if (prev && prev.team !== newID) {
+        axios
+          .get(
+            process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`
+          )
+          .then((res) => {
+            setTeam(res.data);
+          });
+        return { ...prev, team: newID };
+      }
+      return prev;
+    });
+  };
 
   const login = (
     <Login
@@ -122,27 +134,17 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", flexDirection: "row" }}>
-                  {(wideScreen || displaySidebar) && (
-                    <Navbar
-                      userID={auth.userID.id}
-                      logoutUser={() => logoutUser(setAuth)}
-                      wideScreen={wideScreen}
-                      displaySideBar={() => setDisplaySidebar(!displaySidebar)}
-                    />
-                  )}
-                  <Outlet context={socket} className="content" />
-                </div>
-                {!wideScreen && (
-                  <NavMobile
-                    userID={auth.userID.id}
-                    logoutUser={() => logoutUser(setAuth)}
-                    displaySideBar={displaySidebar}
-                    setDisplaySidebar={setDisplaySidebar}
-                  />
-                )}
-              </div>
+              <LoggedInApp
+                auth={auth}
+                logoutUser={() => logoutUser(setAuth)}
+                displaySidebar={displaySidebar}
+                wideScreen={wideScreen}
+                setSocketConnected={setSocketConnected}
+                setDisplaySidebar={setDisplaySidebar}
+                teamID={teamID}
+                setTeamID={setTeamID}
+                setTeam={setTeam}
+              />
             }
           >
             <Route
@@ -158,12 +160,14 @@ export default function App() {
             <Route
               path="edit"
               element={
-                user ? (
+                socketConnected && user && team ? (
                   <Edit
                     user={user}
                     userID={auth.userID.id}
                     setUser={setUser}
                     wideScreen={wideScreen}
+                    team={team}
+                    setTeam={setTeam}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -171,10 +175,15 @@ export default function App() {
               }
             />
             <Route
-              path="myteam"
+              path="browse"
               element={
-                socket?.connected ? (
-                  <MyTeam userID={auth.userID.id} wideScreen={wideScreen} />
+                socketConnected && team ? (
+                  <BrowseTeams
+                    userID={auth.userID.id}
+                    wideScreen={wideScreen}
+                    team={team}
+                    setTeam={setTeam}
+                  />
                 ) : (
                   <div>Loading...</div>
                 )
@@ -183,7 +192,7 @@ export default function App() {
             <Route
               path="chat"
               element={
-                socket?.connected ? (
+                socketConnected ? (
                   <Chat
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
