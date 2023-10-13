@@ -52,7 +52,6 @@ function BrowseTeams(props) {
 BrowseTeams.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  teamID: PropTypes.string,
   setTeamID: PropTypes.func,
   team: PropTypes.object,
   setTeam: PropTypes.func,

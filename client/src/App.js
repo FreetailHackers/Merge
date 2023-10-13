@@ -65,32 +65,43 @@ export default function App() {
         .then((res) => {
           setUser(res.data);
         });
-    } else {
-      setUser(null);
-    }
-  }, [userID]);
-
-  const teamID = user?.team;
-
-  useEffect(() => {
-    if (userID && teamID) {
       axios
         .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
         .then((res) => {
           setTeam(res.data);
         });
     } else {
+      setUser(null);
       setTeam(null);
+    }
+  }, [userID]);
+
+  const teamID = team?._id;
+
+  useEffect(() => {
+    if (userID && teamID) {
+      setUser((prev) => {
+        if (prev !== teamID) {
+          return { ...prev, team: teamID };
+        }
+        return prev;
+      });
     }
   }, [userID, teamID]);
 
   const setTeamID = (newID) => {
     setUser((prev) => {
-      if (prev) {
+      if (prev && prev.team !== newID) {
+        axios
+          .get(
+            process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`
+          )
+          .then((res) => {
+            setTeam(res.data);
+          });
         return { ...prev, team: newID };
-      } else {
-        return prev;
       }
+      return prev;
     });
   };
 
@@ -157,7 +168,6 @@ export default function App() {
                     wideScreen={wideScreen}
                     team={team}
                     setTeam={setTeam}
-                    setTeamID={setTeamID}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -167,12 +177,10 @@ export default function App() {
             <Route
               path="browse"
               element={
-                socketConnected && teamID ? (
+                socketConnected && team ? (
                   <BrowseTeams
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    teamID={teamID}
-                    setTeamID={setTeamID}
                     team={team}
                     setTeam={setTeam}
                   />

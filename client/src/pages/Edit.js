@@ -41,7 +41,6 @@ function Edit(props) {
           <Membership
             team={props.team}
             setTeam={props.setTeam}
-            setTeamID={props.setTeamID}
             userID={props.userID}
             setSection={setSection}
           />
@@ -66,7 +65,6 @@ Edit.propTypes = {
   wideScreen: PropTypes.bool,
   team: PropTypes.object,
   setTeam: PropTypes.func,
-  setTeamID: PropTypes.func,
 };
 
 export default Edit;

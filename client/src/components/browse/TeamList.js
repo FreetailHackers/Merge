@@ -109,8 +109,7 @@ function TeamList(props) {
     axios
       .post(process.env.REACT_APP_API_URL + `/api/teams/acceptMerge/${teamID}`)
       .then((res) => {
-        props.setTeamID(res.data._id);
-        //props.setTeam(res.data);
+        props.setTeam(res.data);
         const absorbedTeamID = res.data._id === teamID ? oldTeamID : teamID;
         socket.emit("accept-merge", { absorbedTeamID, newTeam: res.data });
         navigate("/edit");

@@ -27,9 +27,7 @@ function TeamProfile(props) {
   const socket = useOutletContext();
   const [saved, setSaved] = useState(false);
   const { team, setTeam, userID } = props;
-  //const baseProfile = { ...team?.profile };
   const teamProfile = team.profile;
-  //const [teamProfile, setTeamProfile] = useState(baseProfile);
 
   const teamID = team._id;
   useEffect(() => {

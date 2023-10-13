@@ -10,13 +10,11 @@ function Membership(props) {
   const [newLeader, setNewLeader] = useState(null);
 
   async function leaveTeam() {
-    console.log(`old team ${team._id}`);
     const res = await axios.post(
       process.env.REACT_APP_API_URL + `/api/teams/leaveTeam`
     );
     socket.emit("leave-team", { teamID: team._id, userID: userID });
-    console.log(`new team ${res.data._id}`);
-    props.setTeamID(res.data._id);
+    props.setTeam(res.data);
     props.setSection("User");
   }
 
@@ -105,7 +103,6 @@ Membership.propTypes = {
   team: PropTypes.object,
   setTeam: PropTypes.func,
   userID: PropTypes.string,
-  setTeamID: PropTypes.func,
   setSection: PropTypes.func,
 };
 

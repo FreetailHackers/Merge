@@ -97,10 +97,7 @@ function LoggedInApp(props) {
       socket.on("membership-updated", membershipUpdatedWS);
       socket.on("kicked-from-team", (data) => setTeamID(data.newTeam));
       socket.on("merge-accepted", (data) => {
-        if (teamID === data.newTeam._id) {
-          setTeam(data.newTeam);
-        }
-        setTeamID(data.newTeam._id);
+        setTeam(data.newTeam);
         navigate("/edit");
       });
       socket.on("teammate-left", teammateLeftWS);
@@ -113,7 +110,7 @@ function LoggedInApp(props) {
         socket.off("teammate-left");
       }
     };
-  }, [socket, teamID, setTeamID, setTeam, userID, navigate]);
+  }, [socket, setTeamID, setTeam, userID, navigate]);
 
   useEffect(() => {
     if (socket && teamID) {
