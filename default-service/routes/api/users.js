@@ -416,10 +416,10 @@ async function checkForUpdates(req, res) {
     if (req.params.user !== req.user) {
       throw new Error("nope");
     }
-    let out = { myteam: false, chat: false };
+    let out = { browse: false, chat: false };
     const myTeam = await Team.findOne({ users: req.user });
     if (myTeam?.mergeRequests?.length > 0) {
-      out.myteam = true;
+      out.browse = true;
     }
     const chats = await Chat.find({ users: req.user });
     for (let i = 0; !out.chat && i < chats.length; i++) {
