@@ -13,9 +13,8 @@ function Swipe(props) {
   const [loading, setLoading] = useState(false);
   const [teamsToShow, setTeamsToShow] = useState([]);
   const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
-  //const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
+  const capacity = process.env.REACT_APP_MAX_TEAM_SIZE - props.teamSize;
   const [idealSize, setIdealSize] = useState(0);
-  const [capacity, setCapacity] = useState(0);
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
     cursorDown: false,
@@ -36,7 +35,6 @@ function Swipe(props) {
         setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
-      setCapacity(res.data.capacity);
       setLoading(false);
     }
 
@@ -77,7 +75,6 @@ function Swipe(props) {
         setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
-      setCapacity(res.data.capacity);
     } else {
       setTeamsToShow([]);
     }
@@ -310,6 +307,7 @@ function Swipe(props) {
 Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
+  teamSize: PropTypes.number.isRequired,
 };
 
 export default Swipe;

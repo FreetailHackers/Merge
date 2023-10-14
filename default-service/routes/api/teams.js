@@ -624,12 +624,12 @@ async function getTeamsToSwipe(req, res) {
     }
     const capacity = MAX_TEAM_SIZE - team.users.length;
     if (capacity === 0) {
-      return res.json({ ready: false, capacity, teams: [] });
+      return res.json({ ready: false, teams: [] });
     }
 
     const swipeReady = await isTeamSwipeReady(team);
     if (!swipeReady) {
-      return res.json({ ready: false, capacity, teams: [] });
+      return res.json({ ready: false, teams: [] });
     }
 
     // 1 to MAX_TEAM_SIZE - size
@@ -663,7 +663,7 @@ async function getTeamsToSwipe(req, res) {
     const yourTeam = await standardizeTeamObj(team);
     await sortByAverages(yourTeam, out);
     prioritizeSkillMatches(yourTeam, out);
-    return res.json({ ready: true, capacity, teams: out.slice(0, 5) });
+    return res.json({ ready: true, teams: out.slice(0, 5) });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
