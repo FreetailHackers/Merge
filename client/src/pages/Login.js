@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login(props) {
   const [email, setEmail] = useState("");
@@ -23,10 +23,6 @@ function Login(props) {
     };
     //checking database to see if credentials exist
     props.loginUser(userData, setErrors);
-  };
-
-  const onRegister = (e) => {
-    navigate("/register");
   };
 
   return (
@@ -62,12 +58,16 @@ function Login(props) {
           </span>
 
           <button onClick={onSubmit} className="action" type="submit">
-            Login
+            Log in
           </button>
           <span className="error">{errors.status}</span>
-          <button onClick={onRegister} className="action" type="submit">
-            Register
-          </button>
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link to="/register" className="reg-login-nav">
+              {" "}
+              Sign up
+            </Link>
+          </p>
         </form>
       </div>
     </section>

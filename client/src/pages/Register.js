@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register(props) {
   const [name, setName] = useState("");
@@ -39,10 +39,6 @@ function Register(props) {
     e.style.display = "none";
   }
 
-  const onBack = () => {
-    navigate("/");
-  };
-
   return (
     <section id="register">
       <div className="container-register">
@@ -79,7 +75,6 @@ function Register(props) {
 
         <form noValidate onSubmit={onRegister}>
           <div className="logo" />
-          <hr />
           <label htmlFor="name">Name</label>
           <input
             onChange={(e) => setName(e.target.value)}
@@ -133,12 +128,14 @@ function Register(props) {
             {errors.password2incorrect}
           </span>
           <button type="submit">Register</button>
-          <button type="submit" className="action" onClick={onBack}>
-            Go Back
-          </button>
+          <p>
+            Have an account?{" "}
+            <Link to="/" className="reg-login-nav">
+              {" "}
+              Log in
+            </Link>
+          </p>
           <span className="error">{errors.status}</span>
-          <br />
-          <br />
           <p id="ToS">
             <strong>By using Merge, you agree to our</strong>{" "}
             <a type="button" href="#termsofservice" onClick={termsOfService}>
