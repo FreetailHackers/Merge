@@ -244,7 +244,8 @@ function Swipe(props) {
                   : !containsRequired
                   ? "Please Make Sure Your "
                   : "No Teams Left To Swipe"}
-                {(capacity > 0 && !containsRequired) && <Link
+                {capacity > 0 && !containsRequired && (
+                  <Link
                     to="/edit"
                     style={{
                       textDecoration: "none",
@@ -252,8 +253,9 @@ function Swipe(props) {
                     }}
                   >
                     <b>Profile</b>
-                </Link>}
-                {(capacity > 0 && !containsRequired) && " Is Completed"}
+                  </Link>
+                )}
+                {capacity > 0 && !containsRequired && " Is Completed"}
               </p>
             </label>
             <div className="team-image">
