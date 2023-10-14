@@ -84,7 +84,7 @@ router.post("/updateMembership", async (req, res) =>
 async function requestMerge(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
-    const myTeam = await Team.findOne({ users: { $in: [req.user] } });
+    const myTeam = await Team.findOne({ users: req.user });
     if (!otherTeam || !myTeam) {
       return res.sendStatus(400);
     }
@@ -159,7 +159,7 @@ async function combineProfiles(absorbingTeam, absorbedTeam) {
 async function acceptMerge(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
-    let myTeam = await Team.findOne({ users: { $in: [req.user] } });
+    let myTeam = await Team.findOne({ users: req.user });
     if (
       !otherTeam ||
       !myTeam ||
@@ -220,7 +220,7 @@ async function acceptMerge(req, res) {
 async function rejectMerge(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
-    let myTeam = await Team.findOne({ users: { $in: [req.user] } });
+    let myTeam = await Team.findOne({ users: req.user });
     if (!otherTeam || !myTeam || req.user !== String(myTeam.leader)) {
       return res.sendStatus(400);
     }
@@ -243,7 +243,7 @@ async function rejectMerge(req, res) {
 async function cancelRequest(req, res) {
   try {
     let otherTeam = await Team.findOne({ _id: req.params.team });
-    const myTeam = await Team.findOne({ users: { $in: [req.user] } });
+    const myTeam = await Team.findOne({ users: req.user });
     if (!otherTeam || !myTeam) {
       return res.sendStatus(400);
     }
@@ -347,7 +347,7 @@ async function getTeam(req, res) {
 
 async function getUserTeam(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.params.user] } });
+    const team = await Team.findOne({ users: req.params.user });
     if (!team) {
       return res.sendStatus(404);
     }
@@ -371,7 +371,7 @@ async function addProfilesAndSanitize(teamObj, addRoles = false) {
 
 async function getUserTeamMRs(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.params.user] } });
+    const team = await Team.findOne({ users: req.params.user });
     if (!team) {
       return res.sendStatus(404);
     }
@@ -417,7 +417,7 @@ async function getUserTeamMRs(req, res) {
  */
 async function update(req, res) {
   try {
-    let myTeam = await Team.findOne({ users: { $in: [req.user] } });
+    let myTeam = await Team.findOne({ users: req.user });
     if (!myTeam) {
       return res.sendStatus(400);
     }
@@ -613,7 +613,7 @@ async function noBlocks(team1, team2) {
 
 async function getTeamsToSwipe(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.user] } });
+    const team = await Team.findOne({ users: req.user });
     if (!team) {
       console.error("Invalid user ID provided");
       return res.sendStatus(400);
@@ -625,7 +625,7 @@ async function getTeamsToSwipe(req, res) {
 
     const swipeReady = await isTeamSwipeReady(team);
     if (!swipeReady) {
-      return res.json({ ready: false, teams: [] });
+      return res.json({ ready: false, capacity, teams: [] });
     }
 
     // 1 to MAX_TEAM_SIZE - size
@@ -668,7 +668,7 @@ async function getTeamsToSwipe(req, res) {
 
 async function resetLeftSwipes(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.user] } });
+    const team = await Team.findOne({ users: req.user });
     if (!team) {
       console.error("Incorrect team ID provided");
       return res.sendStatus(400);
@@ -693,7 +693,7 @@ async function generateTeamName(team) {
 
 async function swipe(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.user] } });
+    const team = await Team.findOne({ users: req.user });
     const otherTeam = await Team.findById(req.body.otherTeamID);
     if (!team || !otherTeam) {
       console.error("Incorrect team ID provided");
@@ -739,7 +739,7 @@ async function swipe(req, res) {
 
 async function leaveTeam(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.user] } });
+    const team = await Team.findOne({ users: req.user });
     if (!team) {
       throw new Error("User not in a team!");
     }
@@ -761,7 +761,7 @@ async function leaveTeam(req, res) {
 
 async function updateMembership(req, res) {
   try {
-    const team = await Team.findOne({ users: { $in: [req.user] } });
+    const team = await Team.findOne({ users: req.user });
     if (!team) {
       throw new Error("User not in a team!");
     }
@@ -776,6 +776,7 @@ async function updateMembership(req, res) {
       team.leader = req.body.newLeader;
       await team.save();
     }
+    let newTeams = {};
     if (req.body.kickedUsers?.length > 0) {
       for (const kickedUserID of req.body.kickedUsers) {
         const kickedUser = await User.findById(kickedUserID);
@@ -784,13 +785,14 @@ async function updateMembership(req, res) {
         }
         team.users = [...team.users.filter((e) => String(e) !== kickedUserID)];
         await team.save();
-        await createTeam({ body: { user: kickedUserID } }, res);
+        const newTeam = await createTeam({ body: { user: kickedUserID } }, res);
+        newTeams[kickedUserID] = newTeam._id;
       }
     }
     let teamObj = team.toObject();
     //delete teamObj.mergeRequests;
     await addProfiles(teamObj);
-    return res.json(teamObj);
+    return res.json({ team: teamObj, newTeams });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

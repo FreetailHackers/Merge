@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useOutletContext } from "react-router-dom";
 import axios from "axios";
-import SwipeProfile from "../SwipeProfile";
-import SkillSelector from "../SkillSelector";
-import { roles } from "../../data/roles";
+import SwipeProfile from "./SwipeProfile";
+import SkillSelector from "./SkillSelector";
+import { roles } from "../data/roles";
 
 import {
   TextInput,
@@ -25,9 +25,19 @@ const requiredFields = [
 
 function TeamProfile(props) {
   const socket = useOutletContext();
-  const { team, setTeam, saved, setSaved } = props;
-  const baseProfile = { ...team?.profile };
-  const [teamProfile, setTeamProfile] = useState(baseProfile);
+  const [saved, setSaved] = useState(false);
+  const { team, setTeam, userID } = props;
+  const teamProfile = team.profile;
+
+  useEffect(() => {
+    function profileUpdatedWS(data) {
+      setSaved(true);
+    }
+    socket.on("profile-updated", profileUpdatedWS);
+    return () => {
+      socket.off("profile-updated", profileUpdatedWS);
+    };
+  }, [socket]);
 
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
 
@@ -50,18 +60,21 @@ function TeamProfile(props) {
 
   const cancelEdit = async (e) => {
     e.preventDefault();
-    setTeam((prev) => ({
-      ...prev,
-      profile: { ...baseProfile },
-    }));
-
-    setTeamProfile({ ...baseProfile });
+    axios
+      .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID}`)
+      .then((res) => {
+        setTeam(res.data);
+      });
+    setSaved(true);
   };
 
   const setProfile = (key, value) => {
-    setTeamProfile((prev) => ({
+    setTeam((prev) => ({
       ...prev,
-      [key]: value,
+      profile: {
+        ...prev.profile,
+        [key]: value,
+      },
     }));
     setSaved(false);
   };
@@ -157,10 +170,16 @@ function TeamProfile(props) {
                   : ""
               }
             />
-            {saved && (
-              <p style={{ fontSize: "15.4px", color: "green" }}>
+            {!saved && (
+              <p
+                style={{
+                  fontSize: "15.4px",
+                  color: "#900",
+                  marginTop: "0.5em",
+                }}
+              >
                 {" "}
-                Save Successful
+                Unsaved Changes
               </p>
             )}
           </form>
@@ -197,8 +216,7 @@ function TeamProfile(props) {
 TeamProfile.propTypes = {
   team: PropTypes.object,
   setTeam: PropTypes.func,
-  saved: PropTypes.bool,
-  setSaved: PropTypes.func,
+  userID: PropTypes.string,
 };
 
 export default TeamProfile;

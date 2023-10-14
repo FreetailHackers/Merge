@@ -6,9 +6,8 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
-import toggleBars from "../assets/images/toggle-bars.png";
 
-//import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Swipe(props) {
   const [loading, setLoading] = useState(false);
@@ -201,16 +200,6 @@ function Swipe(props) {
   return (
     <div id="swipeContainer">
       <section id={"swipe-profile-holder"}>
-        {!props.wideScreen && (
-          <div className="toggleHolder">
-            <button
-              className="toggleSidebar toggleCenter"
-              onClick={props.flipDisplaySidebar}
-            >
-              <img src={toggleBars} alt="toggle bars" />
-            </button>
-          </div>
-        )}
         {loading ? (
           <center>
             <Loading />
@@ -250,13 +239,22 @@ function Swipe(props) {
           <center>
             <label>
               <p style={{ fontSize: "20px", marginTop: "15%" }}>
-                {" "}
                 {capacity === 0
                   ? "Team is Full"
                   : !containsRequired
-                  ? "Please Make Sure Your Profile is Completed"
+                  ? "Please Make Sure Your "
                   : "No Teams Left To Swipe"}
-              </p>{" "}
+                {(capacity > 0 && !containsRequired) && <Link
+                    to="/edit"
+                    style={{
+                      textDecoration: "none",
+                      color: "var(--secondary)",
+                    }}
+                  >
+                    <b>Profile</b>
+                </Link>}
+                {(capacity > 0 && !containsRequired) && " Is Completed"}
+              </p>
             </label>
             <div className="team-image">
               <div className="background" />
@@ -310,7 +308,6 @@ function Swipe(props) {
 Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default Swipe;
