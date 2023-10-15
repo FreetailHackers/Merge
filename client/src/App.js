@@ -16,6 +16,7 @@ import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
 import BrowseTeams from "./pages/BrowseTeams";
+import Onboarding from "./pages/Onboarding";
 
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -118,7 +119,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={login} />
-        <Route path="/login" element={login} />
+        <Route path="/login" element={<Onboarding login={login} />} />
         <Route
           path="/register"
           element={

@@ -14,7 +14,8 @@ section#login form button, section#register form button {
 
 nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
 .selectedButton, section#login form button, section#register form button,
-.closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton {
+.closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton,
+.welcome, .learn-more {
   color: var(--text-on-primary);
 }
 
@@ -270,6 +271,21 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   section#register form {
     width: min(400px, 75vw);
   }
+
+  .welcome > h3, .learn-more > h3 {
+    font-size: 25px;
+  }
+
+  .welcome > h3, .learn-more > h3,
+  .welcome > p, .learn-more > p {
+    font-weight: bold;
+    padding: 4vh 0;
+  }
+
+  .welcome > p, .learn-more > p {
+    width: calc(max(160px, 60vw));
+    font-size: 15px;
+  }
 }
 
 @media all and (orientation:landscape) {
@@ -395,6 +411,20 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     height: calc(80 * var(--vh, 1vh));
   }
 
+  .welcome > h3, .learn-more > h3 {
+    font-size: 45px;
+  }
+
+  .welcome > h3, .learn-more > h3,
+  .welcome > p, .learn-more > p {
+    font-weight: bold;
+    padding: 4vh 0;
+  }
+
+  .welcome > p, .learn-more > p {
+    width: calc(max(160px, 40vw));
+    font-size: 25px;
+  }
 }
 
 /* App.css */
@@ -1651,4 +1681,59 @@ input[type=range]::-webkid-slider-runnable-track {
 .nav-line {
   background-color: white;
   height: 1px;
+}
+
+/* Onboarding.js */
+
+.onboarding-pages {
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  background-color: var(--primary);
+}
+
+.onboarding-pages > section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  min-width: 100vw;
+  scroll-snap-align: start;
+  scroll-behavior: smooth;
+  scroll-snap-stop: always;
+  background-color: var(--primary);
+}
+
+.welcome, .learn-more {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.dot-nav {
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  bottom: 7%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.dot {
+  width: 15px;
+  height: 15px;
+  background-color: #A6D0FE;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+.on-dot {
+  width: 15px;
+  height: 15px;
+  background-color: #fff;
+  border-radius: 50%;
+  margin: 0 5px;
 }
