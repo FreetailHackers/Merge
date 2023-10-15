@@ -2,10 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const AWS = require("aws-sdk");
-const CronJob = require("cron").CronJob;
-const mongoose = require("mongoose");
-const User = require("./models/User");
-const Chat = require("./models/Chat");
+//const CronJob = require("cron").CronJob;
+//const mongoose = require("mongoose");
+//const User = require("./models/User");
+//const Chat = require("./models/Chat");
 
 const app = express();
 const server = http.createServer(app);
@@ -50,55 +50,6 @@ io.use((socket, next) => {
   }
 });
 
-function useWithErrorHandling(socket, event, callback) {
-  socket.on(event, (data) => {
-    if (errHandler(data, socket)) {
-      callback(data, socket);
-    }
-  });
-}
-
-io.on("connection", (socket) => {
-  // handles message posted by client
-  useWithErrorHandling(socket, "new-message", newMessage);
-
-  useWithErrorHandling(socket, "join-room", joinRoom);
-
-  useWithErrorHandling(socket, "leave-room", leaveRoom);
-
-  socket.on("leave-chat-rooms", () => leaveChatRooms(socket));
-
-  useWithErrorHandling(socket, "create-room", createRoom);
-
-  useWithErrorHandling(socket, "add-users", addUsers);
-
-  useWithErrorHandling(socket, "block-users", blockUsers);
-
-  useWithErrorHandling(socket, "unblock-users", unblockUsers);
-
-  useWithErrorHandling(socket, "rename-chat", renameChat);
-
-  useWithErrorHandling(socket, "leave-chat", leaveChat);
-
-  useWithErrorHandling(socket, "remove-users", removeUsers);
-
-  useWithErrorHandling(socket, "delete-chat", deleteChat);
-
-  useWithErrorHandling(socket, "leave-team", leaveTeam);
-
-  useWithErrorHandling(socket, "request-merge", requestMerge);
-
-  useWithErrorHandling(socket, "accept-merge", acceptMerge);
-
-  useWithErrorHandling(socket, "reject-merge", rejectMerge);
-
-  useWithErrorHandling(socket, "cancel-request", cancelRequest);
-
-  useWithErrorHandling(socket, "update-profile", updateProfile);
-
-  useWithErrorHandling(socket, "update-membership", updateMembership);
-});
-
 // error handler function
 function errHandler(data, socket) {
   if (!data) {
@@ -111,12 +62,61 @@ function errHandler(data, socket) {
   return true;
 }
 
+function useWithErrorHandling(socket, event, callback) {
+  socket.on(event, (data) => {
+    if (errHandler(data, socket)) {
+      callback(data, socket);
+    }
+  });
+}
+
+io.on("connection", (socket) => {
+  socket.join(socket.data.mongoID);
+
+  // utility functions
+  useWithErrorHandling(socket, "join-room", joinRoom);
+  useWithErrorHandling(socket, "join-team-room", joinTeamRoom);
+  useWithErrorHandling(socket, "leave-room", leaveRoom);
+
+  // Chats
+  useWithErrorHandling(socket, "new-message", newMessage);
+  socket.on("leave-chat-rooms", () => leaveChatRooms(socket));
+  useWithErrorHandling(socket, "create-room", createRoom);
+  useWithErrorHandling(socket, "add-users", addUsers);
+  useWithErrorHandling(socket, "remove-users", removeUsers);
+  useWithErrorHandling(socket, "rename-chat", renameChat);
+  useWithErrorHandling(socket, "leave-chat", leaveChat);
+  useWithErrorHandling(socket, "remove-users", removeUsers);
+  useWithErrorHandling(socket, "delete-chat", deleteChat);
+
+  // blocking
+  useWithErrorHandling(socket, "block-users", blockUsers);
+  useWithErrorHandling(socket, "unblock-users", unblockUsers);
+
+  // Teams
+  useWithErrorHandling(socket, "leave-team", leaveTeam);
+  useWithErrorHandling(socket, "request-merge", requestMerge);
+  useWithErrorHandling(socket, "accept-merge", acceptMerge);
+  useWithErrorHandling(socket, "reject-merge", rejectMerge);
+  useWithErrorHandling(socket, "cancel-request", cancelRequest);
+  useWithErrorHandling(socket, "update-profile", updateProfile);
+  useWithErrorHandling(socket, "update-membership", updateMembership);
+});
+
 function newMessage(data, socket) {
-  socket.to(data.chat).emit("broadcast-message", data);
+  socket.to(data.chat).emit("broadcast-message", data.message);
+  for (const user of data.users) {
+    socket.to(user).emit("chat-update");
+  }
 }
 
 function joinRoom(data, socket) {
   socket.join(data.id);
+}
+
+function joinTeamRoom(data, socket) {
+  socket.join(data.id);
+  socket.data.mongoTeamID = data.id;
 }
 
 function leaveRoom(data, socket) {
@@ -125,7 +125,11 @@ function leaveRoom(data, socket) {
 
 function leaveChatRooms(socket) {
   for (const room of socket.rooms) {
-    if (room != socket.id) {
+    if (
+      room !== socket.id &&
+      room !== socket.data.mongoID &&
+      room !== socket.data.mongoTeamID
+    ) {
       socket.leave(room);
     }
   }
@@ -133,53 +137,34 @@ function leaveChatRooms(socket) {
 
 async function createRoom(data, socket) {
   socket.join(data._id);
+  for (const user of data.otherUsers) {
+    socket.to(user).emit("added-to-room", data.chat);
+  }
+  /* socket.join(data._id);
   const fetched = await io.fetchSockets();
-  let foundSocket = false;
   for (let fetchedSocket of fetched) {
     if (data.otherUsers.includes(fetchedSocket.data.mongoID)) {
       socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
-      foundSocket = true;
     }
-  }
-  if (!foundSocket) {
-    console.error("No sockets found for selected users");
-  }
+  }*/
 }
 
 async function addUsers(data, socket) {
-  const fetched = await io.fetchSockets();
-  for (let fetchedSocket of fetched) {
-    if (data.userIDs.includes(fetchedSocket.data.mongoID)) {
-      socket.to(fetchedSocket.id).emit("added-to-room", data.chat);
-    } else if (
-      data.chat.users.includes(fetchedSocket.data.mongoID) &&
-      !data.userIDs.includes(fetchedSocket.data.mongoID) &&
-      socket.id != fetchedSocket.id
-    ) {
-      socket.to(fetchedSocket.id).emit("new-user-added", data.chat);
-    }
+  socket.to(data.chat._id).emit("new-user-added", data.chat);
+  for (const user of data.userIDs) {
+    socket.to(user).emit("added-to-room", data.chat);
   }
 }
 
 async function blockUsers(data, socket) {
-  const fetched = await io.fetchSockets();
-  for (let fetchedSocket of fetched) {
-    if (data.users.includes(fetchedSocket.data.mongoID)) {
-      socket
-        .to(fetchedSocket.id)
-        .emit("blocked-by", { userID: socket.data.mongoID });
-    }
+  for (const user of data.users) {
+    socket.to(user).emit("blocked-by", { userID: socket.data.mongoID });
   }
 }
 
 async function unblockUsers(data, socket) {
-  const fetched = await io.fetchSockets();
-  for (let fetchedSocket of fetched) {
-    if (data.users.includes(fetchedSocket.data.mongoID)) {
-      socket
-        .to(fetchedSocket.id)
-        .emit("unblocked-by", { userID: socket.data.mongoID });
-    }
+  for (const user of data.users) {
+    socket.to(user).emit("unblocked-by", { userID: socket.data.mongoID });
   }
 }
 
@@ -197,22 +182,18 @@ function leaveChat(data, socket) {
 }
 
 async function removeUsers(data, socket) {
-  const fetched = await io.in(data.chatID).fetchSockets();
-  for (const fetchedSocket of fetched) {
-    if (data.users.includes(fetchedSocket.data.mongoID)) {
-      socket.to(fetchedSocket.id).emit("removed-from", { chatID: data.chatID });
-    } else {
-      for (const user of data.users) {
-        socket
-          .to(fetchedSocket.id)
-          .emit("user-left", { chatID: data.chatID, user: user });
-      }
-    }
+  for (const user of data.users) {
+    socket.to(user).emit("removed-from", { chatID: data.chatID });
+  }
+  for (const user of data.users) {
+    socket.to(data.chatID).emit("user-left", { chatID: data.chatID, user });
   }
 }
 
 async function leaveTeam(data, socket) {
   socket.to(data.teamID).emit("teammate-left", { userID: data.userID });
+  socket.to(data.teamID).emit("team-update");
+  socket.leave(data.teamID);
 }
 
 async function requestMerge(data, socket) {
@@ -222,6 +203,7 @@ async function requestMerge(data, socket) {
   requestedCopy.requestedTeam = { _id: data.requestedTeam._id };
   socket.to(data.requestingTeam._id).emit("merge-requested", requestingCopy);
   socket.to(data.requestedTeam._id).emit("merge-requested", requestedCopy);
+  socket.to(data.requestedTeam._id).emit("browse-update");
 }
 
 async function acceptMerge(data, socket) {
@@ -230,21 +212,42 @@ async function acceptMerge(data, socket) {
 }
 
 async function rejectMerge(data, socket) {
-  socket.to(data.requestingTeamID).emit("merge-rejected", data);
-  socket.to(data.rejectingTeamID).emit("merge-rejected", data);
+  socket
+    .to(data.requestingTeamID)
+    .to(data.rejectingTeamID)
+    .emit("merge-rejected", data);
 }
 
 async function cancelRequest(data, socket) {
-  socket.to(data.cancellingTeamID).emit("request-cancelled", data);
-  socket.to(data.requestedTeamID).emit("request-cancelled", data);
+  socket
+    .to(data.cancellingTeamID)
+    .to(data.requestedTeamID)
+    .emit("request-cancelled", data);
 }
 
 async function updateProfile(data, socket) {
   socket.to(data.teamID).emit("profile-updated", data);
+  socket.to(data.teamID).emit("team-update", data);
 }
 
 async function updateMembership(data, socket) {
-  socket.to(data.teamID).emit("membership-updated");
+  const fetched = await io.in(data.teamID).fetchSockets();
+  for (const fetchedSocket of fetched) {
+    socket.to(fetchedSocket.id).emit("team-update");
+    const userID = fetchedSocket.data.mongoID;
+    if (data.kickedUsers.includes(userID)) {
+      socket
+        .to(fetchedSocket.id)
+        .emit("kicked-from-team", { newTeam: data.newTeams[userID] });
+    } else {
+      socket.to(fetchedSocket.id).emit("membership-updated", data);
+    }
+  }
+  /*for (const user of Object.keys(data.newTeams)) {
+    socket.to(user).emit("kicked-from-team", {newTeam: data.newTeams[user]})
+  }
+  const {newLeader, kickedUsers} = data
+  socket.to(data.teamID).emit("membership-updated", {newLeader, kickedUsers});*/
 }
 
 AWS.config.update({
@@ -253,15 +256,15 @@ AWS.config.update({
   region: process.env.AWS_REGION,
 });
 
-const db = process.env.MONGO_URI;
+/*const db = process.env.MONGO_URI;
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => console.log("MongoDB successfully connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log(err));*/
 
-const ses = new AWS.SES();
+//const ses = new AWS.SES();
 
-async function sendEmails() {
+/*async function sendEmails() {
   const chats = await Chat.find();
   const users = await User.find();
   let promises = [];
@@ -344,17 +347,17 @@ async function sendEmails() {
   }
 
   await Promise.all(promises);
-}
+}*/
 
-new CronJob(
-  "00 0 */4 * * *",
-  () => {
-    sendEmails();
-  },
-  null,
-  true,
-  "America/Chicago"
-);
+//new CronJob(
+//"00 0 */4 * * *",
+//() => {
+//  sendEmails();
+//},
+//null,
+//true,
+//"America/Chicago"
+//);
 
 const port = process.env.CHAT_PORT || 5000;
 

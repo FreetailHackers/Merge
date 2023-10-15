@@ -6,9 +6,7 @@ function ChatMissing(props) {
     <div className="chatsMissingWindow">
       {!props.wideScreen && (
         <div className="windowToggleHolder">
-          <button className="toggleSidebar" onClick={props.flipDisplaySidebar}>
-            ←
-          </button>
+          <button className="toggleSidebar">←</button>
         </div>
       )}
       <h1>
@@ -34,7 +32,6 @@ function ChatMissing(props) {
 ChatMissing.propTypes = {
   hasChats: PropTypes.bool,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
 };
 
 export default ChatMissing;

@@ -13,10 +13,9 @@ function Membership(props) {
     const res = await axios.post(
       process.env.REACT_APP_API_URL + `/api/teams/leaveTeam`
     );
-    props.setTeam((prev) => {
-      socket.emit("leave-team", { teamID: prev._id, userID: userID });
-      return res.data;
-    });
+    socket.emit("leave-team", { teamID: team._id, userID: userID });
+    props.setTeam(res.data);
+    props.setSection("User");
   }
 
   async function manageMembership() {
@@ -25,17 +24,22 @@ function Membership(props) {
         process.env.REACT_APP_API_URL + `/api/teams/updateMembership`,
         { newLeader, kickedUsers: toBeKicked }
       );
+      socket.emit("update-membership", {
+        teamID: team._id,
+        newLeader,
+        kickedUsers: toBeKicked,
+        newTeams: res.data.newTeams,
+      });
       setNewLeader(null);
       setToBeKicked([]);
-      props.setTeam(res.data);
-      socket.emit("update-membership", { teamID: team._id });
+      props.setTeam(res.data.team);
     } catch (err) {
       console.log(err);
     }
   }
 
   return (
-    <div className="flexColumn centerCol">
+    <div className="flexColumn centerCol membership">
       <div className="flexColumn centerCol member-list">
         <h3>Members</h3>
         {team &&
@@ -99,6 +103,7 @@ Membership.propTypes = {
   team: PropTypes.object,
   setTeam: PropTypes.func,
   userID: PropTypes.string,
+  setSection: PropTypes.func,
 };
 
 export default Membership;

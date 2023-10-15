@@ -10,7 +10,7 @@ function Login(props) {
 
   useEffect(() => {
     if (props.auth.userID) {
-      navigate("/dashboard");
+      navigate("/swipe");
     }
   }, [props, navigate]);
 

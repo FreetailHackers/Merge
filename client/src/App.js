@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   loginUser,
   registerUser,
@@ -8,10 +8,6 @@ import {
 } from "./utils/authActions";
 
 import axios from "axios";
-import io from "socket.io-client";
-
-import Navbar from "./components/Navbar";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -19,11 +15,12 @@ import Swipe from "./pages/Swipe";
 import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
-import MyTeam from "./pages/MyTeam";
+import BrowseTeams from "./pages/BrowseTeams";
 
 import { useMediaQuery } from "@mantine/hooks";
 
 import "./App.css";
+import LoggedInApp from "./LoggedInApp";
 
 const initialUserState = {
   userID: null,
@@ -35,9 +32,10 @@ const initialUserState = {
 export default function App() {
   const [auth, setAuth] = useState({ ...initialUserState });
   const [user, setUser] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const [socketConnected, setSocketConnected] = useState(null);
   const [displaySidebar, setDisplaySidebar] = useState(false);
   const wideScreen = useMediaQuery("(orientation:landscape)");
+  const [team, setTeam] = useState(null);
 
   useEffect(() => {
     const resizeFunc = () => {
@@ -51,7 +49,7 @@ export default function App() {
     return () => {
       window.removeEventListener("resize", resizeFunc);
     };
-  });
+  }, []);
 
   useEffect(() => {
     if (!auth.userID && auth.loading) {
@@ -67,30 +65,45 @@ export default function App() {
         .then((res) => {
           setUser(res.data);
         });
+      axios
+        .get(process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`)
+        .then((res) => {
+          setTeam(res.data);
+        });
     } else {
       setUser(null);
+      setTeam(null);
     }
   }, [userID]);
 
-  const token = auth?.token;
+  const teamID = team?._id;
+
   useEffect(() => {
-    if (token) {
-      const socketVar = io(process.env.REACT_APP_CHAT_URL, {
-        transports: ["websocket"],
-        query: { token },
-      });
-      socketVar.on("connect", () => {
-        setSocket(socketVar);
-      });
-    } else {
-      setSocket((prev) => {
-        if (prev?.connected) {
-          prev.disconnect();
+    if (userID && teamID) {
+      setUser((prev) => {
+        if (prev !== teamID) {
+          return { ...prev, team: teamID };
         }
-        return null;
+        return prev;
       });
     }
-  }, [token]);
+  }, [userID, teamID]);
+
+  const setTeamID = (newID) => {
+    setUser((prev) => {
+      if (prev && prev.team !== newID) {
+        axios
+          .get(
+            process.env.REACT_APP_API_URL + `/api/teams/userTeam/${userID.id}`
+          )
+          .then((res) => {
+            setTeam(res.data);
+          });
+        return { ...prev, team: newID };
+      }
+      return prev;
+    });
+  };
 
   const login = (
     <Login
@@ -121,49 +134,40 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                {(displaySidebar || wideScreen) && (
-                  <Navbar
-                    userID={auth.userID.id}
-                    logoutUser={() => logoutUser(setAuth)}
-                    wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(false)}
-                  />
-                )}
-                {(!displaySidebar || wideScreen) && <Outlet context={socket} />}
-              </div>
+              <LoggedInApp
+                auth={auth}
+                logoutUser={() => logoutUser(setAuth)}
+                displaySidebar={displaySidebar}
+                wideScreen={wideScreen}
+                setSocketConnected={setSocketConnected}
+                setDisplaySidebar={setDisplaySidebar}
+                teamID={teamID}
+                setTeamID={setTeamID}
+                setTeam={setTeam}
+              />
             }
           >
             <Route
               path="dashboard"
-              element={
-                <Dashboard
-                  user={user}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
+              element={<Dashboard user={user} wideScreen={wideScreen} />}
             />
             <Route
               path="swipe"
               element={
-                <Swipe
-                  userID={auth.userID.id}
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
+                <Swipe userID={auth.userID.id} wideScreen={wideScreen} />
               }
             />
             <Route
               path="edit"
               element={
-                user ? (
+                socketConnected && user && team ? (
                   <Edit
                     user={user}
                     userID={auth.userID.id}
                     setUser={setUser}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                    team={team}
+                    setTeam={setTeam}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -171,13 +175,14 @@ export default function App() {
               }
             />
             <Route
-              path="myteam"
+              path="browse"
               element={
-                socket?.connected ? (
-                  <MyTeam
+                socketConnected && team ? (
+                  <BrowseTeams
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
+                    team={team}
+                    setTeam={setTeam}
                   />
                 ) : (
                   <div>Loading...</div>
@@ -187,11 +192,10 @@ export default function App() {
             <Route
               path="chat"
               element={
-                socket?.connected ? (
+                socketConnected ? (
                   <Chat
                     userID={auth.userID.id}
                     wideScreen={wideScreen}
-                    flipDisplaySidebar={() => setDisplaySidebar(true)}
                     blockList={user?.blockList}
                   />
                 ) : (
@@ -199,15 +203,7 @@ export default function App() {
                 )
               }
             />
-            <Route
-              path="about"
-              element={
-                <About
-                  wideScreen={wideScreen}
-                  flipDisplaySidebar={() => setDisplaySidebar(true)}
-                />
-              }
-            />
+            <Route path="about" element={<About wideScreen={wideScreen} />} />
           </Route>
         )}
       </Routes>

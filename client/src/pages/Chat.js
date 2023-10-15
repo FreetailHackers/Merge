@@ -39,7 +39,6 @@ function Chat(props) {
       for (const chat of chatList) {
         // join websocket room
         socket.emit("join-room", { id: chat._id });
-        chat.seen = chat.readBy.includes(userID);
       }
       setChats(chatList);
     }
@@ -227,7 +226,11 @@ function Chat(props) {
       })
       .then((res) => {
         // Update the last message of the chat and move it to the top
-        socket.emit("new-message", message);
+        socket.emit("new-message", {
+          chat: chat._id,
+          message,
+          users: chat.users,
+        });
         chat.lastMessage = res.data;
         setChats((prev) => [
           chat,
@@ -350,7 +353,6 @@ function Chat(props) {
           }}
           selectedChat={selectedChat}
           createChat={createChat}
-          flipDisplaySidebar={props.flipDisplaySidebar}
           wideScreen={props.wideScreen}
           otherUsers={otherUsers}
           selfID={userID}
@@ -360,7 +362,6 @@ function Chat(props) {
         (activeChatIndex === -1 ? (
           <ChatMissing
             hasChats={chats.length > 0}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ) : (
@@ -378,10 +379,10 @@ function Chat(props) {
             chat={chats[activeChatIndex]}
             deleteChat={deleteChat}
             leaveChat={leaveChat}
+            displaySidebar={() => setDisplayWindow(false)}
             blockedByMe={blockedByMe}
             blockUnblockUsers={blockUnblockUsers}
             kickUsers={kickUsers}
-            flipDisplaySidebar={() => setDisplayWindow(false)}
             wideScreen={props.wideScreen}
           />
         ))}
@@ -392,7 +393,6 @@ function Chat(props) {
 Chat.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
-  flipDisplaySidebar: PropTypes.func,
   blockList: PropTypes.array,
 };
 
