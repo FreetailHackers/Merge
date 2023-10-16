@@ -39,7 +39,6 @@ function Chat(props) {
       for (const chat of chatList) {
         // join websocket room
         socket.emit("join-room", { id: chat._id });
-        chat.seen = chat.readBy.includes(userID);
       }
       setChats(chatList);
     }
@@ -227,7 +226,11 @@ function Chat(props) {
       })
       .then((res) => {
         // Update the last message of the chat and move it to the top
-        socket.emit("new-message", message);
+        socket.emit("new-message", {
+          chat: chat._id,
+          message,
+          users: chat.users,
+        });
         chat.lastMessage = res.data;
         setChats((prev) => [
           chat,
@@ -376,6 +379,7 @@ function Chat(props) {
             chat={chats[activeChatIndex]}
             deleteChat={deleteChat}
             leaveChat={leaveChat}
+            displaySidebar={() => setDisplayWindow(false)}
             blockedByMe={blockedByMe}
             blockUnblockUsers={blockUnblockUsers}
             kickUsers={kickUsers}

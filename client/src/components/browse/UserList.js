@@ -3,9 +3,9 @@ import axios from "axios";
 import { TextInput, NativeSelect, MultiSelect } from "@mantine/core";
 import PropTypes from "prop-types";
 import SkillSelector from "../SkillSelector";
-import Collapsible from "../Collapsible";
-import { UserToParagraph } from "../UserToParagraph";
-import { Pagination } from "../Pagination";
+import Collapsible from "./Collapsible";
+import { UserToParagraph } from "./UserToParagraph";
+import { Pagination } from "./Pagination";
 import { useNavigate } from "react-router-dom";
 import { roles } from "../../data/roles";
 
