@@ -588,9 +588,9 @@ async function sortByAverages(yourTeam, teamList) {
 async function noBlocks(team1, team2) {
   try {
     const team1Users = await User.find({ team: team1._id });
-    const team1IDs = team1Users.map((e) => e._id);
+    const team1IDs = team1Users.map((e) => String(e._id));
     const team2Users = await User.find({ team: team2._id });
-    const team2IDs = team2Users.map((e) => e._id);
+    const team2IDs = team2Users.map((e) => String(e._id));
     let found = false;
     for (let i = 0; !found && i < team1Users.length; i++) {
       const intersection = team1Users[i].blockList?.filter((e) =>
