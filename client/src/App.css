@@ -1026,6 +1026,12 @@ nav#navbar a.active {
   margin-block-end: 0.25em;
 }
 
+.member-list {
+  margin-bottom: 3%;
+  width: 95%;
+  margin-top: 3%;
+}
+
 .mrButtons {
   justify-content: space-evenly;
   margin: 3px;
@@ -1062,8 +1068,8 @@ nav#navbar a.active {
 }
 
 .manageTeamButton {
-  padding: 5px;
-  border-radius: 20px;
+  padding: 1% 3%;
+  border-radius: 12px;
   margin-left: 12px;
 }
 
@@ -1615,6 +1621,46 @@ input[type=range]::-webkid-slider-runnable-track {
 }
 .teamRow {
   padding-top: 5px;
+  flex-direction: column;
+  background-color: #a3c0e955;
+  width: 80%;
+  padding-left: 5px;
+  margin-bottom: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 8px;
+}
+
+.teamRow button {
+  cursor: pointer;
+}
+
+.teamUserInfo {
+  width: 100%;
+  margin-left: 10%;
+}
+
+.teamRow ul {
+  padding: 0;
+  margin: 5px;
+}
+
+.teamRow-name {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.teamRowBtn {
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+}
+
+.teamRowBtn img {
+  height: 30px;
+  width: auto;
 }
 
 .newInfoButton {
