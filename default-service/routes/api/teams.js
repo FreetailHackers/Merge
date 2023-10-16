@@ -718,11 +718,10 @@ async function swipe(req, res) {
       { $push: { [list]: otherTeam._id } },
       { upsert: true }
     );
-
-    if (
+    const chatCreated =
       req.body.decision === "accept-committed" &&
-      !otherTeam.rightSwipeList.includes(team._id)
-    ) {
+      !otherTeam.rightSwipeList.includes(team._id);
+    if (chatCreated) {
       const firstName = await generateTeamName(team);
       const secondName = await generateTeamName(otherTeam);
       const name = `${firstName} and ${secondName}`;
@@ -734,7 +733,7 @@ async function swipe(req, res) {
       });
       await chat.save();
     }
-    return res.json({ success: true });
+    return res.json({ success: true, chatCreated });
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

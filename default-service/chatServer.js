@@ -101,6 +101,8 @@ io.on("connection", (socket) => {
   useWithErrorHandling(socket, "cancel-request", cancelRequest);
   useWithErrorHandling(socket, "update-profile", updateProfile);
   useWithErrorHandling(socket, "update-membership", updateMembership);
+  useWithErrorHandling(socket, "swipe-on-team", swipeOnTeam);
+  useWithErrorHandling(socket, "clear-left-swipes", clearLeftSwipes);
 });
 
 function newMessage(data, socket) {
@@ -248,6 +250,19 @@ async function updateMembership(data, socket) {
   }
   const {newLeader, kickedUsers} = data
   socket.to(data.teamID).emit("membership-updated", {newLeader, kickedUsers});*/
+}
+
+function swipeOnTeam(data, socket) {
+  socket
+    .to(data.yourTeam)
+    .emit("team-swiped-on", { otherTeam: data.otherTeam });
+  if (data.chatCreated) {
+    socket.to(data.otherTeam).to(data.yourTeam).emit("chat-update");
+  }
+}
+
+function clearLeftSwipes(data, socket) {
+  socket.to(data.teamID).emit("left-swipes-cleared");
 }
 
 AWS.config.update({

@@ -154,11 +154,16 @@ export default function App() {
             <Route
               path="swipe"
               element={
-                <Swipe
-                  userID={auth.userID.id}
-                  wideScreen={wideScreen}
-                  teamSize={team?.users ? team.users.length : 1}
-                />
+                socketConnected && team ? (
+                  <Swipe
+                    userID={auth.userID.id}
+                    wideScreen={wideScreen}
+                    teamSize={team.users ? team.users.length : 1}
+                    teamID={teamID}
+                  />
+                ) : (
+                  <div>Loading...</div>
+                )
               }
             />
             <Route

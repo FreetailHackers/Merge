@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
@@ -6,10 +6,11 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
-
+import { useOutletContext } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Swipe(props) {
+  const socket = useOutletContext();
   const [loading, setLoading] = useState(false);
   const [teamsToShow, setTeamsToShow] = useState([]);
   const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
@@ -25,27 +26,47 @@ function Swipe(props) {
   };
   const [profileState, setProfileState] = useState({ ...defaultProfileState });
 
-  useEffect(() => {
-    async function findTeam() {
+  const refreshTeams = useCallback(
+    async (size) => {
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/teams/teamsToSwipe/${props.userID}`,
-        { params: { idealSize } }
+        { params: { idealSize: size } }
       );
       if (res.data.ready) {
         setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
       setLoading(false);
-    }
+    },
+    [props.userID]
+  );
 
+  useEffect(() => {
     if (
       props.userID &&
       (!teamToShow || (idealSize > 0 && teamToShow.users.length !== idealSize))
     ) {
       setLoading(true);
-      findTeam();
+      refreshTeams();
     }
-  }, [props.userID, idealSize, teamToShow]);
+  }, [props.userID, idealSize, teamToShow, refreshTeams]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("team-swiped-on", (data) =>
+        setTeamsToShow((prev) => [
+          ...prev.filter((e) => e._id !== data.otherTeam),
+        ])
+      );
+      socket.on("left-swipes-cleared", refreshTeams);
+    }
+    return () => {
+      if (socket) {
+        socket.off("team-swiped-on");
+        socket.off("left-swipes-cleared");
+      }
+    };
+  }, [socket, refreshTeams]);
 
   const swipeCallback = (decision) => {
     axios
@@ -54,6 +75,11 @@ function Swipe(props) {
         decision,
       })
       .then((res) => {
+        socket.emit("swipe-on-team", {
+          yourTeam: props.teamID,
+          otherTeam: teamToShow._id,
+          chatCreated: res.data.chatCreated,
+        });
         setTimeout(() => {
           setTeamsToShow((prev) => [...prev.slice(1)]);
           setProfileState((prev) => ({
@@ -65,26 +91,12 @@ function Swipe(props) {
       });
   };
 
-  async function refreshTeams(s) {
-    if (teamsToShow.length === 0) {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/teams/teamsToSwipe/${props.userID}`,
-        { params: { s } }
-      );
-      if (res.data.ready) {
-        setTeamsToShow(res.data.teams);
-      }
-      setContainsRequired(res.data.ready);
-    } else {
-      setTeamsToShow([]);
-    }
-  }
-
   const clearLeftSwipes = async () => {
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe"
       );
+      socket.emit("clear-left-swipes", { teamID: props.teamID });
       await refreshTeams(idealSize);
     } catch (error) {
       // Handle errors here
@@ -308,6 +320,7 @@ Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
   wideScreen: PropTypes.bool,
   teamSize: PropTypes.number.isRequired,
+  teamID: PropTypes.string.isRequired,
 };
 
 export default Swipe;
