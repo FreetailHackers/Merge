@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import SwipeProfile from "./SwipeProfile";
+import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
-import SkillSelector from "./SkillSelector";
+import SkillSelector from "../components/SkillSelector";
+import toggleBars from "../assets/images/toggle-bars.png";
 import { roles } from "../data/roles";
 
 // FileInput,
@@ -35,6 +36,7 @@ function UserProfile(props) {
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));
+  const [underFiveSkills, setUnderFiveSkills] = useState(userProfile.skills.length <= 4);
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -54,6 +56,7 @@ function UserProfile(props) {
         return;
       }
     }
+
     const data = {
       update: {
         name: userProfile.name,
@@ -130,12 +133,25 @@ function UserProfile(props) {
       ...prev,
       [key]: value,
     }));
+    if (key === "skills") {
+      setUnderFiveSkills(value.length <= 5);
+    }
     setSaved(false);
   };
 
   return (
     <div className="profile-container">
       <div className="profile-child">
+        {!props.wideScreen && (
+          <div className="toggleHolder" style={{ marginLeft: -20 }}>
+            <button
+              className="toggleSidebar toggleCenter"
+              onClick={props.flipDisplaySidebar}
+            >
+              <img src={toggleBars} alt="toggle bars" />
+            </button>
+          </div>
+        )}
         <section id="settings">
           <form>
             <TextInput
@@ -249,8 +265,8 @@ function UserProfile(props) {
               className="question"
             />
             <SkillSelector
-              setSkills={(value) => setProfile("skills", value)}
               skills={userProfile.skills}
+              setSkills={(value) => setProfile("skills", value)}
             />
             <MultiSelect
               data={roles}
@@ -310,10 +326,17 @@ function UserProfile(props) {
                 Save Successful
               </p>
             )}
+            {!underFiveSkills && (
+              <p style={{ fontSize: "15.4px", color: "red" }}>
+                {" "}
+                Limit your number of skills to five.
+              </p>
+            )}
           </form>
           <button
             onClick={handleSubmit}
             disabled={
+              !underFiveSkills ||
               !requiredFields.every(
                 (e) => userProfile[e] && userProfile[e].length > 0
               )
@@ -344,6 +367,7 @@ UserProfile.propTypes = {
   userID: PropTypes.string.isRequired,
   setUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default UserProfile;
