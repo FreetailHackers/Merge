@@ -15,7 +15,7 @@ function GithubCard(props) {
         })
         .then((res) => {
           if (res.data.message?.startsWith("API")) {
-            setProfileData({ login: `${props.username}` });
+            setProfileData({ login: `${username}` });
           } else {
             setProfileData(res.data);
           }
