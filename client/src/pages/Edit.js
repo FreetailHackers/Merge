@@ -41,7 +41,7 @@ function Edit(props) {
     event.persist();
     event.preventDefault();
     if (userProfile?.portfolio) {
-      const regex = /^https:\/\//; // regex for input starting with "https://"
+      const regex = /^https:\/\//; //regex for input starting with "https://"
       const inputValue = userProfile.portfolio;
       if (!regex.test(inputValue)) {
         setPortfolioRegex(false);
