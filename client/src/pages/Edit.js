@@ -25,7 +25,7 @@ const requiredFields = [
 ];
 
 function Edit(props) {
-  //frontend for updating
+  // frontend for updating
   const [saved, setSaved] = useState(false);
   const [portfolioRegex, setPortfolioRegex] = useState(true);
   const [linkedinRegex, setLinkedinRegex] = useState(true);
