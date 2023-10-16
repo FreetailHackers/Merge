@@ -25,6 +25,7 @@ const requiredFields = [
 ];
 
 function Edit(props) {
+  const [oversizedFile, setOversizedFile] = useState(false);
   // frontend for updating
   const [saved, setSaved] = useState(false);
   const [portfolioRegex, setPortfolioRegex] = useState(true);
@@ -35,7 +36,6 @@ function Edit(props) {
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));
-  var oversizedFile = false;
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -92,13 +92,7 @@ function Edit(props) {
     // Setting up S3 upload parameters for folder upload
     fd.append("file_name", props.userID.id + "/" + file.name);
     fd.append("file", file);
-
-    if (file.size > 10_000_000) {
-      this.setState({ oversizedFile: true });
-      return;
-    } else {
-      this.setState({ oversizedFile: false });
-    }
+    setOversizedFile(file.size > 10_000_000);
 
     await axios
       .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
@@ -107,17 +101,14 @@ function Edit(props) {
         },
       })
       .then(async (res) => {
-        this.setState({
-          profilePictureUrl: res.data.url,
-          oversizedFile: false,
-        });
-        props.setUser(props.userID, {
-          ...props.user,
-          profilePictureUrl: res.data.url,
-        });
+        setOversizedFile(false);
+        props.setUser((prev) => ({
+          ...prev,
+          profile: { ...prev.profile, profilePictureUrl: res.data.url },
+        }));
       })
       .catch(() => {
-        this.setState({ oversizedFile: true });
+        setOversizedFile(true);
       });
   };
 
