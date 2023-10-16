@@ -228,7 +228,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .swipe-profile h3 {
-    font-size: 2em;
+    font-size: 25px;
   }
 
   .terms {
@@ -285,6 +285,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .welcome > p, .learn-more > p {
     width: calc(max(160px, 60vw));
     font-size: 15px;
+  }
+
+  .swipe-profile img {
+    height: 13vh;
   }
 }
 
@@ -360,7 +364,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .swipe-profile h3 {
-    font-size: 3.5em;
+    font-size: 2em;
   }
 
   .terms {
@@ -424,6 +428,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .welcome > p, .learn-more > p {
     width: calc(max(160px, 40vw));
     font-size: 25px;
+  }
+
+  .swipe-profile img {
+    height: 12.5vh;
   }
 }
 
@@ -721,13 +729,12 @@ nav#navbar a.active {
 }
 
 .swipe-profile h3 {
-  font-weight: normal;
   word-wrap: break-word;
 }
 
 .swipe-profile h4 {
-  margin: 10px 0;
-  font-size: 2em;
+  margin: 1px 0;
+  font-size: 1em;
   font-weight: normal;
   word-wrap: break-word;
 }
@@ -771,12 +778,49 @@ nav#navbar a.active {
 
 .swipe-profile p {
   white-space: pre-line;
+  margin: .5em 0;
+}
+
+.swipe-profile .attributes-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.swipe-profile .attr-item, .swipe-profile .roles-item,
+.swipe-profile .compete-status {
+  color: #fff;
+  margin: 2px;
+  padding: 4px 3px;
+  flex-grow: 1;
+  width: 80px;
+  border-radius: 5px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.swipe-profile .attr-item {
+  background-color: var(--secondary);
+}
+
+.swipe-profile .roles-item {
+  background-color: var(--tertiary);
 }
 
 .swipe-profile img {
-  position: relative;
-  width: 80%;
-  left: 30px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: 1vw;
+}
+
+.swipe-profile .profile-header {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.swipe-profile .compete-status {
+  flex-grow: 0;
 }
 
 .arrows {
