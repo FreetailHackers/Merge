@@ -66,7 +66,7 @@ function UserList(props) {
     } catch (err) {
       console.error(err);
     }
-  };
+  }
 
   async function block(user) {
     await axios.post(
@@ -74,7 +74,7 @@ function UserList(props) {
     );
 
     socket.emit("block-users", { users: [user] });
-  };
+  }
 
   async function unblock(user) {
     await axios.post(
@@ -83,7 +83,6 @@ function UserList(props) {
 
     socket.emit("unblock-users", { users: [user] });
   }
-
 
   return (
     <div className="flexColumn fsCenter">
@@ -135,19 +134,19 @@ function UserList(props) {
           {user._id !== props.userID && (
             <button
               className="chat-button"
-              onClick={() =>
-                {
-                  props.blockList.includes(user['_id']) ? unblock(user['_id']) : block(user['_id'])
-                }
-              }
+              onClick={() => {
+                props.blockList.includes(user["_id"])
+                  ? unblock(user["_id"])
+                  : block(user["_id"]);
+              }}
             >
-              {props.blockList.includes(user['_id']) ? 'Unblock' : 'Block'}
+              {props.blockList.includes(user["_id"]) ? "Unblock" : "Block"}
             </button>
           )}
           <UserToParagraph
             user={user}
             hideKeys={["_id", "profilePictureUrl"]}
-            blocked={props.blockList.includes(user['_id'])}
+            blocked={props.blockList.includes(user["_id"])}
           />
         </Collapsible>
       ))}
@@ -158,7 +157,7 @@ function UserList(props) {
 
 UserList.propTypes = {
   userID: PropTypes.string.isRequired,
-  blockList: PropTypes.array
+  blockList: PropTypes.array,
 };
 
 export default UserList;

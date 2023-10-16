@@ -36,7 +36,9 @@ function UserProfile(props) {
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));
-  const [underFiveSkills, setUnderFiveSkills] = useState(userProfile.skills.length <= 4);
+  const [underFiveSkills, setUnderFiveSkills] = useState(
+    userProfile.skills.length <= 4
+  );
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -135,7 +137,7 @@ function UserProfile(props) {
     }));
     if (key === "skills") {
       setUnderFiveSkills(value.length <= 5);
-      console.log(key)
+      console.log(key);
     }
     setSaved(false);
   };

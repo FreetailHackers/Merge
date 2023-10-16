@@ -64,7 +64,7 @@ section#register form button, .exitButton, .actionButton, .newMessageBox input, 
 }
 
 .toggleSidebar, .swipe-profile, .themeButton, .headerDatabase,
-.pagination a, .chat-button, #settings button.action,
+.pagination p, .chat-button, #settings button.action,
 section#login form button, section#register form button, .closetos,
 .chatPreview, .exitButton, .actionButton, .newMessageBox p {
   cursor: pointer;
@@ -130,7 +130,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   box-shadow: 0 3px 10px #0002;
 }
 
-.pagination a, .pagination span, .filterInput, #settings label,
+.pagination p, .pagination span, .filterInput, #settings label,
 #settings button.action, section#login form, section#register form,
 .about, .terms strong, section#login form label, section#register form label,
 .chatPreview p span.messagePreview, .chatPreview h4, .chatPreview .smallDivider,
@@ -888,13 +888,14 @@ nav#navbar a.active {
   margin-right: 5px;
 }
 
-.pagination a,
+.pagination p,
 .pagination span {
   margin: 0 5px;
   min-width: 20px;
+  display: inline;
 }
 
-.pagination a {
+.pagination p {
   color: var(--primary);
   text-decoration: underline;
 }

@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 export const PaginationButton = ({ n, setPage }) =>
   n >= 0 && (
     // eslint-disable-next-line
-    <a href="#" onClick={(e) => setPage(n, e)}>
-      {n + 1}
-    </a>
+    <p className="paginationNumber" onClick={(e) => setPage(n, e)}>
+      <u>{n + 1}</u>
+    </p>
   );
 
 export const Pagination = ({ page, pages, setPage }) => (

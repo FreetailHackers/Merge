@@ -44,7 +44,9 @@ function BrowseTeams(props) {
           setSection={setSection}
         />
       )}
-      {section === "User List" && <UserList userID={userID} blockList={blockList} />}
+      {section === "User List" && (
+        <UserList userID={userID} blockList={blockList} />
+      )}
     </div>
   );
 }
@@ -55,7 +57,7 @@ BrowseTeams.propTypes = {
   setTeamID: PropTypes.func,
   team: PropTypes.object,
   setTeam: PropTypes.func,
-  blockList: PropTypes.array
+  blockList: PropTypes.array,
 };
 
 export default BrowseTeams;
