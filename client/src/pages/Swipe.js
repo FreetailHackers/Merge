@@ -47,7 +47,7 @@ function Swipe(props) {
       (!teamToShow || (idealSize > 0 && teamToShow.users.length !== idealSize))
     ) {
       setLoading(true);
-      refreshTeams();
+      refreshTeams(idealSize);
     }
   }, [props.userID, idealSize, teamToShow, refreshTeams]);
 
@@ -226,6 +226,7 @@ function Swipe(props) {
               relativePosition={profileState.profilePosition}
               relativeAngle={profileState.profileAngle}
               borderColor={profileState.profileSide}
+              mobile={!props.wideScreen}
             />
             <div className="arrows" onClick={mouseDownOnArrows}>
               <input

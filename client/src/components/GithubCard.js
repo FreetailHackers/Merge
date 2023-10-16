@@ -14,7 +14,11 @@ function GithubCard(props) {
           params: { username },
         })
         .then((res) => {
-          setProfileData(res.data);
+          if (res.data.message?.startsWith("API")) {
+            setProfileData({ login: `${props.username}` });
+          } else {
+            setProfileData(res.data);
+          }
           setLoading(false);
         });
     }
@@ -30,7 +34,9 @@ function GithubCard(props) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img src={profileData.avatar_url} className="githubImage" alt="" />
+          {profileData?.avatar_url && (
+            <img src={profileData.avatar_url} className="githubImage" alt="" />
+          )}
           <div style={{ flexGrow: 2 }}>
             <h5>{profileData.login}</h5>
             <p>{profileData.bio}</p>

@@ -7,7 +7,7 @@ function LinkedInCard(props) {
       <a href={`${props.link}`} target="_blank" rel="noopener noreferrer">
         <div className="linkedinLogo">linkedin</div>
         <div style={{ flexGrow: 2 }}>
-          <h5>LinkedIn Profile</h5>
+          <h5>LinkedIn{!props.mobile ? " Profile" : ""}</h5>
           <p>{props.link}</p>
         </div>
       </a>
@@ -17,6 +17,7 @@ function LinkedInCard(props) {
 
 LinkedInCard.propTypes = {
   link: PropTypes.string.isRequired,
+  mobile: PropTypes.bool,
 };
 
 export default LinkedInCard;
