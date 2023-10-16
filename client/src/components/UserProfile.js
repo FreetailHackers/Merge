@@ -135,6 +135,7 @@ function UserProfile(props) {
     }));
     if (key === "skills") {
       setUnderFiveSkills(value.length <= 5);
+      console.log(key)
     }
     setSaved(false);
   };

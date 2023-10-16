@@ -8,6 +8,7 @@ import { UserToParagraph } from "./UserToParagraph";
 import { Pagination } from "./Pagination";
 import { useNavigate } from "react-router-dom";
 import { roles } from "../../data/roles";
+import { useOutletContext } from "react-router-dom";
 
 function UserList(props) {
   const [users, setUsers] = useState([]);
@@ -19,6 +20,7 @@ function UserList(props) {
   const [skillFilter, setSkillFilter] = useState([]);
   const [roleFilter, setRoleFilter] = useState([]);
   const navigate = useNavigate();
+  const socket = useOutletContext();
 
   useEffect(() => {
     async function getUsersFromAPI() {
@@ -64,7 +66,24 @@ function UserList(props) {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  async function block(user) {
+    await axios.post(
+      process.env.REACT_APP_API_URL + "/api/users/" + user + "/block"
+    );
+
+    socket.emit("block-users", { users: [user] });
+  };
+
+  async function unblock(user) {
+    await axios.post(
+      process.env.REACT_APP_API_URL + "/api/users/" + user + "/unblock"
+    );
+
+    socket.emit("unblock-users", { users: [user] });
   }
+
 
   return (
     <div className="flexColumn fsCenter">
@@ -113,9 +132,22 @@ function UserList(props) {
               Message
             </button>
           )}
+          {user._id !== props.userID && (
+            <button
+              className="chat-button"
+              onClick={() =>
+                {
+                  props.blockList.includes(user['_id']) ? unblock(user['_id']) : block(user['_id'])
+                }
+              }
+            >
+              {props.blockList.includes(user['_id']) ? 'Unblock' : 'Block'}
+            </button>
+          )}
           <UserToParagraph
             user={user}
             hideKeys={["_id", "profilePictureUrl"]}
+            blocked={props.blockList.includes(user['_id'])}
           />
         </Collapsible>
       ))}
@@ -126,6 +158,7 @@ function UserList(props) {
 
 UserList.propTypes = {
   userID: PropTypes.string.isRequired,
+  blockList: PropTypes.array
 };
 
 export default UserList;

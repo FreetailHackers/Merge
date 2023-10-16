@@ -30,7 +30,7 @@ const SkillSelector = (props) => {
       value={props.skills}
       onChange={(value) => {
         props.setSkills(value);
-        console.log("BASE:", value)
+        console.log(skills)
       }}
       className="question"
       error={!props.optional && props.skills?.length === 0 ? "Required" : ""}

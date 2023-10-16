@@ -183,6 +183,7 @@ export default function App() {
                     wideScreen={wideScreen}
                     team={team}
                     setTeam={setTeam}
+                    blockList={user?.blockList}
                   />
                 ) : (
                   <div>Loading...</div>
