@@ -75,6 +75,7 @@ io.on("connection", (socket) => {
 
   // utility functions
   useWithErrorHandling(socket, "join-room", joinRoom);
+  useWithErrorHandling(socket, "join-rooms", joinRooms);
   useWithErrorHandling(socket, "join-team-room", joinTeamRoom);
   useWithErrorHandling(socket, "leave-room", leaveRoom);
 
@@ -114,6 +115,12 @@ function newMessage(data, socket) {
 
 function joinRoom(data, socket) {
   socket.join(data.id);
+}
+
+function joinRooms(data, socket) {
+  for (let i = 0; i < data.ids.length; i++) {
+    socket.join(data.ids[i]);
+  }
 }
 
 function joinTeamRoom(data, socket) {
@@ -256,8 +263,12 @@ function swipeOnTeam(data, socket) {
   socket
     .to(data.yourTeam)
     .emit("team-swiped-on", { otherTeam: data.otherTeam });
-  if (data.chatCreated) {
+  if (data.chatID) {
     socket.to(data.otherTeam).to(data.yourTeam).emit("chat-update");
+    socket
+      .to(data.otherTeam)
+      .to(data.yourTeam)
+      .emit("new-swipe-chat", { chatID: data.chatID });
   }
 }
 

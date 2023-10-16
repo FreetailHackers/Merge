@@ -78,7 +78,7 @@ function Swipe(props) {
         socket.emit("swipe-on-team", {
           yourTeam: props.teamID,
           otherTeam: teamToShow._id,
-          chatCreated: res.data.chatCreated,
+          chatID: res.data.chatID,
         });
         setTimeout(() => {
           setTeamsToShow((prev) => [...prev.slice(1)]);

@@ -35,12 +35,9 @@ function Chat(props) {
       );
       setOtherUsers(res.data);
       res = await axios.get(process.env.REACT_APP_API_URL + "/api/chats");
-      let chatList = res.data;
-      for (const chat of chatList) {
-        // join websocket room
-        socket.emit("join-room", { id: chat._id });
-      }
-      setChats(chatList);
+      let chatList = res.data.map((e) => e._id);
+      socket.emit("join-rooms", { ids: chatList });
+      setChats(res.data);
     }
 
     if (connected) {
@@ -127,6 +124,13 @@ function Chat(props) {
       setChats((prev) => [...prev.filter((e) => e._id !== data.chatID)]);
     };
 
+    const newSwipeChatWS = async (data) => {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/chats/${data.chatID}/info`
+      );
+      setChats((prev) => [res.data, ...prev]);
+    };
+
     socket.on("added-to-room", addedWS);
     socket.on("new-user-added", newUserWS);
     socket.on("chat-renamed", renamedWS);
@@ -134,6 +138,7 @@ function Chat(props) {
     socket.on("blocked-by", blockedWS);
     socket.on("unblocked-by", unblockedWS);
     socket.on("removed-from", kickedWS);
+    socket.on("new-swipe-chat", newSwipeChatWS);
 
     return () => {
       socket.off("added-to-room", addedWS);
@@ -143,6 +148,7 @@ function Chat(props) {
       socket.off("blocked-by", blockedWS);
       socket.off("unblocked-by", unblockedWS);
       socket.off("removed-from", kickedWS);
+      socket.off("new-swipe-chat");
     };
   }, [socket]);
 
