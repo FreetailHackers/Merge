@@ -16,8 +16,8 @@ const SwipeProfile = (props) => {
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
         props.borderColor
       }-side`}
-      onMouseDown={(e) => props.onMouseDown(e, false)}
-      onTouchStart={(e) => props.onMouseDown(e, true)}
+      onMouseDown={(e) => props.onMouseDown && props.onMouseDown(e, false)}
+      onTouchStart={(e) => props.onMouseDown && props.onMouseDown(e, true)}
       onMouseUp={props.onMouseUp}
       onTouchEnd={props.onMouseUp}
       onMouseMove={(e) => props.onMouseMove && props.onMouseMove(e, false)}

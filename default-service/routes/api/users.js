@@ -104,6 +104,7 @@ router.get("/github/user", async (req, res) => {
 
 async function list_func(req, res) {
   // Parse query parameters
+  const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
 
@@ -124,12 +125,12 @@ async function list_func(req, res) {
   }
 
   var options = {
-    skip: parseInt(req.query.page ?? 0) * 10,
-    limit: 10,
+    skip: parseInt(req.query.page ?? 0) * pageSize,
+    limit: pageSize,
   };
   try {
     const itemCount = await User.countDocuments(filters);
-    const pages = Math.ceil(itemCount / 10);
+    const pages = Math.ceil(itemCount / pageSize);
     const data = await User.find(filters, {}, options);
     for (let user of data) {
       user.email = undefined;

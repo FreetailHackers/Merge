@@ -106,6 +106,20 @@ export default function App() {
     });
   };
 
+  const flipBlockedStatus = (otherUser) =>
+    setUser((prev) => {
+      if (prev.blockList.includes(otherUser)) {
+        return {
+          ...prev,
+          blockList: [...prev.blockList.filter((e) => e !== otherUser)],
+        };
+      }
+      return {
+        ...prev,
+        blockList: [...prev.blockList, otherUser],
+      };
+    });
+
   const login = (
     <Login
       auth={auth}
@@ -196,6 +210,8 @@ export default function App() {
                     wideScreen={wideScreen}
                     team={team}
                     setTeam={setTeam}
+                    blockList={user?.blockList}
+                    flipBlockedStatus={flipBlockedStatus}
                   />
                 ) : (
                   <div>Loading...</div>

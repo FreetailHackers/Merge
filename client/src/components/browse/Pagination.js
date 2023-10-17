@@ -4,13 +4,13 @@ import PropTypes from "prop-types";
 export const PaginationButton = ({ n, setPage }) =>
   n >= 0 && (
     // eslint-disable-next-line
-    <a href="#" onClick={(e) => setPage(n, e)}>
-      {n + 1}
-    </a>
+    <p className="paginationNumber" onClick={(e) => setPage(n, e)}>
+      <u>{n + 1}</u>
+    </p>
   );
 
 export const Pagination = ({ page, pages, setPage }) => (
-  <p className="pagination">
+  <div className="pagination">
     {page !== 0 && <PaginationButton n={0} setPage={setPage} />}
     {page > 4 && <span>...</span>}
     {page > 3 && <PaginationButton n={page - 3} setPage={setPage} />}
@@ -22,7 +22,7 @@ export const Pagination = ({ page, pages, setPage }) => (
     {page < pages - 4 && <PaginationButton n={page + 3} setPage={setPage} />}
     {page < pages - 5 && <span>...</span>}
     {page < pages - 1 && <PaginationButton n={pages - 1} setPage={setPage} />}
-  </p>
+  </div>
 );
 
 Pagination.propTypes = {

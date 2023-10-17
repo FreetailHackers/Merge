@@ -28,7 +28,10 @@ const SkillSelector = (props) => {
       placeholder="Python, Java, C, etc."
       nothingFound="Nothing found"
       value={props.skills}
-      onChange={(value) => props.setSkills(value)}
+      onChange={(value) => {
+        props.setSkills(value);
+        console.log(skills);
+      }}
       className="question"
       error={!props.optional && props.skills?.length === 0 ? "Required" : ""}
       required={!props.optional}

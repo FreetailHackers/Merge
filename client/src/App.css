@@ -69,7 +69,7 @@ section#register form button, .exitButton, .actionButton, .newMessageBox input, 
 }
 
 .toggleSidebar, .swipe-profile, .themeButton, .headerDatabase,
-.pagination a, .chat-button, #settings button.action,
+.pagination p, .chat-button, #settings button.action,
 section#login form button, section#register form button, .closetos,
 .chatPreview, .exitButton, .actionButton, .newMessageBox p {
   cursor: pointer;
@@ -135,8 +135,9 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   box-shadow: 0 3px 10px #0002;
 }
 
-.pagination a, .pagination span, .filterInput, #settings label,
-#settings button.action, section#login form, section#register form, .terms strong, section#login form label, section#register form label,
+.pagination p, .pagination span, .filterInput, #settings label,
+#settings button.action, section#login form, section#register form,
+.about, .terms strong, section#login form label, section#register form label,
 .chatPreview p span.messagePreview, .chatPreview h4, .chatPreview .smallDivider,
 .newMessageBox p, h3, .chatWindowHeader .windowToggleHolder {
   display: inline-block;
@@ -291,6 +292,15 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .swipe-profile img {
     height: 13vh;
   }
+  .manageTeamButton {
+    padding: 1% 3%;
+  }
+
+  .teamRow {
+    width: 95%;
+  }
+
+
 }
 
 @media all and (orientation:landscape) {
@@ -434,6 +444,18 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .swipe-profile img {
     height: 12.5vh;
   }
+  #ts-container {
+    margin-bottom: 5%;
+  }
+
+  .teamRow {
+    width: 60%;
+  }
+
+  .manageTeamButton {
+    padding: 5px 10px;
+  }
+
 }
 
 /* App.css */
@@ -975,13 +997,14 @@ nav#navbar a.active {
   margin-right: 5px;
 }
 
-.pagination a,
+.pagination p,
 .pagination span {
   margin: 0 5px;
   min-width: 20px;
+  display: inline;
 }
 
-.pagination a {
+.pagination p {
   color: var(--primary);
   text-decoration: underline;
 }
@@ -1113,6 +1136,12 @@ nav#navbar a.active {
   margin-block-end: 0.25em;
 }
 
+.member-list {
+  margin-bottom: 3%;
+  width: 95%;
+  margin-top: 3%;
+}
+
 .mrButtons {
   justify-content: space-evenly;
   margin: 3px;
@@ -1146,12 +1175,6 @@ nav#navbar a.active {
 .myTeam .themeButton, .edit .themeButton {
   margin-left: 5px;
   margin-right: 5px;
-}
-
-.manageTeamButton {
-  padding: 5px;
-  border-radius: 20px;
-  margin-left: 12px;
 }
 
 .selectedManageButton {
@@ -1699,7 +1722,57 @@ input[type=range]::-webkid-slider-runnable-track {
   background-color: rgb(153, 0, 0);
 }
 .teamRow {
-  padding-top: 5px;
+  flex-direction: column;
+  background-color: #a3c0e955;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.teamRow .manageTeamButton {
+  margin-left: 12px;
+}
+
+.manageTeamButton {
+  border-radius: 12px;
+}
+
+.teamRow button {
+  cursor: pointer;
+}
+
+.teamUserInfo {
+  width: 100%;
+  margin-left: 10%;
+}
+
+.teamRow ul {
+  padding: 0;
+  margin: 5px;
+}
+
+.teamRow-name {
+  width: 100%;
+  display: flex;
+  /*justify-content: space-between;*/
+  align-items: center;
+}
+
+.teamRow-name p {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+
+.teamRowBtn {
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+}
+
+.teamRowBtn img {
+  height: 30px;
+  width: auto;
 }
 
 .newInfoButton {

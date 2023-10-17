@@ -28,6 +28,7 @@ function TeamProfile(props) {
   const [saved, setSaved] = useState(true);
   const { team, setTeam, userID } = props;
   const teamProfile = team.profile;
+  const maxSkills = team?.users ? team.users.length * 5 : 5;
 
   useEffect(() => {
     function profileUpdatedWS(data) {
@@ -148,12 +149,24 @@ function TeamProfile(props) {
             <SkillSelector
               label={"Team's Skills"}
               skills={teamProfile.skills}
-              setSkills={(value) => setProfile("skills", value)}
+              setSkills={(value) =>
+                setProfile(
+                  "skills",
+                  value.length > maxSkills
+                    ? value.slice(0, maxSkills - value.length)
+                    : value
+                )
+              }
             />
             <SkillSelector
               label={"Desired Skills"}
               skills={teamProfile.desiredSkills}
-              setSkills={(value) => setProfile("desiredSkills", value)}
+              setSkills={(value) =>
+                setProfile(
+                  "desiredSkills",
+                  value.length > 10 ? value.slice(0, 10 - value.length) : value
+                )
+              }
             />
             <MultiSelect
               data={roles}
