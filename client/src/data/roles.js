@@ -2,9 +2,10 @@ export const rolesDict = {
   frontend: "Frontend",
   backend: "Backend",
   fullstack: "Full Stack",
-  ml: "ML/Data Scientist",
+  ml: "ML",
   mobile: "Mobile Dev",
   design: "Design",
+  data: "Data Science",
 };
 
 export const roles = [

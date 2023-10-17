@@ -9,7 +9,9 @@ function Collapsible(props) {
     <div style={{ width: "100%" }}>
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="headerDatabase"
+        className={`headerDatabase ${
+          props.oddIndex ? "oddCollapsible" : "evenCollapsible"
+        }`}
       >
         <span
           style={{
@@ -30,5 +32,6 @@ function Collapsible(props) {
 Collapsible.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  oddIndex: PropTypes.bool,
 };
 export default Collapsible;

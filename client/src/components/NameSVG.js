@@ -9,7 +9,7 @@ function NameSVG(props) {
         fontSize="22"
         x="50%"
         y="50%"
-        dominantBaseline="middle"
+        dominantBaseline="central"
         textAnchor="middle"
         fill="black"
       >

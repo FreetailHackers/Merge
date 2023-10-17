@@ -47,6 +47,7 @@ function UserList(props) {
               _id: user._id,
               name: user.name,
               ...user.profile,
+              reachable: user.reachable,
             }))
           );
           setPages(res.data.pages ?? 0);
@@ -130,15 +131,17 @@ function UserList(props) {
       </div>
 
       {users.map((user, index) => (
-        <Collapsible key={index} title={user.name}>
-          {user._id !== props.userID && !props.blockList.includes(user._id) && (
-            <button
-              className="chat-button"
-              onClick={() => messageUser(user._id)}
-            >
-              Message
-            </button>
-          )}
+        <Collapsible key={index} title={user.name} oddIndex={index % 2 !== 0}>
+          {user._id !== props.userID &&
+            user.reachable &&
+            !props.blockList.includes(user._id) && (
+              <button
+                className="chat-button"
+                onClick={() => messageUser(user._id)}
+              >
+                Message
+              </button>
+            )}
           {user._id !== props.userID && (
             <button
               className="chat-button"
