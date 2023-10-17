@@ -10,7 +10,6 @@ const SwipeProfile = (props) => {
   const relativePosition = props.relativePosition || 0;
   const angle = props.relativeAngle || 0;
   const isBeingDragged = relativePosition !== 0;
-  console.log(props.userProfiles);
   return (
     <div
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${

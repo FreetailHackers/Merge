@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import SkillSelector from "../components/SkillSelector";
 import { roles } from "../data/roles";
 
-// FileInput,
 import {
   NumberInput,
   TextInput,
@@ -14,6 +13,7 @@ import {
   Radio,
   Textarea,
   NativeSelect,
+  FileInput,
 } from "@mantine/core";
 
 const requiredFields = [
@@ -29,6 +29,8 @@ function UserProfile(props) {
   const [saved, setSaved] = useState(false);
   const [portfolioRegex, setPortfolioRegex] = useState(true);
   const [linkedinRegex, setLinkedinRegex] = useState(true);
+  const [oversizedFile, setOversizedFile] = useState(false);
+
   const baseProfile = (user) => ({
     ...user.profile,
     name: user.name,
@@ -71,7 +73,7 @@ function UserProfile(props) {
       }
     }
 
-    // data.update.profile.profilePictureUrl = profilePictureUrl;
+    //data.update.profile.profilePictureUrl = profilePictureUrl;
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/update",
@@ -90,40 +92,35 @@ function UserProfile(props) {
     }
   };
 
-  // handleNewProfilePicture = async (file) => {
-  //   const fd = new FormData();
-  //
-  //   // Setting up S3 upload parameters for folder upload
-  //   fd.append("file_name", props.userID.id + "/" + file.name);
-  //   fd.append("file", file);
-  //
-  //   if (file.size > 10_000_000) {
-  //     setState({ oversizedFile: true });
-  //     return;
-  //   } else {
-  //     setState({ oversizedFile: false });
-  //   }
-  //
-  //   await axios
-  //     .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then(async (res) => {
-  //       setState({
-  //         profilePictureUrl: res.data.url,
-  //         oversizedFile: false,
-  //       });
-  //       props.setUser(props.userID, {
-  //         ...props.user,
-  //         profilePictureUrl: res.data.url,
-  //       });
-  //     })
-  //     .catch(() => {
-  //       setState({ oversizedFile: true });
-  //     });
-  // };
+  const handleNewProfilePicture = async (file) => {
+    const fd = new FormData();
+    //Setting up S3 upload parameters for folder upload
+    fd.append("file_name", props.userID.id + "/" + file.name);
+    fd.append("file", file);
+    const overSized = file.size > 10_000_000;
+    setOversizedFile(overSized);
+    if (overSized) return;
+    await axios
+      .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(async (res) => {
+        console.log(res);
+        setProfile("profilePictureUrl", res.data.url);
+        /*props.setUser(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            profilePictureUrl: res.data.url,
+          }
+        }));*/
+      })
+      .catch(() => {
+        setOversizedFile(true);
+      });
+  };
 
   const cancelEdit = async (e) => {
     e.preventDefault();
@@ -192,18 +189,14 @@ function UserProfile(props) {
               required
             />
             {
-              //   <FileInput
-              //   label="Profile Picture"
-              //   placeholder="Upload JPG/PNG/GIF, up to 10 MB"
-              //   accept="image/jpg, image/png, image/gif"
-              //   error={
-              //     oversizedFile
-              //       ? "File must be 10 MB or smaller"
-              //       : ""
-              //   }
-              //   onChange={handleNewProfilePicture}
-              //   className="question"
-              // />
+              <FileInput
+                label="Profile Picture"
+                placeholder="Upload JPG/PNG/GIF, up to 10 MB"
+                accept="image/jpg, image/png, image/gif"
+                error={oversizedFile ? "File must be 10 MB or smaller" : ""}
+                onChange={handleNewProfilePicture}
+                className="question"
+              />
             }
             <TextInput
               label="Portfolio"
