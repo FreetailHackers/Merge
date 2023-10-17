@@ -289,9 +289,11 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     font-size: 15px;
   }
 
-  .swipe-profile img {
+  .profile-photo {
     height: 13vh;
+    width: 13vh;
   }
+
   .manageTeamButton {
     padding: 1% 3%;
   }
@@ -441,8 +443,9 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     font-size: 25px;
   }
 
-  .swipe-profile img {
+  .profile-photo {
     height: 12.5vh;
+    width: 12.5vh;
   }
   #ts-container {
     margin-bottom: 5%;
@@ -827,10 +830,11 @@ nav#navbar a.active {
   background-color: var(--tertiary);
 }
 
-.swipe-profile img {
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: 1vw;
+
+
+.profile-photo {
+  margin-left: 0;
+  margin-right: 20px;
 }
 
 .swipe-profile .profile-header {
@@ -1397,12 +1401,25 @@ section#register form .reg-login-nav {
 .chatPicture {
   margin-right: 10px;
   margin-left: 5px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
   width: 45px;
   height: 45px;
 }
+
+.outerCircle {
+  position: relative;
+}
+
+.chatPicture, .innerCircle, .profile-photo {
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.innerCircle {
+  position: absolute;
+  aspect-ratio: 1;
+}
+
 
 
 .unreadBubble {

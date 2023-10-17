@@ -5,6 +5,7 @@ import LinkedInCard from "./LinkedInCard";
 import PortfolioCard from "./PortfolioCard";
 import { skillsDict } from "../data/skills";
 import { rolesDict } from "../data/roles";
+import PictureCircle from "./PictureCircle";
 
 const SwipeProfile = (props) => {
   const relativePosition = props.relativePosition || 0;
@@ -30,10 +31,8 @@ const SwipeProfile = (props) => {
       }}
     >
       <div className="profile-header">
-        {props.isAlone && (
-          <div className="profile-photo">
-            <img src={props.profile.profilePictureUrl} alt="" />
-          </div>
+        {(
+          <PictureCircle outerClass="profile-photo" profiles={Object.values(props.userProfiles)}/>
         )}
         <div>
           <h3 draggable={false}>{props.name}</h3>

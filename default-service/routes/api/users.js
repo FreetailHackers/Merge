@@ -209,9 +209,9 @@ async function register_func(req, res) {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      profile: {
-        profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
-      },
+      //profile: {
+        //profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
+      //},
     });
     // Hash password before saving in database
     const salt = await bcrypt.genSalt(10);
