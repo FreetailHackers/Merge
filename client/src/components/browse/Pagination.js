@@ -10,7 +10,7 @@ export const PaginationButton = ({ n, setPage }) =>
   );
 
 export const Pagination = ({ page, pages, setPage }) => (
-  <p className="pagination">
+  <div className="pagination">
     {page !== 0 && <PaginationButton n={0} setPage={setPage} />}
     {page > 4 && <span>...</span>}
     {page > 3 && <PaginationButton n={page - 3} setPage={setPage} />}
@@ -22,7 +22,7 @@ export const Pagination = ({ page, pages, setPage }) => (
     {page < pages - 4 && <PaginationButton n={page + 3} setPage={setPage} />}
     {page < pages - 5 && <span>...</span>}
     {page < pages - 1 && <PaginationButton n={pages - 1} setPage={setPage} />}
-  </p>
+  </div>
 );
 
 Pagination.propTypes = {

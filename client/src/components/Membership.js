@@ -4,6 +4,8 @@ import axios from "axios";
 import { useOutletContext } from "react-router-dom";
 import expand from "../assets/images/expand.png";
 import minimize from "../assets/images/minimize.png";
+import { skillsDict } from "../data/skills";
+import { rolesDict } from "../data/roles";
 
 function Membership(props) {
   const { team, userID } = props;
@@ -103,33 +105,30 @@ function Membership(props) {
                   )}
                 <button
                   onClick={() => {
-                    if (expandedUser === team.profiles[e].name) {
-                      setExpandedUser(null);
-                    } else {
-                      setExpandedUser(team.profiles[e].name);
-                    }
-                    console.log(teamUserData[e]);
+                    setExpandedUser((prev) => (prev === e ? null : e));
                   }}
                   className="teamRowBtn"
                 >
                   <img
                     alt="open/close"
-                    src={
-                      expandedUser === team.profiles[e].name ? expand : minimize
-                    }
+                    src={expandedUser === e ? expand : minimize}
                   />
                 </button>
               </div>
-              {expandedUser === team.profiles[e].name && (
+              {expandedUser === e && (
                 <div className="teamUserInfo">
                   <ul>
                     <li key={"skills"}>
                       <strong>Skills:</strong>{" "}
-                      {teamUserData[e]["skills"].join(", ")}
+                      {teamUserData[e]["skills"]
+                        .map((e) => skillsDict[e] ?? e)
+                        .join(", ")}
                     </li>
                     <li key={"roles"}>
                       <strong>Roles:</strong>{" "}
-                      {teamUserData[e]["roles"].join(", ")}
+                      {teamUserData[e]["roles"]
+                        .map((e) => rolesDict[e] ?? e)
+                        .join(", ")}
                     </li>
                   </ul>
                 </div>
@@ -138,7 +137,9 @@ function Membership(props) {
           ))}
 
         {(newLeader || toBeKicked.length > 0) && (
-          <button onClick={manageMembership}>Modify Team</button>
+          <button className="manageTeamButton" onClick={manageMembership}>
+            Modify Team
+          </button>
         )}
       </div>
       {team.users.length > 1 && userID !== team.leader && (
