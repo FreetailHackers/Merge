@@ -269,6 +269,7 @@ async function cancelRequest(req, res) {
  * BODY PARAMETER filters: filters to list teams for
  */
 async function listTeams(req, res) {
+  const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
   if (filters.name) {
@@ -292,8 +293,8 @@ async function listTeams(req, res) {
     delete filters.size;
   }
   var options = {
-    skip: parseInt(req.query.page ?? 0) * 10,
-    limit: 10,
+    skip: parseInt(req.query.page ?? 0) * pageSize,
+    limit: pageSize,
   };
   try {
     if (filters.memberName) {
@@ -305,7 +306,7 @@ async function listTeams(req, res) {
       delete filters.memberName;
     }
     const itemCount = await Team.countDocuments(filters);
-    const pages = Math.ceil(itemCount / 10);
+    const pages = Math.ceil(itemCount / pageSize);
     const data = await Team.find(filters, {}, options);
     let foundTeams = [];
     for (let teamItem of data) {

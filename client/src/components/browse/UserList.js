@@ -26,6 +26,7 @@ function UserList(props) {
     async function getUsersFromAPI() {
       try {
         const queryParamters = {
+          pageSize: props.pageSize,
           page,
           filters: {
             ...(nameFilter && { name: nameFilter }),
@@ -55,7 +56,14 @@ function UserList(props) {
       }
     }
     getUsersFromAPI();
-  }, [nameFilter, skillFilter, competitiveness, roleFilter, page]);
+  }, [
+    nameFilter,
+    skillFilter,
+    competitiveness,
+    roleFilter,
+    page,
+    props.pageSize,
+  ]);
 
   async function messageUser(userID) {
     try {
@@ -134,19 +142,22 @@ function UserList(props) {
           {user._id !== props.userID && (
             <button
               className="chat-button"
-              onClick={() => {
-                props.blockList.includes(user["_id"])
-                  ? unblock(user["_id"])
-                  : block(user["_id"]);
+              onClick={async () => {
+                if (props.blockList.includes(user._id)) {
+                  await unblock(user._id);
+                } else {
+                  await block(user._id);
+                }
+                props.flipBlockedStatus(user._id);
               }}
             >
-              {props.blockList.includes(user["_id"]) ? "Unblock" : "Block"}
+              {props.blockList.includes(user._id) ? "Unblock" : "Block"}
             </button>
           )}
           <UserToParagraph
             user={user}
             hideKeys={["_id", "profilePictureUrl"]}
-            blocked={props.blockList.includes(user["_id"])}
+            blocked={props.blockList.includes(user._id)}
           />
         </Collapsible>
       ))}
@@ -158,6 +169,8 @@ function UserList(props) {
 UserList.propTypes = {
   userID: PropTypes.string.isRequired,
   blockList: PropTypes.array,
+  flipBlockedStatus: PropTypes.func,
+  pageSize: PropTypes.number,
 };
 
 export default UserList;

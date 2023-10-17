@@ -42,10 +42,16 @@ function BrowseTeams(props) {
           setTeam={setTeam}
           setTeamID={setTeamID}
           setSection={setSection}
+          pageSize={props.wideScreen ? 10 : 6}
         />
       )}
       {section === "User List" && (
-        <UserList userID={userID} blockList={blockList} />
+        <UserList
+          userID={userID}
+          blockList={blockList}
+          flipBlockedStatus={props.flipBlockedStatus}
+          pageSize={props.wideScreen ? 10 : 6}
+        />
       )}
     </div>
   );
@@ -58,6 +64,7 @@ BrowseTeams.propTypes = {
   team: PropTypes.object,
   setTeam: PropTypes.func,
   blockList: PropTypes.array,
+  flipBlockedStatus: PropTypes.func,
 };
 
 export default BrowseTeams;
