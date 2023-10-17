@@ -1,39 +1,23 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
-class LinkedInCard extends Component {
-  constructor() {
-    super();
-    this.state = {
-      isLoadingProfile: true,
-      profileData: {},
-    };
-  }
-
-  render = () => (
+function LinkedInCard(props) {
+  return (
     <div className="linkedin-card">
-      {this.state.loading ? (
-        "loading"
-      ) : (
-        <a
-          href={`${this.props.link}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <div className="linkedinLogo">linkedin</div>
-          <div style={{ flexGrow: 2 }}>
-            <h5>LinkedIn Profile</h5>
-            <p>{this.props.link}</p>
-          </div>
-        </a>
-      )}
+      <a href={`${props.link}`} target="_blank" rel="noopener noreferrer">
+        <div className="linkedinLogo">linkedin</div>
+        <div style={{ flexGrow: 2 }}>
+          <h5>LinkedIn{!props.mobile ? " Profile" : ""}</h5>
+          <p>{props.link}</p>
+        </div>
+      </a>
     </div>
   );
 }
 
 LinkedInCard.propTypes = {
-  username: PropTypes.string,
   link: PropTypes.string.isRequired,
+  mobile: PropTypes.bool,
 };
 
 export default LinkedInCard;
