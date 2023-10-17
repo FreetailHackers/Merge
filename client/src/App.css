@@ -35,7 +35,7 @@ nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
 .centerCol, .mrButtons, .merge-requests, .hideDiv, section#login form label,
 section#register form label, section#login form button, section#register form button,
 .chatPreview h4, .buttonHolder, .reportFloatingWindowHeader, .reportWindowUserSelect,
-.chatWindowHeader, .chatWindowHeader input, .chatScrollBox, .userAddition {
+.chatWindowHeader input, .chatScrollBox, .userAddition {
   width: 100%;
 }
 
@@ -167,7 +167,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .about-page, .chat, .dash, .edit,
-  .myTeam, nav#navbar, .chatWindow {
+  .myTeam, nav#navbar, .chatWindow, .chatSidebar {
     height: calc(90.5 * var(--vh, 1vh));
     overflow-y: scroll;
   }
@@ -301,7 +301,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .teamRow {
     width: 95%;
   }
-
+  
+  .message {
+    max-width: 80%;
+  }
 
 }
 
@@ -323,6 +326,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .chatSidebar {
     width: 300px;
+    height: calc(100 * var(--vh, 1vh) - 30px);
   }
   .chatWindow {
     width: calc(100vw - 550px);
@@ -364,6 +368,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .reportFloatingWindow {
     top: 20%;
+    height: 55%;
   }
 
   .reportFloatingWindow, .profile-child, .mrColumn {
@@ -457,6 +462,10 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   .manageTeamButton {
     padding: 5px 10px;
+  }
+
+  .message {
+    max-width: 60%;
   }
 
 }
@@ -1338,7 +1347,6 @@ section#register form .reg-login-nav {
 }
 
 .chatSidebar {
-  height: calc(100 * var(--vh, 1vh) - 30px);
   border-right: 1px #ddd solid;
   overflow-y: auto;
 }
@@ -1615,7 +1623,6 @@ section#register form .reg-login-nav {
 /* Messages */
 
 .message {
-  max-width: 60%;
   margin-bottom: 14px;
   display: flex;
   align-items: flex-end;
@@ -1655,6 +1662,20 @@ section#register form .reg-login-nav {
   margin: 6px 4px 2px 4px;
 }
 
+.topTimestamp {
+  height: calc(100% - 0.8em);
+}
+
+.otherTimestamp {
+  height: 100%;
+}
+
+.timestampHolder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .message.rightSide .messageContent {
   background: var(--primary);
   text-align: left;
@@ -1684,6 +1705,7 @@ section#register form .reg-login-nav {
   justify-content: flex-end;
   padding-top: 15px;
   padding-bottom: 15px;
+  width: calc(100% - 2px);
 }
 
 .chatWindowHeader .themeButton {

@@ -221,13 +221,6 @@ function ChatWindow(props) {
           }}
           onKeyDown={onKeyDown}
         />
-        <p
-          onClick={() => {
-            props.sendMessage("❤️");
-          }}
-        >
-          ❤️
-        </p>
         <p onClick={sendMessageButton}>➡️</p>
       </div>
     </div>
