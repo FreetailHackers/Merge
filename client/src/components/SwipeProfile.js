@@ -102,7 +102,7 @@ const SwipeProfile = (props) => {
         />
       ) : null}
       {props.isAlone && props.profile.linkedin ? (
-        <LinkedInCard link={props.profile.linkedin} />
+        <LinkedInCard link={props.profile.linkedin} mobile={props.mobile} />
       ) : null}
       {props.isAlone && props.profile.portfolio ? (
         <PortfolioCard link={props.profile.portfolio} />
@@ -122,6 +122,7 @@ SwipeProfile.propTypes = {
   onMouseDown: PropTypes.func,
   onMouseUp: PropTypes.func,
   onMouseMove: PropTypes.func,
+  mobile: PropTypes.bool,
 };
 
 export default SwipeProfile;

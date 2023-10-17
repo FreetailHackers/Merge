@@ -6,6 +6,8 @@ import { MultiSelect } from "@mantine/core";
 function ChatSidebar(props) {
   const [newChatInput, setNewChatInput] = useState([]);
   const [creatingNewChat, setCreatingNewChat] = useState(false);
+  const MAX_OTHERS = process.env.REACT_APP_MAX_TEAM_SIZE - 1;
+
   return (
     <div className="chatSidebar">
       <div className="chatSidebarTop">
@@ -50,7 +52,9 @@ function ChatSidebar(props) {
             value={newChatInput}
             onChange={(values) =>
               setNewChatInput(
-                values.length > 4 ? values.slice(0, 4 - values.length) : values
+                values.length > MAX_OTHERS
+                  ? values.slice(0, MAX_OTHERS - values.length)
+                  : values
               )
             }
             placeholder="Search for people to add"

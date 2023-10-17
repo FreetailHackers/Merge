@@ -13,7 +13,7 @@ router.use(authenticateToken);
 const dotenv = require("dotenv");
 dotenv.config();
 
-const MAX_TEAM_SIZE = 5;
+const MAX_TEAM_SIZE = 4;
 
 // @route POST api/team/requestMerge
 // @desc Request Team Merge
@@ -585,6 +585,36 @@ async function sortByAverages(yourTeam, teamList) {
   teamList.sort((a, b) => averageScore(a) - averageScore(b));
 }
 
+async function noBlocks(team1, team2) {
+  try {
+    const team1Users = await User.find({ team: team1._id });
+    const team1IDs = team1Users.map((e) => String(e._id));
+    const team2Users = await User.find({ team: team2._id });
+    const team2IDs = team2Users.map((e) => String(e._id));
+    let found = false;
+    for (let i = 0; !found && i < team1Users.length; i++) {
+      const intersection = team1Users[i].blockList?.filter((e) =>
+        team2IDs.includes(e)
+      );
+      if (intersection?.length > 0) {
+        found = true;
+      }
+    }
+    for (let i = 0; !found && i < team2Users.length; i++) {
+      const intersection = team2Users[i].blockList?.filter((e) =>
+        team1IDs.includes(e)
+      );
+      if (intersection?.length > 0) {
+        found = true;
+      }
+    }
+    return !found;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
 async function getTeamsToSwipe(req, res) {
   try {
     const team = await Team.findOne({ users: req.user });
@@ -592,14 +622,26 @@ async function getTeamsToSwipe(req, res) {
       console.error("Invalid user ID provided");
       return res.sendStatus(400);
     }
+    const capacity = MAX_TEAM_SIZE - team.users.length;
+    if (capacity === 0) {
+      return res.json({ ready: false, teams: [] });
+    }
+
     const swipeReady = await isTeamSwipeReady(team);
     if (!swipeReady) {
       return res.json({ ready: false, teams: [] });
     }
+
+    // 1 to MAX_TEAM_SIZE - size
+    const sizeRange = [...Array(MAX_TEAM_SIZE - team.users.length).keys()].map(
+      (e) => ({ users: { $size: e + 1 } })
+    );
+
     const userFilter =
       req.query.idealSize && req.query.idealSize > 0
         ? { users: { $size: req.query.idealSize } }
-        : { users: { $not: { $size: MAX_TEAM_SIZE } } };
+        : { $or: sizeRange }; //{ users: { $not: { $size: MAX_TEAM_SIZE } } };
+
     let teamList = await Team.find({
       ...userFilter,
       "profile.displayTeamProfile": true,
@@ -610,10 +652,11 @@ async function getTeamsToSwipe(req, res) {
       return res.sendStatus(404);
     }
     let out = [];
-    for (const team of teamList) {
-      const swipeReady = await isTeamSwipeReady(team);
-      if (swipeReady) {
-        const newTeam = await standardizeTeamObj(team);
+    for (const othTeam of teamList) {
+      const swipeReady = await isTeamSwipeReady(othTeam);
+      const noBlocksFound = await noBlocks(team, othTeam);
+      if (swipeReady && noBlocksFound) {
+        const newTeam = await standardizeTeamObj(othTeam);
         out.push(newTeam);
       }
     }
@@ -649,10 +692,7 @@ async function generateTeamName(team) {
     return team.profile.name;
   }
   const leaderUser = await User.findById(team.leader);
-  if (team.users.length > 1) {
-    return `${leaderUser.name}'s team`;
-  }
-  return leaderUser.name;
+  return `${leaderUser.name}'s team`;
 }
 
 async function swipe(req, res) {
@@ -663,6 +703,13 @@ async function swipe(req, res) {
       console.error("Incorrect team ID provided");
       return res.sendStatus(400);
     }
+    if (
+      [...team.leftSwipeList, ...team.rightSwipeList]
+        .map((e) => String(e))
+        .includes(req.body.otherTeamID)
+    ) {
+      return res.json({ success: false });
+    }
     const list = `${
       req.body.decision === "accept-committed" ? "right" : "left"
     }SwipeList`;
@@ -671,8 +718,11 @@ async function swipe(req, res) {
       { $push: { [list]: otherTeam._id } },
       { upsert: true }
     );
-
-    if (req.body.decision === "accept-committed") {
+    let out = { success: true };
+    if (
+      req.body.decision === "accept-committed" &&
+      !otherTeam.rightSwipeList.includes(team._id)
+    ) {
       const firstName = await generateTeamName(team);
       const secondName = await generateTeamName(otherTeam);
       const name = `${firstName} and ${secondName}`;
@@ -682,9 +732,10 @@ async function swipe(req, res) {
         name: name,
         owner: req.user,
       });
-      await chat.save();
+      const savedChat = await chat.save();
+      out.chatID = savedChat._id;
     }
-    return res.json({ success: true });
+    return res.json(out);
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);

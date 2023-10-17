@@ -28,6 +28,9 @@ router.use(authenticateToken);
 const addProfiles = require("../helpers/addProfiles");
 
 router.get("/", async (req, res) => get_default_function(req, res));
+
+router.get("/:chat/info", get_chat_function);
+
 router.get("/:chat/messages", async (req, res) =>
   get_messages_function(req, res)
 );
@@ -48,6 +51,16 @@ router.post("/:chat/delete", async (req, res) =>
 );
 router.post("/:chat/read", async (req, res) => post_read_function(req, res));
 
+async function prepareChat(req, chat) {
+  let newChat = chat.toObject();
+  newChat.lastMessage = await Message.findOne({ chat: chat })
+    .sort({ _id: -1 })
+    .exec();
+  await addProfiles(newChat);
+  newChat.seen = newChat.readBy.map((e) => String(e)).includes(req.user);
+  return newChat;
+}
+
 /**
  * Find all chats that the logged-in user is a member of.
  *
@@ -61,28 +74,30 @@ async function get_default_function(req, res) {
     const result = [];
     // Retrieve last message for each chat
     for (let chat of chats) {
-      chat = chat.toObject();
-      chat.lastMessage = await Message.findOne({ chat: chat })
-        .sort({ _id: -1 })
-        .exec();
-      await addProfiles(chat);
-      chat.seen = chat.readBy.map((e) => String(e)).includes(req.user);
-      result.push(chat);
+      const preparedChat = await prepareChat(req, chat);
+      result.push(preparedChat);
     }
     // Sort chats in reverse chronological order; i.e., most recent on top
     result.sort((a, b) => {
-      if (!a.lastMessage && !b.lastMessage) {
-        return b.created - a.created;
-      }
-      if (!a.lastMessage) {
-        return b.lastMessage.timestamp - a.created;
-      }
-      if (!b.lastMessage) {
-        return b.created - a.lastMessage.timestamp;
-      }
-      return b.lastMessage.timestamp - a.lastMessage.timestamp;
+      const aTime = a.lastMessage?.timestamp ?? a.created;
+      const bTime = b.lastMessage?.timestamp ?? b.created;
+      return bTime - aTime;
     });
     return res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+}
+
+async function get_chat_function(req, res) {
+  try {
+    let chat = await Chat.findOne({ _id: req.params.chat, users: req.user });
+    if (!chat) {
+      return res.sendStatus(404);
+    }
+    const preparedChat = await prepareChat(req, chat);
+    return res.json(preparedChat);
   } catch (err) {
     console.error(err);
     return res.sendStatus(500);
