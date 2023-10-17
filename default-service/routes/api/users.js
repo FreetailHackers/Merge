@@ -281,24 +281,6 @@ async function clear_old_pictures(req) {
   } catch (err) {
     console.log(err, err.stack);
   }
-  /*const data = await s3.listObjectsV2(params, async function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else {
-        let listOfObjects = data.Contents;
-        let newimg = profile_pic_link.replace(
-          "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
-          ""
-        );
-        for (let i = 1; i < data.KeyCount; i++) {
-          let nameOfFile = listOfObjects[i].Key;
-          if (nameOfFile !== newimg) {
-            var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
-            await s3.deleteObject(params).promise();
-          }
-        }
-      }
-    })
-    .promise();*/
 }
 
 async function update(req, res) {
