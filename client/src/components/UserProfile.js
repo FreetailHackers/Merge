@@ -32,7 +32,7 @@ function UserProfile(props) {
   const baseProfile = (user) => ({
     ...user.profile,
     name: user.name,
-    competitiveness: user.competitiveness,
+    //competitiveness: user.competitiveness,
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));

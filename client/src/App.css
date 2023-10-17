@@ -684,7 +684,7 @@ nav#navbar a.active {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 5%;
+  /*margin-bottom: 5%;*/
   /* border: 1px solid blue; */
 }
 
@@ -773,7 +773,7 @@ nav#navbar a.active {
   background: rgb(50, 205, 50);
 }
 
-.swipe-profile p {
+.swipe-profile > p {
   white-space: pre-line;
   margin: .5em 0;
 }
@@ -782,6 +782,7 @@ nav#navbar a.active {
   display: flex;
   flex-wrap: wrap;
   margin: 0;
+  /*max-width: 50%;*/
 }
 
 .swipe-profile .attr-item, .swipe-profile .roles-item,

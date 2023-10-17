@@ -119,7 +119,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={login} />
-        <Route path="/login" element={<Onboarding login={login} />} />
+        <Route
+          path="/login"
+          element={wideScreen ? login : <Onboarding login={login} />}
+        />
         <Route
           path="/register"
           element={

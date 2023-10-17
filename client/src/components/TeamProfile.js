@@ -25,7 +25,7 @@ const requiredFields = [
 
 function TeamProfile(props) {
   const socket = useOutletContext();
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(true);
   const { team, setTeam, userID } = props;
   const teamProfile = team.profile;
 

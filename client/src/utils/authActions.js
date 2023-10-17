@@ -22,8 +22,8 @@ export const registerUser = async (userData, setAuth, setErrors) => {
     if (!res.data.isValid) {
       if (res.data.name) throw new Error(res.data.name);
       else if (res.data.email) throw new Error(res.data.email);
-      else if (res.data.password) throw new Error(res.data.password);
       else if (res.data.password2) throw new Error(res.data.password2);
+      else if (res.data.password) throw new Error(res.data.password);
     }
     const { token, admitted } = res.data;
     if (!admitted) {
