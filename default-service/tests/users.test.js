@@ -161,7 +161,8 @@ describe("Register Validation Tests", () => {
     };
     await users.register_func(req, res);
     expect(res.object).toEqual({
-      password: "Password must be at least 8 characters",
+      password:
+        "Password must be at least 8 characters, contain 1 symbol, and 1 capital letter.",
       isValid: false,
     });
   });
@@ -184,7 +185,8 @@ describe("Register Validation Tests", () => {
     };
     await users.register_func(req, res);
     expect(res.object).toEqual({
-      password: "Password must have 1 capital letter",
+      password:
+        "Password must be at least 8 characters, contain 1 symbol, and 1 capital letter.",
       isValid: false,
     });
   });
@@ -207,7 +209,8 @@ describe("Register Validation Tests", () => {
     };
     await users.register_func(req, res);
     expect(res.object).toEqual({
-      password: "Password must have a symbol",
+      password:
+        "Password must be at least 8 characters, contain 1 symbol, and 1 capital letter.",
       password2: "Passwords must match",
       isValid: false,
     });

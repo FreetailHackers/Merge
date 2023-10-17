@@ -104,6 +104,7 @@ router.get("/github/user", async (req, res) => {
 
 async function list_func(req, res) {
   // Parse query parameters
+  const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
   let filters =
     req.query.filters === undefined ? {} : JSON.parse(req.query.filters);
 
@@ -124,12 +125,12 @@ async function list_func(req, res) {
   }
 
   var options = {
-    skip: parseInt(req.query.page ?? 0) * 10,
-    limit: 10,
+    skip: parseInt(req.query.page ?? 0) * pageSize,
+    limit: pageSize,
   };
   try {
     const itemCount = await User.countDocuments(filters);
-    const pages = Math.ceil(itemCount / 10);
+    const pages = Math.ceil(itemCount / pageSize);
     const data = await User.find(filters, {}, options);
     for (let user of data) {
       user.email = undefined;
@@ -208,9 +209,9 @@ async function register_func(req, res) {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      profile: {
-        profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
-      },
+      //profile: {
+      //profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
+      //},
     });
     // Hash password before saving in database
     const salt = await bcrypt.genSalt(10);
@@ -251,38 +252,36 @@ async function s3Upload(file_name, files, res) {
   res.json({ url: promise.Location });
 }
 
-// async function clear_old_pictures(req) {
-//   const id = req.body.id;
-//   const profile_pic_link = req.body.update.profile.profilePictureUrl;
-//   if (!profile_pic_link) {
-//     console.log("No profile pic link");
-//     return;
-//   }
-//   const folder_name = id + "/";
-//   var params = {
-//     Bucket: BUCKET_NAME,
-//     Prefix: folder_name,
-//   };
-//   await s3
-//     .listObjectsV2(params, async function (err, data) {
-//       if (err) console.log(err, err.stack); // an error occurred
-//       else {
-//         let listOfObjects = data.Contents;
-//         let newimg = profile_pic_link.replace(
-//           "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
-//           ""
-//         );
-//         for (let i = 1; i < data.KeyCount; i++) {
-//           let nameOfFile = listOfObjects[i].Key;
-//           if (nameOfFile !== newimg) {
-//             var params = { Bucket: BUCKET_NAME, Key: nameOfFile };
-//             await s3.deleteObject(params).promise();
-//           }
-//         }
-//       }
-//     })
-//     .promise();
-// }
+async function clear_old_pictures(req) {
+  const id = req.user;
+  const profile_pic_link = req.body.update.profile?.profilePictureUrl;
+  if (!profile_pic_link) {
+    console.log("No profile pic link");
+    return;
+  }
+  const folder_name = id + "/";
+  var params = {
+    Bucket: BUCKET_NAME,
+    Prefix: folder_name,
+  };
+  try {
+    const data = await s3.listObjectsV2(params).promise();
+    let listOfObjects = data.Contents;
+    let newimg = profile_pic_link.replace(
+      "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
+      ""
+    );
+    for (let i = 1; i < data.KeyCount; i++) {
+      let nameOfFile = listOfObjects[i].Key;
+      if (nameOfFile !== newimg) {
+        const deleteParams = { Bucket: BUCKET_NAME, Key: nameOfFile };
+        await s3.deleteObject(deleteParams).promise();
+      }
+    }
+  } catch (err) {
+    console.log(err, err.stack);
+  }
+}
 
 async function update(req, res) {
   const profile = req.body.update;
@@ -291,7 +290,7 @@ async function update(req, res) {
   };
 
   //Clear all old s3 files
-  //await clear_old_pictures(req);
+  await clear_old_pictures(req);
   if (profile.name?.length > 1000) {
     return res.sendStatus(413);
   }

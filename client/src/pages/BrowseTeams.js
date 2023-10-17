@@ -5,7 +5,7 @@ import UserList from "../components/browse/UserList";
 
 function BrowseTeams(props) {
   //frontend for updating
-  const { team, setTeam, userID, setTeamID } = props;
+  const { team, setTeam, userID, setTeamID, blockList } = props;
   const [section, setSection] = useState("Team List");
 
   if (!team) {
@@ -42,9 +42,17 @@ function BrowseTeams(props) {
           setTeam={setTeam}
           setTeamID={setTeamID}
           setSection={setSection}
+          pageSize={props.wideScreen ? 10 : 6}
         />
       )}
-      {section === "User List" && <UserList userID={userID} />}
+      {section === "User List" && (
+        <UserList
+          userID={userID}
+          blockList={blockList}
+          flipBlockedStatus={props.flipBlockedStatus}
+          pageSize={props.wideScreen ? 10 : 6}
+        />
+      )}
     </div>
   );
 }
@@ -55,6 +63,8 @@ BrowseTeams.propTypes = {
   setTeamID: PropTypes.func,
   team: PropTypes.object,
   setTeam: PropTypes.func,
+  blockList: PropTypes.array,
+  flipBlockedStatus: PropTypes.func,
 };
 
 export default BrowseTeams;

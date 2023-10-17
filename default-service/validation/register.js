@@ -23,13 +23,15 @@ module.exports = function validateRegisterInput(data) {
   // Password checks
   if (Validator.isEmpty(data.password)) {
     errors.password = "Password field is required";
-  } else if (!Validator.isLength(data.password, { min: 8, max: 30 })) {
-    errors.password = "Password must be at least 8 characters";
-  } else if (Validator.equals(data.password, data.password.toLowerCase())) {
-    errors.password = "Password must have 1 capital letter";
-  } else if (!format.test(data.password)) {
-    errors.password = "Password must have a symbol";
+  } else if (
+    !Validator.isLength(data.password, { min: 8, max: 30 }) ||
+    Validator.equals(data.password, data.password.toLowerCase()) ||
+    !format.test(data.password)
+  ) {
+    errors.password =
+      "Password must be at least 8 characters, contain 1 symbol, and 1 capital letter.";
   }
+
   if (Validator.isEmpty(data.password2)) {
     errors.password2 = "Confirm password field is required";
   } else if (!Validator.equals(data.password, data.password2)) {
