@@ -95,7 +95,7 @@ function UserProfile(props) {
   const handleNewProfilePicture = async (file) => {
     const fd = new FormData();
     //Setting up S3 upload parameters for folder upload
-    fd.append("file_name", props.userID.id + "/" + file.name);
+    fd.append("file_name", props.userID + "/" + file.name);
     fd.append("file", file);
     const overSized = file.size > 10_000_000;
     setOversizedFile(overSized);
@@ -107,7 +107,6 @@ function UserProfile(props) {
         },
       })
       .then(async (res) => {
-        console.log(res);
         setProfile("profilePictureUrl", res.data.url);
         /*props.setUser(prev => ({
           ...prev,
@@ -134,7 +133,6 @@ function UserProfile(props) {
     }));
     if (key === "skills") {
       setUnderFiveSkills(value.length <= 5);
-      console.log(key);
     }
     setSaved(false);
   };
