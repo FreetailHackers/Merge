@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import NameSVG from "../NameSVG";
 
 const Message = ({
   fromSelf,
@@ -24,14 +25,20 @@ const Message = ({
         style={{
           backgroundImage: `url("${image}")`,
         }}
-      />
+      >
+        {!image && <NameSVG name={name} />}
+      </div>
     )}
     <div>
       {mergeTop ? null : <p className="messageName">{name}</p>}
       <div className="messageContent">{content}</div>
     </div>
-    <div>
-      <p className="messageTimestamp">{timestamp}</p>
+    <div
+      className={`timestampHolder ${
+        mergeTop ? "otherTimestamp" : "topTimestamp"
+      }`}
+    >
+      <p className={`messageTimestamp`}>{timestamp}</p>
     </div>
   </div>
 );

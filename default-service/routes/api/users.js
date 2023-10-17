@@ -135,6 +135,8 @@ async function list_func(req, res) {
     for (let user of data) {
       user.email = undefined;
       user.password = undefined;
+      user.reachable = !user.blockList || !user.blockList.includes(req.user);
+      user.blockList = undefined;
     }
     var result = {
       list: data,

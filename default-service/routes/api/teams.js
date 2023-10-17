@@ -298,6 +298,7 @@ async function listTeams(req, res) {
   };
   filters._id = { $ne: req.query.teamID };
   try {
+    const yourTeam = await Team.findOne({ users: req.user });
     if (filters.memberName) {
       const users = await User.find({
         name: { $regex: filters.memberName, $options: "i" },
@@ -314,6 +315,8 @@ async function listTeams(req, res) {
       let team = await standardizeTeamObj(teamItem);
       delete team.mergeRequests;
       //await addProfilesAndSanitize(team, true);
+      const reachable = await noBlocks(team, yourTeam);
+      team.reachable = reachable;
       foundTeams.push(team);
     }
     return res.json({
@@ -521,26 +524,38 @@ function prioritizeSkillMatches(yourTeam, teamList) {
 
   function roleScore(team) {
     let out = 0;
+
+    function replaceFullStack(roleList) {
+      if (!roleList) return roleList;
+      let out = [...roleList];
+      if (roleList.includes("fullstack")) {
+        roleList = roleList.filter((e) => e !== "fullstack");
+        !roleList.includes("frontend") && roleList.push("frontend");
+        !roleList.includes("backend") && roleList.push("backend");
+      }
+      return out;
+    }
+    const yourRoles = replaceFullStack(yourTeam.profile.roles);
+    const yourDesiredRoles = replaceFullStack(yourTeam.profile.desiredRoles);
+    const theirRoles = replaceFullStack(team.profile.roles);
+    const theirDesiredRoles = replaceFullStack(team.profile.desiredRoles);
+
     if (yourTeam.profile.desiredRoles && team.profile.roles) {
-      const intersection = team.profile.roles.filter((e) =>
-        yourTeam.profile.desiredRoles.includes(e)
+      const intersection = theirRoles.filter((e) =>
+        yourDesiredRoles.includes(e)
       );
       out += intersection.length * 2;
     }
     if (team.profile.desiredRoles && yourTeam.profile.roles) {
-      const intersection = yourTeam.profile.roles.filter((e) =>
-        team.profile.desiredRoles.includes(e)
+      const intersection = yourRoles.filter((e) =>
+        theirDesiredRoles.includes(e)
       );
       out += intersection.length;
     }
     if (yourTeam.users.length === 1 && team.users.length === 1) {
       const disjointRoles = [
-        ...yourTeam.profile.roles.filter(
-          (e) => !team.profile.roles.includes(e)
-        ),
-        ...team.profile.roles.filter(
-          (e) => !yourTeam.profile.roles.includes(e)
-        ),
+        ...yourRoles.filter((e) => !theirRoles.includes(e)),
+        ...theirRoles.filter((e) => !yourRoles.includes(e)),
       ];
       out += disjointRoles.length;
     }
