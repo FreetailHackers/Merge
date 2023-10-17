@@ -95,7 +95,7 @@ function UserProfile(props) {
   const handleNewProfilePicture = async (file) => {
     const fd = new FormData();
     //Setting up S3 upload parameters for folder upload
-    fd.append("file_name", props.userID + "/" + file.name);
+    fd.append("file_name", props.userID + "/" + file.name.replaceAll(" ", "_"));
     fd.append("file", file);
     const overSized = file.size > 10_000_000;
     setOversizedFile(overSized);

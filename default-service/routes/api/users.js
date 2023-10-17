@@ -254,7 +254,7 @@ async function s3Upload(file_name, files, res) {
 
 async function clear_old_pictures(req) {
   const id = req.user;
-  const profile_pic_link = req.body.update.profile.profilePictureUrl;
+  const profile_pic_link = req.body.update.profile?.profilePictureUrl;
   if (!profile_pic_link) {
     console.log("No profile pic link");
     return;
@@ -264,8 +264,24 @@ async function clear_old_pictures(req) {
     Bucket: BUCKET_NAME,
     Prefix: folder_name,
   };
-  await s3
-    .listObjectsV2(params, async function (err, data) {
+  try {
+    const data = await s3.listObjectsV2(params).promise();
+    let listOfObjects = data.Contents;
+    let newimg = profile_pic_link.replace(
+      "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
+      ""
+    );
+    for (let i = 1; i < data.KeyCount; i++) {
+      let nameOfFile = listOfObjects[i].Key;
+      if (nameOfFile !== newimg) {
+        const deleteParams = { Bucket: BUCKET_NAME, Key: nameOfFile };
+        await s3.deleteObject(deleteParams).promise();
+      }
+    }
+  } catch (err) {
+    console.log(err, err.stack);
+  }
+  /*const data = await s3.listObjectsV2(params, async function (err, data) {
       if (err) console.log(err, err.stack); // an error occurred
       else {
         let listOfObjects = data.Contents;
@@ -282,7 +298,7 @@ async function clear_old_pictures(req) {
         }
       }
     })
-    .promise();
+    .promise();*/
 }
 
 async function update(req, res) {
