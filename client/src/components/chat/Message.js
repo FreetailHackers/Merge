@@ -26,14 +26,18 @@ const Message = ({
           backgroundImage: `url("${image}")`,
         }}
       >
-        {!image && <NameSVG name={name}/>}
+        {!image && <NameSVG name={name} />}
       </div>
     )}
     <div>
       {mergeTop ? null : <p className="messageName">{name}</p>}
       <div className="messageContent">{content}</div>
     </div>
-    <div className={`timestampHolder ${mergeTop ? "otherTimestamp" : "topTimestamp"}`}>
+    <div
+      className={`timestampHolder ${
+        mergeTop ? "otherTimestamp" : "topTimestamp"
+      }`}
+    >
       <p className={`messageTimestamp`}>{timestamp}</p>
     </div>
   </div>

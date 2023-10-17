@@ -526,19 +526,19 @@ function prioritizeSkillMatches(yourTeam, teamList) {
     let out = 0;
 
     function replaceFullStack(roleList) {
-      if (!roleList) return roleList
-      let out = [...roleList]
+      if (!roleList) return roleList;
+      let out = [...roleList];
       if (roleList.includes("fullstack")) {
-        roleList = roleList.filter(e => e !== "fullstack")
-        !roleList.includes("frontend") && roleList.push("frontend")
-        !roleList.includes("backend") && roleList.push("backend")
+        roleList = roleList.filter((e) => e !== "fullstack");
+        !roleList.includes("frontend") && roleList.push("frontend");
+        !roleList.includes("backend") && roleList.push("backend");
       }
-      return out
+      return out;
     }
-    const yourRoles = replaceFullStack(yourTeam.profile.roles)
-    const yourDesiredRoles = replaceFullStack(yourTeam.profile.desiredRoles)
-    const theirRoles = replaceFullStack(team.profile.roles)
-    const theirDesiredRoles = replaceFullStack(team.profile.desiredRoles)
+    const yourRoles = replaceFullStack(yourTeam.profile.roles);
+    const yourDesiredRoles = replaceFullStack(yourTeam.profile.desiredRoles);
+    const theirRoles = replaceFullStack(team.profile.roles);
+    const theirDesiredRoles = replaceFullStack(team.profile.desiredRoles);
 
     if (yourTeam.profile.desiredRoles && team.profile.roles) {
       const intersection = theirRoles.filter((e) =>
@@ -548,18 +548,14 @@ function prioritizeSkillMatches(yourTeam, teamList) {
     }
     if (team.profile.desiredRoles && yourTeam.profile.roles) {
       const intersection = yourRoles.filter((e) =>
-       theirDesiredRoles.includes(e)
+        theirDesiredRoles.includes(e)
       );
       out += intersection.length;
     }
     if (yourTeam.users.length === 1 && team.users.length === 1) {
       const disjointRoles = [
-        ...yourRoles.filter(
-          (e) => !theirRoles.includes(e)
-        ),
-        ...theirRoles.filter(
-          (e) => !yourRoles.includes(e)
-        ),
+        ...yourRoles.filter((e) => !theirRoles.includes(e)),
+        ...theirRoles.filter((e) => !yourRoles.includes(e)),
       ];
       out += disjointRoles.length;
     }

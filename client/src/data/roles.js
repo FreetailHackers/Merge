@@ -5,7 +5,7 @@ export const rolesDict = {
   ml: "ML",
   mobile: "Mobile Dev",
   design: "Design",
-  data: "Data Science"
+  data: "Data Science",
 };
 
 export const roles = [
