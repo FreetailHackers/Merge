@@ -306,9 +306,11 @@ function TeamList(props) {
           return (
             <Collapsible
               key={index}
+              oddIndex={index % 2 !== 0}
               title={team.profile.name ?? `${teamObj.leader}'s team`}
             >
               {team._id !== props.team._id &&
+                team.reachable &&
                 ![
                   ...outgoingMRs.map((req) => req.requestedTeam._id),
                   ...ingoingMRs.map((req) => req.requestingTeam._id),
@@ -321,13 +323,16 @@ function TeamList(props) {
                     Request to Merge
                   </button>
                 )}
-              {team._id !== props.team._id && (
+              {team._id !== props.team._id && team.reachable && (
                 <button
                   className="chat-button"
                   onClick={() => messageTeam(team)}
                 >
                   Message
                 </button>
+              )}
+              {!team.reachable && (
+                <div className="unreachable-box">1+ blocks</div>
               )}
               <UserToParagraph
                 user={teamObj}

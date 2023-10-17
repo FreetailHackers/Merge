@@ -298,6 +298,7 @@ async function listTeams(req, res) {
   };
   filters._id = { $ne: req.query.teamID };
   try {
+    const yourTeam = await Team.findOne({ users: req.user });
     if (filters.memberName) {
       const users = await User.find({
         name: { $regex: filters.memberName, $options: "i" },
@@ -314,6 +315,8 @@ async function listTeams(req, res) {
       let team = await standardizeTeamObj(teamItem);
       delete team.mergeRequests;
       //await addProfilesAndSanitize(team, true);
+      const reachable = await noBlocks(team, yourTeam);
+      team.reachable = reachable;
       foundTeams.push(team);
     }
     return res.json({

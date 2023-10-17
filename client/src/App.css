@@ -3,7 +3,7 @@
 /* grouping repeated lines */
 
 nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background,
-.team-image .primary, .team-image .secondary, .headerDatabase, .selectedButton, section#login,
+.team-image .primary, .team-image .secondary, .evenCollapsible, .selectedButton, section#login,
 section#register {
   background-color: var(--primary);
 }
@@ -15,7 +15,7 @@ section#login form button, section#register form button {
 nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
 .selectedButton, section#login form button, section#register form button,
 .closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton,
-.welcome, .learn-more {
+.welcome, .learn-more, .unreachable-box {
   color: var(--text-on-primary);
 }
 
@@ -64,7 +64,7 @@ section#register form label, section#login form button, section#register form bu
 }
 
 hr, .toggleSidebar, .themeButton, .chat-button, #settings button.action, .manageTeamButton, section#login form button,
-section#register form button, .exitButton, .actionButton, .newMessageBox input, .teamInfoButton, .leaveTeamButton{
+section#register form button, .exitButton, .actionButton, .newMessageBox input, .teamInfoButton, .leaveTeamButton {
   border: none;
 }
 
@@ -241,7 +241,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     flex-direction: column;
   }
 
-  .chat-button {
+  .chat-button, .unreachable-box {
     font-size: 0.9em;
     padding: 8px;
   }
@@ -407,7 +407,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     line-height: 1.5rem;
   }
 
-  .chat-button {
+  .chat-button, .unreachable-box {
     font-size: 1.2em;
     padding: 10px;
   }
@@ -560,6 +560,7 @@ code {
 
 :root {
   --primary: #174D7E;
+  --primary-light: #476D9E;
   --primary-transparent: #e7648230;
   --primary-less-transparent: #e7648250;
   --secondary: #774158;
@@ -982,6 +983,10 @@ nav#navbar a.active {
   text-align: left;
 }
 
+.oddCollapsible {
+  background-color: var(--primary-light);
+}
+
 .contentDatabase {
   margin-left: 15px;
   margin-right: 15px;
@@ -1026,13 +1031,20 @@ nav#navbar a.active {
   margin-left: 12px;
 }
 
+.unreachable-box, .chat-button {
+  border-radius: 8px;
+  margin-left: 10px;
+  float: right;
+}
+
+.unreachable-box {
+  background-color: rgb(153, 0, 0);
+}
+
 .chat-button {
   background-color: var(--tertiary);
   color: var(--text-on-tertiary);
-  float: right;
   font-family: var(--font-body);
-  border-radius: 8px;
-  margin-left: 10px;
 }
 
 .filterList {
