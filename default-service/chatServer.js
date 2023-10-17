@@ -75,6 +75,7 @@ io.on("connection", (socket) => {
 
   // utility functions
   useWithErrorHandling(socket, "join-room", joinRoom);
+  useWithErrorHandling(socket, "join-rooms", joinRooms);
   useWithErrorHandling(socket, "join-team-room", joinTeamRoom);
   useWithErrorHandling(socket, "leave-room", leaveRoom);
 
@@ -101,6 +102,8 @@ io.on("connection", (socket) => {
   useWithErrorHandling(socket, "cancel-request", cancelRequest);
   useWithErrorHandling(socket, "update-profile", updateProfile);
   useWithErrorHandling(socket, "update-membership", updateMembership);
+  useWithErrorHandling(socket, "swipe-on-team", swipeOnTeam);
+  useWithErrorHandling(socket, "clear-left-swipes", clearLeftSwipes);
 });
 
 function newMessage(data, socket) {
@@ -112,6 +115,12 @@ function newMessage(data, socket) {
 
 function joinRoom(data, socket) {
   socket.join(data.id);
+}
+
+function joinRooms(data, socket) {
+  for (let i = 0; i < data.ids.length; i++) {
+    socket.join(data.ids[i]);
+  }
 }
 
 function joinTeamRoom(data, socket) {
@@ -248,6 +257,23 @@ async function updateMembership(data, socket) {
   }
   const {newLeader, kickedUsers} = data
   socket.to(data.teamID).emit("membership-updated", {newLeader, kickedUsers});*/
+}
+
+function swipeOnTeam(data, socket) {
+  socket
+    .to(data.yourTeam)
+    .emit("team-swiped-on", { otherTeam: data.otherTeam });
+  if (data.chatID) {
+    socket.to(data.otherTeam).to(data.yourTeam).emit("chat-update");
+    socket
+      .to(data.otherTeam)
+      .to(data.yourTeam)
+      .emit("new-swipe-chat", { chatID: data.chatID });
+  }
+}
+
+function clearLeftSwipes(data, socket) {
+  socket.to(data.teamID).emit("left-swipes-cleared");
 }
 
 AWS.config.update({
