@@ -1,13 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import expand from "../assets/images/expand.png";
+import minimize from "../assets/images/minimize.png";
+import { skillsDict } from "../data/skills";
+import { rolesDict } from "../data/roles";
 
 function Membership(props) {
   const { team, userID } = props;
   const socket = useOutletContext();
   const [toBeKicked, setToBeKicked] = useState([]);
   const [newLeader, setNewLeader] = useState(null);
+  const [expandedUser, setExpandedUser] = useState(null);
+  const [teamUserData, setTeamUserData] = useState({});
+
+  useEffect(() => {
+    const getTeamUserData = async () => {
+      let teamUserData = {};
+      for (let i = 0; i < team.users.length; i++) {
+        axios
+          .get(process.env.REACT_APP_API_URL + `/api/users/${team.users[i]}`)
+          .then((res) => {
+            teamUserData[res.data["_id"]] = res.data["profile"];
+          });
+      }
+      setTeamUserData(teamUserData);
+    };
+
+    getTeamUserData();
+  }, [team.users]);
 
   async function leaveTeam() {
     const res = await axios.post(
@@ -45,46 +67,79 @@ function Membership(props) {
         {team &&
           Object.keys(team.profiles).map((e, i) => (
             <div className="flexRow teamRow" key={i}>
-              <p>
-                {team.profiles[e].name} {e === team.leader ? "(Leader)" : ""}{" "}
-                {e === userID ? "(You)" : ""}
-              </p>
-              {team.leader === userID && e !== userID && newLeader !== e && (
-                <button
-                  className={`manageTeamButton ${
-                    toBeKicked.includes(e) ? "selectedManageButton" : ""
-                  }`}
-                  onClick={() =>
-                    setToBeKicked((prev) => {
-                      if (prev.includes(e)) {
-                        return [...prev.filter((id) => id !== e)];
-                      }
-                      return [...prev, e];
-                    })
-                  }
-                >
-                  Kick
-                </button>
-              )}
-              {team.leader === userID &&
-                e !== userID &&
-                !toBeKicked.includes(e) && (
+              <div className="teamRow-name">
+                <p>
+                  {team.profiles[e].name} {e === team.leader ? "(Leader)" : ""}{" "}
+                  {e === userID ? "(You)" : ""}
+                </p>
+                {team.leader === userID && e !== userID && newLeader !== e && (
                   <button
                     className={`manageTeamButton ${
-                      newLeader === e ? "selectedManageButton" : ""
+                      toBeKicked.includes(e) ? "selectedManageButton" : ""
                     }`}
                     onClick={() =>
-                      setNewLeader((prev) => (prev === e ? null : e))
+                      setToBeKicked((prev) => {
+                        if (prev.includes(e)) {
+                          return [...prev.filter((id) => id !== e)];
+                        }
+                        return [...prev, e];
+                      })
                     }
                   >
-                    Make Leader
+                    Kick
                   </button>
                 )}
+                {team.leader === userID &&
+                  e !== userID &&
+                  !toBeKicked.includes(e) && (
+                    <button
+                      className={`manageTeamButton ${
+                        newLeader === e ? "selectedManageButton" : ""
+                      }`}
+                      onClick={() =>
+                        setNewLeader((prev) => (prev === e ? null : e))
+                      }
+                    >
+                      Make Leader
+                    </button>
+                  )}
+                <button
+                  onClick={() => {
+                    setExpandedUser((prev) => (prev === e ? null : e));
+                  }}
+                  className="teamRowBtn"
+                >
+                  <img
+                    alt="open/close"
+                    src={expandedUser === e ? expand : minimize}
+                  />
+                </button>
+              </div>
+              {expandedUser === e && (
+                <div className="teamUserInfo">
+                  <ul>
+                    <li key={"skills"}>
+                      <strong>Skills:</strong>{" "}
+                      {teamUserData[e]["skills"]
+                        .map((e) => skillsDict[e] ?? e)
+                        .join(", ")}
+                    </li>
+                    <li key={"roles"}>
+                      <strong>Roles:</strong>{" "}
+                      {teamUserData[e]["roles"]
+                        .map((e) => rolesDict[e] ?? e)
+                        .join(", ")}
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
 
         {(newLeader || toBeKicked.length > 0) && (
-          <button onClick={manageMembership}>Modify Team</button>
+          <button className="manageTeamButton" onClick={manageMembership}>
+            Modify Team
+          </button>
         )}
       </div>
       {team.users.length > 1 && userID !== team.leader && (

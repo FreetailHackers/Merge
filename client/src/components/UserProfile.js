@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import SwipeProfile from "./SwipeProfile";
+import SwipeProfile from "../components/SwipeProfile";
 import { Link } from "react-router-dom";
-import SkillSelector from "./SkillSelector";
+import SkillSelector from "../components/SkillSelector";
 import { roles } from "../data/roles";
 
-// FileInput,
 import {
   NumberInput,
   TextInput,
@@ -14,6 +13,7 @@ import {
   Radio,
   Textarea,
   NativeSelect,
+  FileInput,
 } from "@mantine/core";
 
 const requiredFields = [
@@ -29,12 +29,18 @@ function UserProfile(props) {
   const [saved, setSaved] = useState(false);
   const [portfolioRegex, setPortfolioRegex] = useState(true);
   const [linkedinRegex, setLinkedinRegex] = useState(true);
+  const [oversizedFile, setOversizedFile] = useState(false);
+
   const baseProfile = (user) => ({
     ...user.profile,
     name: user.name,
+    //competitiveness: user.competitiveness,
     githubFinished: !!user.profile.github,
   });
   const [userProfile, setUserProfile] = useState(baseProfile(props.user));
+  const [underFiveSkills, setUnderFiveSkills] = useState(
+    userProfile.skills.length <= 4
+  );
 
   const handleSubmit = async (event) => {
     event.persist();
@@ -54,6 +60,7 @@ function UserProfile(props) {
         return;
       }
     }
+
     const data = {
       update: {
         name: userProfile.name,
@@ -66,7 +73,7 @@ function UserProfile(props) {
       }
     }
 
-    // data.update.profile.profilePictureUrl = profilePictureUrl;
+    //data.update.profile.profilePictureUrl = profilePictureUrl;
     try {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/users/update",
@@ -85,40 +92,34 @@ function UserProfile(props) {
     }
   };
 
-  // handleNewProfilePicture = async (file) => {
-  //   const fd = new FormData();
-  //
-  //   // Setting up S3 upload parameters for folder upload
-  //   fd.append("file_name", props.userID.id + "/" + file.name);
-  //   fd.append("file", file);
-  //
-  //   if (file.size > 10_000_000) {
-  //     setState({ oversizedFile: true });
-  //     return;
-  //   } else {
-  //     setState({ oversizedFile: false });
-  //   }
-  //
-  //   await axios
-  //     .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     })
-  //     .then(async (res) => {
-  //       setState({
-  //         profilePictureUrl: res.data.url,
-  //         oversizedFile: false,
-  //       });
-  //       props.setUser(props.userID, {
-  //         ...props.user,
-  //         profilePictureUrl: res.data.url,
-  //       });
-  //     })
-  //     .catch(() => {
-  //       setState({ oversizedFile: true });
-  //     });
-  // };
+  const handleNewProfilePicture = async (file) => {
+    const fd = new FormData();
+    //Setting up S3 upload parameters for folder upload
+    fd.append("file_name", props.userID + "/" + file.name.replaceAll(" ", "_"));
+    fd.append("file", file);
+    const overSized = file.size > 10_000_000;
+    setOversizedFile(overSized);
+    if (overSized) return;
+    await axios
+      .post(process.env.REACT_APP_API_URL + "/api/users/profile-picture", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(async (res) => {
+        setProfile("profilePictureUrl", res.data.url);
+        /*props.setUser(prev => ({
+          ...prev,
+          profile: {
+            ...prev.profile,
+            profilePictureUrl: res.data.url,
+          }
+        }));*/
+      })
+      .catch(() => {
+        setOversizedFile(true);
+      });
+  };
 
   const cancelEdit = async (e) => {
     e.preventDefault();
@@ -130,6 +131,9 @@ function UserProfile(props) {
       ...prev,
       [key]: value,
     }));
+    if (key === "skills") {
+      setUnderFiveSkills(value.length <= 5);
+    }
     setSaved(false);
   };
 
@@ -183,18 +187,14 @@ function UserProfile(props) {
               required
             />
             {
-              //   <FileInput
-              //   label="Profile Picture"
-              //   placeholder="Upload JPG/PNG/GIF, up to 10 MB"
-              //   accept="image/jpg, image/png, image/gif"
-              //   error={
-              //     oversizedFile
-              //       ? "File must be 10 MB or smaller"
-              //       : ""
-              //   }
-              //   onChange={handleNewProfilePicture}
-              //   className="question"
-              // />
+              <FileInput
+                label="Profile Picture"
+                placeholder="Upload JPG/PNG/GIF, up to 10 MB"
+                accept="image/jpg, image/png, image/gif"
+                error={oversizedFile ? "File must be 10 MB or smaller" : ""}
+                onChange={handleNewProfilePicture}
+                className="question"
+              />
             }
             <TextInput
               label="Portfolio"
@@ -249,8 +249,13 @@ function UserProfile(props) {
               className="question"
             />
             <SkillSelector
-              setSkills={(value) => setProfile("skills", value)}
               skills={userProfile.skills}
+              setSkills={(value) =>
+                setProfile(
+                  "skills",
+                  value.length > 5 ? value.slice(0, 5 - value.length) : value
+                )
+              }
             />
             <MultiSelect
               data={roles}
@@ -310,10 +315,17 @@ function UserProfile(props) {
                 Save Successful
               </p>
             )}
+            {!underFiveSkills && (
+              <p style={{ fontSize: "15.4px", color: "red" }}>
+                {" "}
+                Limit your number of skills to five.
+              </p>
+            )}
           </form>
           <button
             onClick={handleSubmit}
             disabled={
+              !underFiveSkills ||
               !requiredFields.every(
                 (e) => userProfile[e] && userProfile[e].length > 0
               )
@@ -330,6 +342,12 @@ function UserProfile(props) {
       </div>
       <div className="profile-child">
         <SwipeProfile
+          userProfiles={{
+            [props.userID]: {
+              name: userProfile.name,
+              profilePictureUrl: userProfile.profilePictureUrl,
+            },
+          }}
           profile={userProfile}
           name={userProfile.name}
           isAlone={true}
@@ -344,6 +362,7 @@ UserProfile.propTypes = {
   userID: PropTypes.string.isRequired,
   setUser: PropTypes.func.isRequired,
   wideScreen: PropTypes.bool,
+  flipDisplaySidebar: PropTypes.func,
 };
 
 export default UserProfile;

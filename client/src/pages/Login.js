@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login(props) {
   const [email, setEmail] = useState("");
@@ -25,16 +25,11 @@ function Login(props) {
     props.loginUser(userData, setErrors);
   };
 
-  const onRegister = (e) => {
-    navigate("/register");
-  };
-
   return (
     <section id="login">
       <div className="container">
         <form id="fields">
           <div className="logo" />
-          <hr />
           <label htmlFor="email">Email</label>
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -63,46 +58,17 @@ function Login(props) {
           </span>
 
           <button onClick={onSubmit} className="action" type="submit">
-            Login
+            Log in
           </button>
           <span className="error">{errors.status}</span>
-          <button onClick={onRegister} className="action" type="submit">
-            Register
-          </button>
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link to="/register" className="reg-login-nav">
+              {" "}
+              Sign up
+            </Link>
+          </p>
         </form>
-        <div className="about">
-          <h4>
-            Merge is a team-matching and real-time chat app made with ❤️ by
-            Freetail Hackers.
-          </h4>
-          <p>
-            <a
-              rel="noreferrer"
-              target="_blank"
-              href="https://freetailhackers.com/"
-            >
-              <strong>Freetail Hackers</strong>
-            </a>{" "}
-            is an organization centered at the University of Texas at Austin
-            that specializes in hosting hackathons.
-          </p>
-          <p>
-            We host two hackathons every year - our spring hackathon (
-            <a
-              rel="noreferrer"
-              target="_blank"
-              href="https://freetailhackers.com/hack-the-future/"
-            >
-              Hack the Future 2023
-            </a>
-            !) , and our flagship event,{" "}
-            <a rel="noreferrer" target="_blank" href="https://hacktx.com/">
-              <strong>HackTX</strong>
-            </a>{" "}
-            , in the fall.
-          </p>
-          <p>We hope to see you at one of our events!</p>
-        </div>
       </div>
     </section>
   );

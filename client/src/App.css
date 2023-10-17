@@ -4,13 +4,18 @@
 
 nav#navbar, .toggle, #navbar-spacing, .chat .themeButton, .team-image .background,
 .team-image .primary, .team-image .secondary, .headerDatabase, .selectedButton, section#login,
-section#register, section#login form button, section#register form button {
+section#register {
+  background-color: var(--primary);
+}
+
+section#login form button, section#register form button {
   background-color: var(--primary);
 }
 
 nav#navbar a, .chat .themeButton, .themeButton:hover, .headerDatabase,
 .selectedButton, section#login form button, section#register form button,
-.closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton {
+.closetos, .message.rightSide .messageContent, .teamInfoButton, .leaveTeamButton,
+.welcome, .learn-more {
   color: var(--text-on-primary);
 }
 
@@ -64,7 +69,7 @@ section#register form button, .exitButton, .actionButton, .newMessageBox input, 
 }
 
 .toggleSidebar, .swipe-profile, .themeButton, .headerDatabase,
-.pagination a, .chat-button, #settings button.action,
+.pagination p, .chat-button, #settings button.action,
 section#login form button, section#register form button, .closetos,
 .chatPreview, .exitButton, .actionButton, .newMessageBox p {
   cursor: pointer;
@@ -130,7 +135,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   box-shadow: 0 3px 10px #0002;
 }
 
-.pagination a, .pagination span, .filterInput, #settings label,
+.pagination p, .pagination span, .filterInput, #settings label,
 #settings button.action, section#login form, section#register form,
 .about, .terms strong, section#login form label, section#register form label,
 .chatPreview p span.messagePreview, .chatPreview h4, .chatPreview .smallDivider,
@@ -224,17 +229,16 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .swipe-profile h3 {
-    font-size: 2em;
+    font-size: 25px;
   }
 
   .terms {
     width: 70vw;
   }
+
+
   .container {
     flex-direction: column;
-  }
-  section#login form, .about {
-    margin-top: calc(2 * var(--vh, 1vh));
   }
 
   .chat-button {
@@ -258,6 +262,47 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
     padding-top: 10px;
     max-height: calc(75 * var(--vh, 1vh) - 10px);
   }
+
+  section#login,
+  section#register {
+    background-image: none;
+    background-color: var(--primary);
+  }
+
+  section#login form,
+  section#register form {
+    width: min(400px, 75vw);
+  }
+
+  .welcome > h3, .learn-more > h3 {
+    font-size: 25px;
+  }
+
+  .welcome > h3, .learn-more > h3,
+  .welcome > p, .learn-more > p {
+    font-weight: bold;
+    padding: 4vh 0;
+  }
+
+  .welcome > p, .learn-more > p {
+    width: calc(max(160px, 60vw));
+    font-size: 15px;
+  }
+
+  .profile-photo {
+    height: 13vh;
+    width: 13vh;
+  }
+
+  .manageTeamButton {
+    padding: 1% 3%;
+  }
+
+  .teamRow {
+    width: 95%;
+  }
+
+
 }
 
 @media all and (orientation:landscape) {
@@ -332,27 +377,29 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   }
 
   .swipe-profile h3 {
-    font-size: 3.5em;
+    font-size: 2em;
   }
 
   .terms {
     width: 35vw;
   }
+
   .container {
     flex-direction: row;
   }
 
-  section#login form {
-    margin-left: auto;
-    margin-right: 5vw;
-    margin-bottom: 0;
-    margin-top: 200px;
+  .container-register {
+    width: 50%;
   }
-  .about {
-    margin-right: auto;
-    margin-left: 5vw;
-    margin-top: 0;
-    margin-bottom: 200px;
+
+  section#login form,
+  section#regsiter form {
+    width: min(400px, 85vw);
+  }
+
+  section#login,
+  section#register {
+    background-image: var(--login-background);
   }
 
   .about-page {
@@ -379,6 +426,37 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
 
   #swipe-profile-holder {
     height: calc(80 * var(--vh, 1vh));
+  }
+
+  .welcome > h3, .learn-more > h3 {
+    font-size: 45px;
+  }
+
+  .welcome > h3, .learn-more > h3,
+  .welcome > p, .learn-more > p {
+    font-weight: bold;
+    padding: 4vh 0;
+  }
+
+  .welcome > p, .learn-more > p {
+    width: calc(max(160px, 40vw));
+    font-size: 25px;
+  }
+
+  .profile-photo {
+    height: 12.5vh;
+    width: 12.5vh;
+  }
+  #ts-container {
+    margin-bottom: 5%;
+  }
+
+  .teamRow {
+    width: 60%;
+  }
+
+  .manageTeamButton {
+    padding: 5px 10px;
   }
 
 }
@@ -484,7 +562,7 @@ code {
   --primary: #174D7E;
   --primary-transparent: #e7648230;
   --primary-less-transparent: #e7648250;
-  --secondary: #473899;
+  --secondary: #774158;
   --secondary-transparent: #47389930;
   --secondary-less-transparent: #47389950;
   --tertiary: #4c82cc;
@@ -504,7 +582,7 @@ code {
   --text-on-accept: var(--text-on-tertiary);
   --text-on-reject: var(--text-on-primary);
 
-  --login-background: url("./assets/images/background.png");
+  --login-background: url("./assets/images/login-background-blue.svg");
 
   --logo-color: url("./assets/images/logo/color.png");
   --logo-white: url("./assets/images/logo/white.png");
@@ -631,7 +709,7 @@ nav#navbar a.active {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 5%;
+  /*margin-bottom: 5%;*/
   /* border: 1px solid blue; */
 }
 
@@ -673,13 +751,12 @@ nav#navbar a.active {
 }
 
 .swipe-profile h3 {
-  font-weight: normal;
   word-wrap: break-word;
 }
 
 .swipe-profile h4 {
-  margin: 10px 0;
-  font-size: 2em;
+  margin: 1px 0;
+  font-size: 1em;
   font-weight: normal;
   word-wrap: break-word;
 }
@@ -721,14 +798,53 @@ nav#navbar a.active {
   background: rgb(50, 205, 50);
 }
 
-.swipe-profile p {
+.swipe-profile > p {
   white-space: pre-line;
+  margin: .5em 0;
 }
 
-.swipe-profile img {
-  position: relative;
-  width: 80%;
-  left: 30px;
+.swipe-profile .attributes-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  /*max-width: 50%;*/
+}
+
+.swipe-profile .attr-item, .swipe-profile .roles-item,
+.swipe-profile .compete-status {
+  color: #fff;
+  margin: 2px;
+  padding: 4px 3px;
+  flex-grow: 1;
+  width: 80px;
+  border-radius: 5px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.swipe-profile .attr-item {
+  background-color: var(--secondary);
+}
+
+.swipe-profile .roles-item {
+  background-color: var(--tertiary);
+}
+
+
+
+.profile-photo {
+  margin-left: 0;
+  margin-right: 20px;
+}
+
+.swipe-profile .profile-header {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+.swipe-profile .compete-status {
+  flex-grow: 0;
 }
 
 .arrows {
@@ -885,13 +1001,14 @@ nav#navbar a.active {
   margin-right: 5px;
 }
 
-.pagination a,
+.pagination p,
 .pagination span {
   margin: 0 5px;
   min-width: 20px;
+  display: inline;
 }
 
-.pagination a {
+.pagination p {
   color: var(--primary);
   text-decoration: underline;
 }
@@ -1023,6 +1140,12 @@ nav#navbar a.active {
   margin-block-end: 0.25em;
 }
 
+.member-list {
+  margin-bottom: 3%;
+  width: 95%;
+  margin-top: 3%;
+}
+
 .mrButtons {
   justify-content: space-evenly;
   margin: 3px;
@@ -1058,12 +1181,6 @@ nav#navbar a.active {
   margin-right: 5px;
 }
 
-.manageTeamButton {
-  padding: 5px;
-  border-radius: 20px;
-  margin-left: 12px;
-}
-
 .selectedManageButton {
   background-color: var(--primary-transparent);
 }
@@ -1076,7 +1193,6 @@ section#register {
   width: 100vw;
   height: calc(100 * var(--vh, 1vh));
   overflow: scroll;
-  background-image: var(--login-background);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -1084,13 +1200,10 @@ section#register {
 }
 
 section#login form,
-section#register form,
-.about {
-  width: min(400px, 85vw);
+section#register form {
   border-radius: 10px;
   background-color: #fff;
-  box-shadow: 15px 8px 8px rgba(0, 0, 0, 0.55);
-
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.55);
 }
 
 .terms {
@@ -1124,24 +1237,14 @@ section#register form,
 }
 
 .container {
-  width: 95%;
+  width: 93%;
+}
+
+.container, .container-register {
   margin: auto;
   display: flex;
-  height: 100%;
   align-items: center;
-}
-
-.about {
-  font-size: 22px;
-  padding: 10px 30px 30px 30px;
-}
-
-p#ToS {
-  font-size: 16px;
-  color: red;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  justify-content: center;
 }
 
 section#login form {
@@ -1151,14 +1254,6 @@ section#login form {
 section#register form {
   padding: 50px 30px 20px 30px;
   margin: calc(2 * var(--vh, 1vh)) auto;
-}
-
-.closetos {
-  position: relative;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, 0);
-  width: 40%;
 }
 
 section#login form label,
@@ -1184,6 +1279,14 @@ section#register form button {
   margin: 15px 0 0 0;
 }
 
+.closetos {
+  position: relative;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 40%;
+}
+
 section#login form button,
 section#register form button,
 .closetos {
@@ -1202,6 +1305,18 @@ section#register form button:hover,
 section#login form span.error
 section#register form span.error {
   color: rgb(228, 83, 83);
+}
+
+section#login form p,
+section#register form p {
+  text-align: center;
+}
+
+section#login form .reg-login-nav,
+section#register form .reg-login-nav {
+  text-decoration: none;
+  color: var(--secondary);
+  font-weight: bold;
 }
 
 /* ChatSidebar.css */
@@ -1286,12 +1401,25 @@ section#register form span.error {
 .chatPicture {
   margin-right: 10px;
   margin-left: 5px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
   width: 45px;
   height: 45px;
 }
+
+.outerCircle {
+  position: relative;
+}
+
+.chatPicture, .innerCircle, .profile-photo {
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.innerCircle {
+  position: absolute;
+  aspect-ratio: 1;
+}
+
 
 
 .unreadBubble {
@@ -1611,7 +1739,57 @@ input[type=range]::-webkid-slider-runnable-track {
   background-color: rgb(153, 0, 0);
 }
 .teamRow {
-  padding-top: 5px;
+  flex-direction: column;
+  background-color: #a3c0e955;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+
+.teamRow .manageTeamButton {
+  margin-left: 12px;
+}
+
+.manageTeamButton {
+  border-radius: 12px;
+}
+
+.teamRow button {
+  cursor: pointer;
+}
+
+.teamUserInfo {
+  width: 100%;
+  margin-left: 10%;
+}
+
+.teamRow ul {
+  padding: 0;
+  margin: 5px;
+}
+
+.teamRow-name {
+  width: 100%;
+  display: flex;
+  /*justify-content: space-between;*/
+  align-items: center;
+}
+
+.teamRow-name p {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+
+.teamRowBtn {
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+}
+
+.teamRowBtn img {
+  height: 30px;
+  width: auto;
 }
 
 .newInfoButton {
@@ -1635,4 +1813,59 @@ input[type=range]::-webkid-slider-runnable-track {
 .nav-line {
   background-color: white;
   height: 1px;
+}
+
+/* Onboarding.js */
+
+.onboarding-pages {
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  background-color: var(--primary);
+}
+
+.onboarding-pages > section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  min-width: 100vw;
+  scroll-snap-align: start;
+  scroll-behavior: smooth;
+  scroll-snap-stop: always;
+  background-color: var(--primary);
+}
+
+.welcome, .learn-more {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.dot-nav {
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  bottom: 7%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.dot {
+  width: 15px;
+  height: 15px;
+  background-color: #A6D0FE;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+.on-dot {
+  width: 15px;
+  height: 15px;
+  background-color: #fff;
+  border-radius: 50%;
+  margin: 0 5px;
 }

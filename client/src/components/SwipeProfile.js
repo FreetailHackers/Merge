@@ -5,6 +5,7 @@ import LinkedInCard from "./LinkedInCard";
 import PortfolioCard from "./PortfolioCard";
 import { skillsDict } from "../data/skills";
 import { rolesDict } from "../data/roles";
+import PictureCircle from "./PictureCircle";
 
 const SwipeProfile = (props) => {
   const relativePosition = props.relativePosition || 0;
@@ -15,8 +16,8 @@ const SwipeProfile = (props) => {
       className={`swipe-profile ${isBeingDragged ? "dragged" : ""} ${
         props.borderColor
       }-side`}
-      onMouseDown={(e) => props.onMouseDown(e, false)}
-      onTouchStart={(e) => props.onMouseDown(e, true)}
+      onMouseDown={(e) => props.onMouseDown && props.onMouseDown(e, false)}
+      onTouchStart={(e) => props.onMouseDown && props.onMouseDown(e, true)}
       onMouseUp={props.onMouseUp}
       onTouchEnd={props.onMouseUp}
       onMouseMove={(e) => props.onMouseMove && props.onMouseMove(e, false)}
@@ -29,15 +30,40 @@ const SwipeProfile = (props) => {
         transform: `rotate(${angle}deg)`,
       }}
     >
-      <h3 draggable={false}>{props.name}</h3>
-      {/*<img src={props.profile.profilePictureUrl} alt="" />*/}
-      {props.profile.school && (
-        <h4 draggable={false}>{props.profile.school}</h4>
-      )}
-      <p draggable={false} style={{ marginBottom: "1em" }}>
-        {props.profile.bio}
+      <div className="profile-header">
+        {
+          <PictureCircle
+            outerClass="profile-photo"
+            profiles={Object.values(props.userProfiles)}
+          />
+        }
+        <div>
+          <h3 draggable={false}>{props.name}</h3>
+          {props.profile.competitiveness === "win" ? (
+            <p
+              draggable={false}
+              className="compete-status"
+              style={{ textAlign: "center", backgroundColor: "#48bc39" }}
+            >
+              <b>Competititve</b>
+            </p>
+          ) : (
+            <p
+              draggable={false}
+              className="compete-status"
+              style={{ textAlign: "center", backgroundColor: "#54429e" }}
+            >
+              <b>Here For Fun</b>
+            </p>
+          )}
+          {props.profile.school && (
+            <h4 draggable={false}>🎓 {props.profile.school}</h4>
+          )}
+        </div>
+      </div>
+      <p draggable={false}>
+        <b>About:</b> {props.profile.bio}
       </p>
-
       {!props.isAlone && (
         <p>
           <b>Members:</b>{" "}
@@ -58,43 +84,50 @@ const SwipeProfile = (props) => {
           ).replaceAll(",", ", ")}
         </p>
       )}
-
-      <p>
-        <b>Skills:</b>&nbsp;
-        {String(props.profile.skills.map((e) => skillsDict[e] ?? e)).replaceAll(
-          ",",
-          ", "
-        )}
+      <b>Skills:</b>&nbsp;
+      <p className="attributes-container">
+        {props.profile.skills.map((e, index) => (
+          <p className="attr-item" key={index}>
+            {skillsDict[e] ?? e}
+          </p>
+        ))}
       </p>
-
       {!props.isAlone && (
         <p>
           <b>Desired Skills:</b>&nbsp;
-          {String(
-            props.profile.desiredSkills.map((e) => skillsDict[e] ?? e)
-          ).replaceAll(",", ", ")}
+          <p className="attributes-container">
+            {props.profile.skills.map((e, index) => (
+              <p className="attr-item" key={index}>
+                {skillsDict[e] ?? e}
+              </p>
+            ))}
+          </p>
         </p>
       )}
-
       {props.isAlone && props.profile.roles?.length > 0 && (
         <p>
           <b>Roles:</b>&nbsp;
-          {String(props.profile.roles.map((e) => rolesDict[e] ?? e)).replaceAll(
-            ",",
-            ", "
-          )}
+          <p className="attributes-container">
+            {props.profile.roles.map((e, index) => (
+              <p className="roles-item" key={index}>
+                {rolesDict[e] ?? e}
+              </p>
+            ))}
+          </p>
         </p>
       )}
-
       {!props.isAlone && props.profile.desiredRoles?.length > 0 && (
         <p>
           <b>Looking for:</b>&nbsp;
-          {String(
-            props.profile.desiredRoles.map((e) => rolesDict[e] ?? e)
-          ).replaceAll(",", ", ")}
+          <p className="attributes-container">
+            {props.profile.desiredRoles.map((e, index) => (
+              <p className="roles-item" key={index}>
+                {rolesDict[e] ?? e}
+              </p>
+            ))}
+          </p>
         </p>
       )}
-
       {props.isAlone && props.profile.github && props.profile.githubFinished ? (
         <GithubCard
           username={props.profile.github}

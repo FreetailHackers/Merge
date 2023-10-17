@@ -16,6 +16,7 @@ import Edit from "./pages/Edit";
 import Chat from "./pages/Chat";
 import About from "./pages/About";
 import BrowseTeams from "./pages/BrowseTeams";
+import Onboarding from "./pages/Onboarding";
 
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -105,6 +106,20 @@ export default function App() {
     });
   };
 
+  const flipBlockedStatus = (otherUser) =>
+    setUser((prev) => {
+      if (prev.blockList.includes(otherUser)) {
+        return {
+          ...prev,
+          blockList: [...prev.blockList.filter((e) => e !== otherUser)],
+        };
+      }
+      return {
+        ...prev,
+        blockList: [...prev.blockList, otherUser],
+      };
+    });
+
   const login = (
     <Login
       auth={auth}
@@ -118,7 +133,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={login} />
-        <Route path="/login" element={login} />
+        <Route
+          path="/login"
+          element={wideScreen ? login : <Onboarding login={login} />}
+        />
         <Route
           path="/register"
           element={
@@ -192,6 +210,8 @@ export default function App() {
                     wideScreen={wideScreen}
                     team={team}
                     setTeam={setTeam}
+                    blockList={user?.blockList}
+                    flipBlockedStatus={flipBlockedStatus}
                   />
                 ) : (
                   <div>Loading...</div>

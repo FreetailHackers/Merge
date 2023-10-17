@@ -13,7 +13,7 @@ import { TextInput, NativeSelect, NumberInput } from "@mantine/core";
 function TeamList(props) {
   const [ingoingMRs, setIngoingMRs] = useState([]);
   const [outgoingMRs, setOutgoingMRs] = useState([]);
-  const { userID } = props;
+  const { userID, pageSize } = props;
   const MAX_TEAM_SIZE = process.env.REACT_APP_MAX_TEAM_SIZE;
   const [otherTeams, setOtherTeams] = useState([]);
   const socket = useOutletContext();
@@ -151,6 +151,8 @@ function TeamList(props) {
       try {
         const queryParamters = {
           page,
+          pageSize,
+          teamID,
           filters: {
             ...(nameFilter && { name: nameFilter }),
             ...(memberFilter && { memberName: memberFilter }),
@@ -180,9 +182,11 @@ function TeamList(props) {
     nameFilter,
     skillFilter,
     page,
+    pageSize,
     memberFilter,
     sizeFilter,
     desiredSkillFilter,
+    teamID,
   ]);
 
   async function messageTeam(team) {
@@ -354,6 +358,7 @@ TeamList.propTypes = {
   setTeam: PropTypes.func,
   userID: PropTypes.string,
   setTeamID: PropTypes.func,
+  pageSize: PropTypes.number,
 };
 
 export default TeamList;
