@@ -131,7 +131,7 @@ function UserList(props) {
 
       {users.map((user, index) => (
         <Collapsible key={index} title={user.name}>
-          {user._id !== props.userID && (
+          {user._id !== props.userID && !props.blockList.includes(user._id) && (
             <button
               className="chat-button"
               onClick={() => messageUser(user._id)}

@@ -269,7 +269,12 @@ function UserProfile(props) {
             />
             <SkillSelector
               skills={userProfile.skills}
-              setSkills={(value) => setProfile("skills", value)}
+              setSkills={(value) =>
+                setProfile(
+                  "skills",
+                  value.length > 5 ? value.slice(0, 5 - value.length) : value
+                )
+              }
             />
             <MultiSelect
               data={roles}

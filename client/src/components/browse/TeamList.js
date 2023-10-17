@@ -152,6 +152,7 @@ function TeamList(props) {
         const queryParamters = {
           page,
           pageSize,
+          teamID,
           filters: {
             ...(nameFilter && { name: nameFilter }),
             ...(memberFilter && { memberName: memberFilter }),
@@ -185,6 +186,7 @@ function TeamList(props) {
     memberFilter,
     sizeFilter,
     desiredSkillFilter,
+    teamID,
   ]);
 
   async function messageTeam(team) {

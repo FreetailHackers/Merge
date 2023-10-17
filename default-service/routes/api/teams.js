@@ -296,6 +296,7 @@ async function listTeams(req, res) {
     skip: parseInt(req.query.page ?? 0) * pageSize,
     limit: pageSize,
   };
+  filters._id = { $ne: req.query.teamID };
   try {
     if (filters.memberName) {
       const users = await User.find({
