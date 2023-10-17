@@ -210,7 +210,7 @@ async function register_func(req, res) {
       email: req.body.email,
       password: req.body.password,
       //profile: {
-        //profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
+      //profilePictureUrl: "https://ui-avatars.com/api/?name=" + req.body.name,
       //},
     });
     // Hash password before saving in database

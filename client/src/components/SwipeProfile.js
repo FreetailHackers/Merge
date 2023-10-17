@@ -31,9 +31,12 @@ const SwipeProfile = (props) => {
       }}
     >
       <div className="profile-header">
-        {(
-          <PictureCircle outerClass="profile-photo" profiles={Object.values(props.userProfiles)}/>
-        )}
+        {
+          <PictureCircle
+            outerClass="profile-photo"
+            profiles={Object.values(props.userProfiles)}
+          />
+        }
         <div>
           <h3 draggable={false}>{props.name}</h3>
           {props.profile.competitiveness === "win" ? (

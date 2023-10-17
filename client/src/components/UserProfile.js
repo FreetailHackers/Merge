@@ -342,7 +342,12 @@ function UserProfile(props) {
       </div>
       <div className="profile-child">
         <SwipeProfile
-          userProfiles={{[props.userID]: {name: userProfile.name, profilePictureUrl: userProfile.profilePictureUrl}}}
+          userProfiles={{
+            [props.userID]: {
+              name: userProfile.name,
+              profilePictureUrl: userProfile.profilePictureUrl,
+            },
+          }}
           profile={userProfile}
           name={userProfile.name}
           isAlone={true}

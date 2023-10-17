@@ -25,7 +25,7 @@ const ChatPreview = ({
   >
     {!seen ? <span className="unreadBubble" /> : null}
 
-    <PictureCircle outerClass="chatPicture" profiles={profiles}/>
+    <PictureCircle outerClass="chatPicture" profiles={profiles} />
     <div className="text">
       <h4>{title}</h4>
       {chatRequest ? (
