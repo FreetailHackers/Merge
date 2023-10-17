@@ -1,61 +1,48 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-class GithubCard extends Component {
-  constructor() {
-    super();
-    this.state = {
-      isLoadingProfile: true,
-      profileData: {},
-      oldUser: null,
-    };
-  }
+function GithubCard(props) {
+  const [profileData, setProfileData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const { username, change } = props;
 
-  componentDidMount() {
-    axios
-      .get(process.env.REACT_APP_API_URL + "/api/users/github/user", {
-        params: {
-          username: this.props.username,
-        },
-      })
-      .then((response) => {
-        this.setState({
-          profileData: response.data,
-          isLoadingProfile: false,
-          oldUser: this.props.username,
+  useEffect(() => {
+    if (change) {
+      axios
+        .get(process.env.REACT_APP_API_URL + "/api/users/github/user", {
+          params: { username },
+        })
+        .then((res) => {
+          if (res.data.message?.startsWith("API")) {
+            setProfileData({ login: `${username}` });
+          } else {
+            setProfileData(res.data);
+          }
+          setLoading(false);
         });
-      });
-  }
-
-  componentDidUpdate() {
-    if (this.props.change && this.state.oldUser !== this.props.username) {
-      this.componentDidMount();
     }
-  }
+  }, [username, change]);
 
-  render = () => (
+  return (
     <div className="github-card">
-      {this.state.loading ? (
+      {loading ? (
         "loading"
       ) : (
         <a
-          href={`https://github.com/${this.state.profileData.login}`}
+          href={`https://github.com/${profileData.login}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img
-            src={this.state.profileData.avatar_url}
-            className="githubImage"
-            alt=""
-          />
+          {profileData?.avatar_url && (
+            <img src={profileData.avatar_url} className="githubImage" alt="" />
+          )}
           <div style={{ flexGrow: 2 }}>
-            <h5>{this.state.profileData.login}</h5>
-            <p>{this.state.profileData.bio}</p>
+            <h5>{profileData.login}</h5>
+            <p>{profileData.bio}</p>
             <p className="ligher">
-              {this.state.profileData.followers} Followers •{" "}
-              {this.state.profileData.following} Following •{" "}
-              {this.state.profileData.public_repos} Repos
+              {profileData.followers} Followers • {profileData.following}{" "}
+              Following • {profileData.public_repos} Repos
             </p>
           </div>
           <div className="githubLogo">github</div>

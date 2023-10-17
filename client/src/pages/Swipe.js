@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 
@@ -6,15 +6,15 @@ import Loading from "../components/Loading";
 import SwipeProfile from "../components/SwipeProfile";
 import yes from "../assets/images/yes.png";
 import no from "../assets/images/no.png";
-
-import { useNavigate, Link } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Swipe(props) {
-  const navigate = useNavigate();
+  const socket = useOutletContext();
   const [loading, setLoading] = useState(false);
   const [teamsToShow, setTeamsToShow] = useState([]);
   const teamToShow = teamsToShow.length > 0 && teamsToShow[0];
-
+  const capacity = process.env.REACT_APP_MAX_TEAM_SIZE - props.teamSize;
   const [idealSize, setIdealSize] = useState(0);
   const [containsRequired, setContainsRequired] = useState(false);
   const defaultProfileState = {
@@ -26,43 +26,47 @@ function Swipe(props) {
   };
   const [profileState, setProfileState] = useState({ ...defaultProfileState });
 
-  useEffect(() => {
-    async function findTeam() {
+  const refreshTeams = useCallback(
+    async (size) => {
       const res = await axios.get(
-        process.env.REACT_APP_API_URL +
-          "/api/teams/teamsToSwipe/" +
-          props.userID
+        `${process.env.REACT_APP_API_URL}/api/teams/teamsToSwipe/${props.userID}`,
+        { params: { idealSize: size } }
       );
       if (res.data.ready) {
         setTeamsToShow(res.data.teams);
       }
       setContainsRequired(res.data.ready);
       setLoading(false);
-    }
+    },
+    [props.userID]
+  );
 
-    if (props.userID) {
+  useEffect(() => {
+    if (
+      props.userID &&
+      (!teamToShow || (idealSize > 0 && teamToShow.users.length !== idealSize))
+    ) {
       setLoading(true);
-      findTeam();
+      refreshTeams(idealSize);
     }
-  }, [props.userID]);
+  }, [props.userID, idealSize, teamToShow, refreshTeams]);
 
-  async function getTeamToShow() {
-    const res = await axios.get(
-      process.env.REACT_APP_API_URL + "/api/teams/teamsToSwipe/" + props.userID,
-      {
-        params: {
-          idealSize: idealSize,
-        },
+  useEffect(() => {
+    if (socket) {
+      socket.on("team-swiped-on", (data) =>
+        setTeamsToShow((prev) => [
+          ...prev.filter((e) => e._id !== data.otherTeam),
+        ])
+      );
+      socket.on("left-swipes-cleared", refreshTeams);
+    }
+    return () => {
+      if (socket) {
+        socket.off("team-swiped-on");
+        socket.off("left-swipes-cleared");
       }
-    );
-    setTeamsToShow(res.data.teams);
-    setLoading(false);
-    setProfileState((prev) => ({
-      ...prev,
-      profileAngle: 0,
-      profileSide: "neutral",
-    }));
-  }
+    };
+  }, [socket, refreshTeams]);
 
   const swipeCallback = (decision) => {
     axios
@@ -71,22 +75,19 @@ function Swipe(props) {
         decision,
       })
       .then((res) => {
-        if (decision === "accept-committed") {
-          navigate("/chat");
-        } else {
-          setTimeout(() => {
-            if (teamsToShow.length === 1) {
-              getTeamToShow();
-            } else {
-              setTeamsToShow((prev) => [...prev.slice(1)]);
-              setProfileState((prev) => ({
-                ...prev,
-                profileAngle: 0,
-                profileSide: "neutral",
-              }));
-            }
-          }, 175);
-        }
+        socket.emit("swipe-on-team", {
+          yourTeam: props.teamID,
+          otherTeam: teamToShow._id,
+          chatID: res.data.chatID,
+        });
+        setTimeout(() => {
+          setTeamsToShow((prev) => [...prev.slice(1)]);
+          setProfileState((prev) => ({
+            ...prev,
+            profileAngle: 0,
+            profileSide: "neutral",
+          }));
+        }, 175);
       });
   };
 
@@ -95,21 +96,8 @@ function Swipe(props) {
       await axios.post(
         process.env.REACT_APP_API_URL + "/api/teams/swipe/resetLeftSwipe"
       );
-
-      const nextCall = await axios.get(
-        process.env.REACT_APP_API_URL +
-          "/api/teams/teamsToSwipe/" +
-          props.userID,
-        {
-          params: {
-            idealSize: idealSize,
-          },
-        }
-      );
-
-      if (nextCall.data.ready) {
-        setTeamsToShow(nextCall.data.teams);
-      }
+      socket.emit("clear-left-swipes", { teamID: props.teamID });
+      await refreshTeams(idealSize);
     } catch (error) {
       // Handle errors here
       console.error("Error:", error);
@@ -238,6 +226,7 @@ function Swipe(props) {
               relativePosition={profileState.profilePosition}
               relativeAngle={profileState.profileAngle}
               borderColor={profileState.profileSide}
+              mobile={!props.wideScreen}
             />
             <div className="arrows" onClick={mouseDownOnArrows}>
               <input
@@ -260,28 +249,24 @@ function Swipe(props) {
           <center>
             <label>
               <p style={{ fontSize: "20px", marginTop: "15%" }}>
-                {" "}
-                {!containsRequired ? (
-                  <p>
-                    {" "}
-                    Please Make Sure Your{" "}
-                    {
-                      <Link
-                        to="/edit"
-                        style={{
-                          textDecoration: "none",
-                          color: "var(--secondary)",
-                        }}
-                      >
-                        <b>Profile</b>
-                      </Link>
-                    }{" "}
-                    is Completed
-                  </p>
-                ) : (
-                  "No Teams Left To Swipe"
+                {capacity === 0
+                  ? "Team is Full"
+                  : !containsRequired
+                  ? "Please Make Sure Your "
+                  : "No Teams Left To Swipe"}
+                {capacity > 0 && !containsRequired && (
+                  <Link
+                    to="/edit"
+                    style={{
+                      textDecoration: "none",
+                      color: "var(--secondary)",
+                    }}
+                  >
+                    <b>Profile</b>
+                  </Link>
                 )}
-              </p>{" "}
+                {capacity > 0 && !containsRequired && " Is Completed"}
+              </p>
             </label>
             <div className="team-image">
               <div className="background" />
@@ -292,7 +277,7 @@ function Swipe(props) {
           </center>
         )}
       </section>
-      {containsRequired && (
+      {containsRequired && capacity > 0 && (
         <div id="ts-container">
           <input
             type="range"
@@ -300,21 +285,26 @@ function Swipe(props) {
             value={String(idealSize)}
             onChange={(e) => setIdealSize(parseInt(e.target.value))}
             min={0}
-            max={4}
+            max={capacity}
             step={1}
             list="team-sizes"
           />
-          <datalist id="team-sizes">
-            {[...[...Array(4).keys()].map((e) => e + 1)].map((e) => (
-              <option value={e} key={e} label={`${e}`} />
-            ))}
-          </datalist>
+          {
+            <datalist id="team-sizes">
+              {[...[...Array(capacity).keys()].map((e) => e + 1)].map((e) => (
+                <option value={e} key={e} label={`${e}`} />
+              ))}
+            </datalist>
+          }
           <p>
             Searching for teams of size{" "}
             <strong>{idealSize > 0 ? idealSize : "any"}</strong>
           </p>
           <div className="flexRow">
-            <button onClick={getTeamToShow} className="refreshBtn">
+            <button
+              onClick={() => refreshTeams(idealSize)}
+              className="refreshBtn"
+            >
               Refresh
             </button>
             <button onClick={clearLeftSwipes} className="refreshBtn">
@@ -329,8 +319,9 @@ function Swipe(props) {
 
 Swipe.propTypes = {
   userID: PropTypes.string.isRequired,
-  navigate: PropTypes.func,
   wideScreen: PropTypes.bool,
+  teamSize: PropTypes.number.isRequired,
+  teamID: PropTypes.string.isRequired,
 };
 
 export default Swipe;
