@@ -96,7 +96,7 @@ const SwipeProfile = (props) => {
         <p>
           <b>Desired Skills:</b>&nbsp;
           <p className="attributes-container">
-            {props.profile.skills.map((e, index) => (
+            {props.profile.desiredSkills.map((e, index) => (
               <p className="attr-item" key={index}>
                 {skillsDict[e] ?? e}
               </p>
