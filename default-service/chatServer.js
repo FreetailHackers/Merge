@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const http = require("http");
-const AWS = require("aws-sdk");
+//const AWS = require("aws-sdk");
 //const CronJob = require("cron").CronJob;
 //const mongoose = require("mongoose");
 //const User = require("./models/User");
@@ -276,11 +276,11 @@ function clearLeftSwipes(data, socket) {
   socket.to(data.teamID).emit("left-swipes-cleared");
 }
 
-AWS.config.update({
+/*AWS.config.update({
   accessKeyId: process.env.AWS_ID,
   secretAccessKey: process.env.AWS_SECRET,
   region: process.env.AWS_REGION,
-});
+});*/
 
 /*const db = process.env.MONGO_URI;
 mongoose

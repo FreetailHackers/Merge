@@ -301,7 +301,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .teamRow {
     width: 95%;
   }
-  
+
   .message {
     max-width: 80%;
   }
@@ -826,7 +826,7 @@ nav#navbar a.active {
   margin: 2px;
   padding: 4px 3px;
   flex-grow: 1;
-  width: 80px;
+  min-width: 80px;
   border-radius: 5px;
   font-size: 13px;
   text-align: center;
@@ -858,9 +858,10 @@ nav#navbar a.active {
 }
 
 .arrows {
-  height: calc(10% + 10px);
+  width: 300px;
+  height: 60px;
   display: flex;
-  margin: 0 auto;
+  margin: 0;
   justify-content: space-between;
 }
 
@@ -871,7 +872,7 @@ nav#navbar a.active {
 
 .left {
   float: left;
-  margin: 0 10vw;
+  margin: 0;
   border: 0;
 }
 
@@ -882,7 +883,7 @@ nav#navbar a.active {
 
 .right {
   float: right;
-  margin: 0 10vw;
+  margin: 0;
   border: 0;
 }
 
