@@ -26,14 +26,17 @@ function Dashboard(props) {
           </div>
           <div className="links">
             <span>
-              <a href="https://forms.gle/ixKqxd8w9gmeGAYV6">Feedback</a> for
+              <a href="https://forms.gle/8351SySEuQ4R9A178">Feedback</a> for
               Merge is greatly appreciated as it is in early access!{" "}
             </span>
             <br /> <br />
             <span>
               Have any issues with inappropriate behavior? Please let us know
               using this{" "}
-              <a href="freetailhackers.com/htf-report">Misconduct Form</a>.
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSdpI2jA8BmbP9UUOEpXDMROCHFBeHO-Dy4V6lI7WKAs0y8eEg/viewform">
+                Misconduct Form
+              </a>
+              .
             </span>
             <br /> <br />
             <span>
