@@ -20,15 +20,20 @@ const Report = require("../../models/Report");
 
 //AWS credentials
 require("dotenv").config();
-const AWS = require("aws-sdk");
+const AWS = require("@aws-sdk/client-s3");
+
 // const { authenticate } = require("passport");
 const ID = process.env.AWS_ID;
 const SECRET = process.env.AWS_SECRET;
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
-const s3 = new AWS.S3({
-  accessKeyId: ID,
-  secretAccessKey: SECRET,
+
+const s3Client = new AWS.S3Client({
+  credentials: {
+    accessKeyId: ID,
+    secretAccessKey: SECRET,
+  },
 });
+
 // @route POST api/users/register
 // @desc Register user
 // @access Public
@@ -132,14 +137,17 @@ async function list_func(req, res) {
     const itemCount = await User.countDocuments(filters);
     const pages = Math.ceil(itemCount / pageSize);
     const data = await User.find(filters, {}, options);
-    for (let user of data) {
-      user.email = undefined;
-      user.password = undefined;
-      user.reachable = !user.blockList || !user.blockList.includes(req.user);
-      user.blockList = undefined;
+    let list = [];
+    for (const user of data) {
+      let newUser = user.toObject();
+      newUser.email = undefined;
+      newUser.password = undefined;
+      newUser.reachable = !user.blockList || !user.blockList.includes(req.user);
+      newUser.blockList = undefined;
+      list.push(newUser);
     }
     var result = {
-      list: data,
+      list,
       pages,
     };
     return res.json(result);
@@ -247,11 +255,14 @@ async function s3Upload(file_name, files, res) {
     Body: fs.createReadStream(files.file.filepath),
     ContentType: files.file.mimetype,
   };
+  const uploadCommand = new AWS.PutObjectCommand(params);
   if (files.file.size > 10_000_000) {
     return res.sendStatus(413);
   }
-  var promise = await s3.upload(params).promise();
-  res.json({ url: promise.Location });
+  await s3Client.send(uploadCommand);
+  //console.log(response)
+  const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${file_name}`;
+  res.json({ url });
 }
 
 async function clear_old_pictures(req) {
@@ -267,7 +278,8 @@ async function clear_old_pictures(req) {
     Prefix: folder_name,
   };
   try {
-    const data = await s3.listObjectsV2(params).promise();
+    const command = new AWS.ListObjectsV2Command(params);
+    const data = await s3Client.send(command);
     let listOfObjects = data.Contents;
     let newimg = profile_pic_link.replace(
       "https://" + BUCKET_NAME + ".s3.amazonaws.com/",
@@ -277,7 +289,8 @@ async function clear_old_pictures(req) {
       let nameOfFile = listOfObjects[i].Key;
       if (nameOfFile !== newimg) {
         const deleteParams = { Bucket: BUCKET_NAME, Key: nameOfFile };
-        await s3.deleteObject(deleteParams).promise();
+        const deleteCommand = new AWS.DeleteObjectCommand(deleteParams);
+        await s3Client.send(deleteCommand);
       }
     }
   } catch (err) {

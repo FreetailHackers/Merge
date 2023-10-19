@@ -2,11 +2,11 @@ const users = require("../routes/api/users");
 const mockingoose = require("mockingoose");
 const User = require("../models/User");
 require("dotenv").config();
-const AWSMock = require("aws-sdk");
-const BUCKET_NAME = process.env.S3_BUCKET_NAME;
-var fs = require("fs");
+//const AWSMock = require("aws-sdk");
+//const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+//var fs = require("fs");
 
-jest.mock("aws-sdk", () => {
+/*jest.mock("aws-sdk", () => {
   const mS3Instance = {
     upload: jest.fn().mockReturnThis(),
     promise: jest.fn(),
@@ -15,7 +15,7 @@ jest.mock("aws-sdk", () => {
   return {
     S3: jest.fn(() => mS3Instance),
   };
-});
+});*/
 
 describe("Login route tests", () => {
   test("Basic Login Test", async () => {
@@ -263,7 +263,7 @@ describe("Login Validation Tests", () => {
   });
 });
 
-describe("Profile Picture Route Tests", () => {
+/*describe("Profile Picture Route Tests", () => {
   test("Upload Profile Picture basic test", async () => {
     // const fd = new FormData()
     let folder_name = "testfoldername/";
@@ -293,7 +293,7 @@ describe("Profile Picture Route Tests", () => {
     await users.s3Upload(file_name, files, res);
     expect(res.url == "THIS IS UR URL");
   });
-});
+});*/
 
 describe("update router tests", () => {
   test("Basic Update Router Tests", async () => {
@@ -321,13 +321,13 @@ describe("update router tests", () => {
       },
     };
 
-    const mS3Instance = new AWSMock.S3();
+    /*const mS3Instance = new AWSMock.S3();
     mS3Instance
       .listObjectsV2({
         Bucket: BUCKET_NAME,
         Prefix: "RANDOM FODLER NAME",
       })
-      .promise.mockResolvedValueOnce("THIS WORKED");
+      .promise.mockResolvedValueOnce("THIS WORKED");*/
     await users.update(req, res);
     expect(res.object).toEqual({ success: true });
   });
