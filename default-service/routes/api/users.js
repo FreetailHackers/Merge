@@ -132,14 +132,17 @@ async function list_func(req, res) {
     const itemCount = await User.countDocuments(filters);
     const pages = Math.ceil(itemCount / pageSize);
     const data = await User.find(filters, {}, options);
-    for (let user of data) {
-      user.email = undefined;
-      user.password = undefined;
-      user.reachable = !user.blockList || !user.blockList.includes(req.user);
-      user.blockList = undefined;
+    let list = [];
+    for (const user of data) {
+      let newUser = user.toObject();
+      newUser.email = undefined;
+      newUser.password = undefined;
+      newUser.reachable = !user.blockList || !user.blockList.includes(req.user);
+      newUser.blockList = undefined;
+      list.push(newUser);
     }
     var result = {
-      list: data,
+      list,
       pages,
     };
     return res.json(result);

@@ -301,7 +301,7 @@ body, .swipe-profile h3, .chatPreview h4, .chatPreview p,
   .teamRow {
     width: 95%;
   }
-  
+
   .message {
     max-width: 80%;
   }
@@ -826,7 +826,7 @@ nav#navbar a.active {
   margin: 2px;
   padding: 4px 3px;
   flex-grow: 1;
-  width: 80px;
+  min-width: 80px;
   border-radius: 5px;
   font-size: 13px;
   text-align: center;
