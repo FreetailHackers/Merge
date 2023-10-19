@@ -249,11 +249,16 @@ async function register_func(req, res) {
 }
 
 async function s3Upload(file_name, files, res) {
+  const split_name = file_name.split(".");
+  let extension = split_name[split_name.length - 1];
+  if (extension === "jpg") {
+    extension = "jpeg";
+  }
   var params = {
     Bucket: BUCKET_NAME,
     Key: file_name, // File name in S3 = user's name
     Body: fs.createReadStream(files.file.filepath),
-    ContentType: "image/jpeg",
+    ContentType: `image/${extension}`,
   };
   const uploadCommand = new AWS.PutObjectCommand(params);
   if (files.file.size > 10_000_000) {
