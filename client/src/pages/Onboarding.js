@@ -124,7 +124,7 @@ const Onboarding = (props) => {
               />
               <p>
                 Freetail Hackers is an organization centered at The University
-                of Texas at Austin that specealizes in hosting hackathons.
+                of Texas at Austin that specializes in hosting hackathons.
               </p>
               <p>We hope to see you at one of our events!</p>
             </div>
