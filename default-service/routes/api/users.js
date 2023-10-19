@@ -253,7 +253,7 @@ async function s3Upload(file_name, files, res) {
     Bucket: BUCKET_NAME,
     Key: file_name, // File name in S3 = user's name
     Body: fs.createReadStream(files.file.filepath),
-    ContentType: files.file.mimetype,
+    ContentType: "image/jpeg",
   };
   const uploadCommand = new AWS.PutObjectCommand(params);
   if (files.file.size > 10_000_000) {
