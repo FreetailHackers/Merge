@@ -25,9 +25,9 @@ export const UserToParagraph = ({ user, hideKeys }) => (
         }
         if (key === "competitiveness") {
           if (val === "learn") {
-            val = "Trying to win";
-          } else {
             val = "Looking to learn/have fun";
+          } else {
+            val = "Trying to win";
           }
         }
         if (key === "hours") {
