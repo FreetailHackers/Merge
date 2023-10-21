@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const http = require("http");
-const AWS = require("aws-sdk");
+const AWS = require("@aws-sdk/client-ses");
 const CronJob = require("cron").CronJob;
 const mongoose = require("mongoose");
 const sendEmails = require("./sendEmails");
@@ -275,19 +275,19 @@ function clearLeftSwipes(data, socket) {
   socket.to(data.teamID).emit("left-swipes-cleared");
 }
 
-AWS.config.update({
-  accessKeyId: process.env.AWS_ID,
-  secretAccessKey: process.env.AWS_SECRET,
-  region: process.env.AWS_REGION,
-});
-
 const db = process.env.MONGO_URI;
 mongoose
   .connect(db, { useNewUrlParser: true })
   .then(() => console.log("MongoDB successfully connected"))
   .catch((err) => console.log(err));
 
-const ses = new AWS.SES();
+const ses = new AWS.SESClient({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET,
+  },
+});
 
 new CronJob(
   "00 0 */4 * * *",

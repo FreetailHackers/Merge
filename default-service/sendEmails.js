@@ -1,10 +1,11 @@
 const User = require("./models/User");
 const Chat = require("./models/Chat");
 const Team = require("./models/Team");
+const AWS = require("@aws-sdk/client-ses");
 
-export default async function sendEmails(ses) {
+module.exports = async function sendEmails(ses) {
   const allUsers = await User.find();
-  let promises = [];
+  let emailCommands = [];
 
   for (let user of allUsers) {
     const chats = await Chat.find({ users: user._id });
@@ -80,20 +81,16 @@ export default async function sendEmails(ses) {
         },
         Source: "tech@freetailhackers.com",
       };
-
-      promises.push(
-        new Promise(() => {
-          ses.sendEmail(params, (err, data) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log("Email sent:", data);
-            }
-          });
-        })
-      );
+      emailCommands.push(new AWS.SendEmailCommand(params));
     }
   }
 
-  await Promise.all(promises);
-}
+  for (let i = 0; i < emailCommands.length; i++) {
+    try {
+      const data = await ses.send(emailCommands[i]);
+      console.log("Email sent:", data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
