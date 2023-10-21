@@ -290,7 +290,7 @@ const ses = new AWS.SESClient({
 });
 
 new CronJob(
-  "00 0 */4 * * *",
+  "0 9 * * *",
   () => {
     sendEmails(ses);
   },
